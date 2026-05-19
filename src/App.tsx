@@ -25,7 +25,7 @@ import {
   toggleFavoriteFood,
 } from "./utils/favoriteFoodStorage";
 import { selectClosestMealPlan } from "./utils/mealPlanSelector";
-import { mockGenerateMealPlan } from "./utils/mockGenerateMealPlan";
+import { generateMealPlanFromApi } from "./api/mealPlanApi";
 import { calculateNutritionTarget } from "./utils/nutritionCalculator";
 import {
   deleteSavedMealPlan,
@@ -68,7 +68,7 @@ function App() {
   const [viewingSavedMealPlan, setViewingSavedMealPlan] =
     useState<SavedMealPlan | null>(null);
 
-  // mock AI 응답 상태입니다.
+  // AI 응답 상태입니다.
   // 실제 API를 붙일 때도 이 세 가지 상태(응답/로딩/에러)를 그대로 재사용할 수 있습니다.
   const [aiMealPlanResponse, setAiMealPlanResponse] =
     useState<AIMealPlanResponse | null>(null);
@@ -93,7 +93,12 @@ function App() {
     setAiMealPlanResponse(null);
 
     try {
-      const response = await mockGenerateMealPlan({ mealPlan, target });
+          const response = await generateMealPlanFromApi({
+          profile,
+          goal,
+          durationDays: mealPlan.durationDays,
+          targetCalories: target.calories,
+        });
       setAiMealPlanResponse(response);
     } catch (error) {
       setAiError(

@@ -4,6 +4,704 @@
   box-sizing: border-box;
 }
 
+.appShell {
+  min-height: 100vh;
+  background: #f7f8fa;
+  color: #191f28;
+}
+
+.appTopTitle,
+.appTopSubtitle {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+}
+
+.appTopTitle {
+  padding-top: 6px;
+}
+
+.appTopSubtitle {
+  max-width: 280px;
+  margin: 8px auto 0;
+  color: #333d4b;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.38;
+  letter-spacing: 0;
+  word-break: keep-all;
+}
+
+.appLogo {
+  display: block;
+  width: 132px;
+  height: auto;
+  object-fit: contain;
+}
+
+.savedPlansShortcut,
+.topShortcutGrid {
+  padding: 8px 24px 0;
+}
+
+.topShortcutGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 24px 32px;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.sectionHeader p {
+  margin: 0;
+  color: #6b7684;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.sectionHeader .stepText {
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.savedAtText {
+  color: #3182f6 !important;
+  font-size: 13px !important;
+  font-weight: 700;
+}
+
+.formError {
+  margin: -4px 0 0;
+  color: #f04452;
+  font-size: 13px;
+}
+
+.fieldGroup,
+.goalList,
+.mealList,
+.shoppingList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.numberField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 0 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.numberField span {
+  color: #4e5968;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.numberField em {
+  margin-left: 6px;
+  color: #8b95a1;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.numberField div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 132px;
+}
+
+.numberField input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #191f28;
+  font-size: 20px;
+  font-weight: 700;
+  outline: none;
+  text-align: right;
+}
+
+.numberField strong {
+  min-width: 24px;
+  color: #8b95a1;
+  font-size: 14px;
+}
+
+.choiceGroup,
+.buttonRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.choiceButton,
+.goalCard {
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #333d4b;
+  cursor: pointer;
+}
+
+.choiceButton {
+  min-height: 52px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.choiceButton.selected,
+.goalCard.selected {
+  border-color: #3182f6;
+  background: #edf6ff;
+  color: #1b64da;
+}
+
+.goalCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  text-align: left;
+}
+
+.goalCard strong {
+  font-size: 18px;
+}
+
+.goalCard span {
+  color: #6b7684;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.caloriePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 8px;
+  background: #191f28;
+  color: #ffffff;
+}
+
+.caloriePanel span {
+  color: #d1d6db;
+  font-size: 14px;
+}
+
+.caloriePanel strong {
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.metricGrid,
+.macroGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.metricGrid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.macroGrid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.metricItem,
+.macroItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.metricItem span,
+.macroItem span {
+  color: #6b7684;
+  font-size: 13px;
+}
+
+.metricItem strong,
+.macroItem strong {
+  font-size: 19px;
+}
+
+.durationPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.durationPanel h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.durationButtons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.durationButton {
+  min-height: 44px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4e5968;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.durationButton.selected {
+  border-color: #3182f6;
+  background: #edf6ff;
+  color: #1b64da;
+}
+
+.durationButton:disabled {
+  cursor: default;
+}
+
+.aiPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #d6e8ff;
+  border-radius: 8px;
+  background: #f7fbff;
+}
+
+.aiPanel.error {
+  border-color: #ffd6d9;
+  background: #fff7f8;
+}
+
+.aiPanel h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.aiPanel p {
+  margin: 0;
+  color: #4e5968;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.aiPanel button {
+  min-height: 40px;
+  border: 1px solid #3182f6;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1b64da;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.aiPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.aiPanelHeader span {
+  flex: 0 0 auto;
+  color: #3182f6;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.aiMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.aiMetaGrid div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.aiMetaGrid span {
+  color: #8b95a1;
+  font-size: 11px;
+}
+
+.aiMetaGrid strong {
+  color: #333d4b;
+  font-size: 13px;
+}
+
+.aiDayList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aiDayCard {
+  padding: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.aiDayCard p {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.aiCautionList {
+  margin: 0;
+  padding-left: 18px;
+  color: #6b7684;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mealListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mealListHeader h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.mealListHeader span {
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dayMealCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dayMealHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+}
+
+.dayMealHeader strong {
+  font-size: 17px;
+}
+
+.dayMealHeader span {
+  color: #6b7684;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mealCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.mealCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mealCardHeader strong {
+  font-size: 16px;
+}
+
+.mealCardHeader span {
+  flex: 0 0 auto;
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.foodList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.foodRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 0;
+  border-top: 1px solid #f2f4f6;
+}
+
+.foodRow div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.foodRow strong {
+  color: #333d4b;
+  font-size: 14px;
+}
+
+.foodRow span {
+  color: #8b95a1;
+  font-size: 12px;
+}
+
+.foodRowActions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.favoriteFoodButton {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #b0b8c1;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.favoriteFoodButton.selected {
+  border-color: #f9c23c;
+  background: #fff7df;
+  color: #f2a900;
+}
+
+.buyFoodButton {
+  flex: 0 0 auto;
+  min-width: 66px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #edf6ff;
+  color: #1b64da;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.shoppingListRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.shoppingListRow div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.shoppingListRow strong {
+  color: #333d4b;
+  font-size: 15px;
+}
+
+.shoppingListRow span {
+  color: #8b95a1;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.emptySavedList,
+.savedPlanCard {
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.emptySavedList {
+  padding: 24px 18px;
+  text-align: center;
+}
+
+.emptySavedList strong {
+  color: #333d4b;
+  font-size: 17px;
+}
+
+.emptySavedList p {
+  margin: 8px 0 0;
+  color: #8b95a1;
+  font-size: 14px;
+}
+
+.savedPlanList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.savedPlanCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.savedPlanCard strong {
+  color: #333d4b;
+  font-size: 16px;
+}
+
+.savedPlanCard p {
+  margin: 6px 0 0;
+  color: #8b95a1;
+  font-size: 13px;
+}
+
+.savedPlanCard span {
+  display: block;
+  margin-top: 6px;
+  color: #4e5968;
+  font-size: 13px;
+}
+
+.savedPlanActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.savedPlanActions button {
+  min-height: 40px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #333d4b;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.savedPlanActions button:first-child {
+  border-color: #3182f6;
+  background: #edf6ff;
+  color: #1b64da;
+}
+
+.favoriteFoodList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.favoriteFoodCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.favoriteFoodCard > div:first-child {
+  min-width: 0;
+}
+
+.favoriteFoodCard strong {
+  color: #333d4b;
+  font-size: 16px;
+}
+
+.favoriteFoodCard p {
+  margin: 6px 0 0;
+  color: #8b95a1;
+  font-size: 13px;
+}
+
+.favoriteFoodActions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.favoriteFoodActions a,
+.favoriteFoodActions button {
+  min-width: 58px;
+  padding: 8px 10px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #333d4b;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.favoriteFoodActions a {
+  border-color: #3182f6;
+  background: #edf6ff;
+  color: #1b64da;
+}
+
 @media (min-width: 481px) {
   #root {
     background-color: #ffffff !important;

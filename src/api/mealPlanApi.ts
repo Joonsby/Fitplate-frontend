@@ -25,6 +25,125 @@ interface BackendMealPlanResponse {
   days: BackendDay[];
 }
 
+/**
+ * 임시 식단 데이터 사용 여부입니다.
+ *
+ * 현재 백엔드 서버나 AI 식단 생성 API가 준비되지 않았거나, 호출 실패 화면이 아닌
+ * 정상 결과 화면을 먼저 확인해야 할 때만 true로 켜두는 개발용 스위치입니다.
+ *
+ * true일 때:
+ * - 아래 generateMealPlanFromApi 함수가 실제 fetch 요청을 보내지 않습니다.
+ * - createTemporaryBackendMealPlanResponse가 만든 임시 데이터를 실제 백엔드 응답처럼
+ *   mapBackendMealPlan에 전달합니다.
+ * - 따라서 ResultScreen, 쇼핑 목록, 즐겨찾기, 저장하기 같은 프론트 화면 흐름을
+ *   백엔드 없이도 테스트할 수 있습니다.
+ *
+ * false로 바꾸면:
+ * - http://localhost:8080/api/meal-plan 으로 실제 요청을 보냅니다.
+ * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
+ *   통째로 삭제하면 됩니다.
+ */
+const USE_TEMPORARY_MEAL_PLAN_DATA = true;
+
+/**
+ * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.
+ *
+ * 중요한 점은 이 데이터가 화면 전용 가짜 데이터가 아니라, 현재 프론트가 기대하는
+ * 백엔드 DTO 구조(BackendMealPlanResponse, BackendDay, BackendMeal)를 그대로 따른다는
+ * 것입니다. 그래서 실제 API 응답이 들어왔을 때도 mapBackendMealPlan 함수의 동작을
+ * 거의 같은 조건에서 확인할 수 있습니다.
+ *
+ * calories, protein, carbohydrate, fat 값은 화면 표시와 reason 문구 생성을 확인하기 위한
+ * 샘플 숫자입니다. 의학적/영양학적 처방 값이 아니므로 실제 서비스용 추천값으로
+ * 사용하면 안 됩니다.
+ */
+const TEMPORARY_MEAL_TEMPLATES: Array<{
+  breakfast: BackendMeal;
+  lunch: BackendMeal;
+  dinner: BackendMeal;
+}> = [
+  {
+    breakfast: {
+      name: "그릭요거트 바나나 볼",
+      calories: 420,
+      protein: 24,
+      carbohydrate: 58,
+      fat: 10,
+    },
+    lunch: {
+      name: "닭가슴살 현미밥 정식",
+      calories: 640,
+      protein: 42,
+      carbohydrate: 78,
+      fat: 15,
+    },
+    dinner: {
+      name: "연어 구이와 고구마 샐러드",
+      calories: 560,
+      protein: 36,
+      carbohydrate: 48,
+      fat: 22,
+    },
+  },
+  {
+    breakfast: {
+      name: "계란 토스트와 사과",
+      calories: 450,
+      protein: 26,
+      carbohydrate: 55,
+      fat: 14,
+    },
+    lunch: {
+      name: "소불고기 채소덮밥",
+      calories: 690,
+      protein: 38,
+      carbohydrate: 86,
+      fat: 20,
+    },
+    dinner: {
+      name: "닭가슴살 샐러드와 견과",
+      calories: 520,
+      protein: 44,
+      carbohydrate: 32,
+      fat: 24,
+    },
+  },
+  {
+    breakfast: {
+      name: "오트밀 과일 요거트",
+      calories: 430,
+      protein: 22,
+      carbohydrate: 64,
+      fat: 9,
+    },
+    lunch: {
+      name: "연어 현미밥 포케",
+      calories: 660,
+      protein: 39,
+      carbohydrate: 74,
+      fat: 21,
+    },
+    dinner: {
+      name: "계란 닭가슴살 볶음밥",
+      calories: 590,
+      protein: 41,
+      carbohydrate: 62,
+      fat: 18,
+    },
+  },
+];
+
+function createTemporaryBackendMealPlanResponse(
+  durationDays: PlanDuration,
+): BackendMealPlanResponse {
+  return {
+    days: Array.from({ length: durationDays }, (_, index) => ({
+      dayNumber: index + 1,
+      ...TEMPORARY_MEAL_TEMPLATES[index % TEMPORARY_MEAL_TEMPLATES.length],
+    })),
+  };
+}
+
 function mapGoalToBackend(goal: GoalType): string {
   if (goal === "lose") return "WEIGHT_LOSS";
   if (goal === "gain") return "WEIGHT_GAIN";
@@ -116,26 +235,46 @@ export async function generateMealPlanFromApi({
   };
 
   console.log("백엔드로 보낼 식단 생성 요청:", requestBody);
-  
-  const response = await fetch("http://localhost:8080/api/meal-plan", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      height: profile.heightCm,
-      weight: profile.weightKg,
-      gender: mapGenderToBackend(profile.gender),
-      age: profile.age,
-      bodyFatRate: profile.bodyFatPercentage ?? null,
-      goal: mapGoalToBackend(goal),
-      periodDays: durationDays,
-    }),
-  });  
 
-  if (!response.ok) {
-    throw new Error(`식단 생성 API 호출 실패: ${response.status}`);
+  if (USE_TEMPORARY_MEAL_PLAN_DATA) {
+    const temporaryData = createTemporaryBackendMealPlanResponse(durationDays);
+
+    console.log("임시 식단 데이터를 사용합니다:", temporaryData);
+    return mapBackendMealPlan(temporaryData, targetCalories, durationDays);
   }
+  
+  let response: Response;
+
+  try {
+    response = await fetch("http://localhost:8080/api/meal-plan", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+  } catch (error) {
+    console.error("식단 생성 API 네트워크 오류:", error);
+    throw new Error(
+      "AI 식단 생성 서버에 연결하지 못했습니다. 서버 상태를 확인한 뒤 다시 시도해주세요.",
+    );
+  }
+
+console.log("백엔드로부터 받은 원시 응답:", response);
+
+if (!response.ok) {
+  const errorText = await response.text();
+
+  console.error("식단 생성 API 호출 실패:", {
+    status: response.status,
+    statusText: response.statusText,
+    body: errorText,
+  });
+
+  throw new Error(
+    "AI 식단 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
+  );
+}
 
   const data = (await response.json()) as BackendMealPlanResponse;  
   console.log("백엔드로부터 받은 식단 응답:", data);

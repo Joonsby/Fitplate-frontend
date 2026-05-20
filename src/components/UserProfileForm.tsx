@@ -1,154 +1,149 @@
-import { Button } from "@toss/tds-mobile";
+import { Button, TextField } from "@toss/tds-mobile";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
+import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type { Gender, UserProfile } from "../types/fitplate";
 
 interface UserProfileFormProps {
   profile: UserProfile;
-  onChange: (profile: UserProfile) => void;
   onNext: () => void;
 }
 
-// 신체정보 입력 폼 컴포넌트입니다.
-// 입력값은 이 컴포넌트 안에 저장하지 않고, 부모(App)의 state를 props로 받아서 사용합니다.
-export function UserProfileForm({
-  profile,
-  onChange,
-  onNext,
-}: UserProfileFormProps) {
-  const isProfileValid =
-    profile.heightCm > 0 && profile.weightKg > 0 && profile.age > 0;
+type ProfileFieldName = "heightCm" | "weightKg" | "age" | "bodyFatPercentage";
 
-  const updateNumber = (
-    field: keyof Omit<UserProfile, "gender">,
-    value: string,
-  ) => {
-    const nextValue = value === "" ? 0 : Number(value);
+type ProfileFieldValues = Record<ProfileFieldName, string>;
+type ProfileFieldErrors = Partial<Record<ProfileFieldName, string>>;
 
-    onChange({
-      ...profile,
-      [field]: Number.isFinite(nextValue) ? nextValue : 0,
-    });
-  };
+const NUMBER_TYPE_ERROR_MESSAGE = "숫자만 입력할 수 있어요.";
+const NEGATIVE_NUMBER_ERROR_MESSAGE = "0보다 큰 숫자만 입력할 수 있어요.";
 
-  const updateGender = (gender: Gender) => {
-    onChange({
-      ...profile,
-      gender,
-    });
-  };
+function validateNumberField(value: string): string | null {
+  const trimmedValue = value.trim();
+
+  if (trimmedValue === "") {
+    return null;
+  }
+
+  if (Number.isNaN(Number(trimmedValue))) {
+    return NUMBER_TYPE_ERROR_MESSAGE;
+  }
+
+  if (Number(trimmedValue) <= 0) {
+    return NEGATIVE_NUMBER_ERROR_MESSAGE;
+  }
+
+  return null;
+}
+
+export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
+  const [selectedGender, setSelectedGender] = useState<Gender>(profile.gender);
+  const [fieldValues, setFieldValues] = useState<ProfileFieldValues>({
+    heightCm: String(profile.heightCm),
+    weightKg: String(profile.weightKg),
+    age: String(profile.age),
+    bodyFatPercentage:
+      profile.bodyFatPercentage == null ? "" : String(profile.bodyFatPercentage),
+  });
+  const [fieldErrors, setFieldErrors] = useState<ProfileFieldErrors>({});
+
+  const updateNumberField =
+    (fieldName: ProfileFieldName) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const nextValue = event.target.value;
+      const nextError = validateNumberField(nextValue);
+
+      setFieldValues((previousValues) => ({
+        ...previousValues,
+        [fieldName]: nextValue,
+      }));
+      setFieldErrors((previousErrors) => ({
+        ...previousErrors,
+        [fieldName]: nextError ?? undefined,
+      }));
+    };
+
+  const hasFieldError = Object.values(fieldErrors).some(Boolean);
+  const hasRequiredEmptyField =
+    fieldValues.heightCm.trim() === "" ||
+    fieldValues.weightKg.trim() === "" ||
+    fieldValues.age.trim() === "";
+  const isProfileValid = !hasFieldError && !hasRequiredEmptyField;
 
   return (
     <section className="screen">
-      <div className="sectionHeader">
-        <p className="stepText">1단계</p>
-        <h2>신체정보 입력</h2>
-        <p>키, 몸무게, 나이, 성별을 입력하면 결과 화면에서 목표를 계산합니다.</p>
-      </div>
+      <ScreenSectionHeader
+        description="키, 몸무게, 나이, 성별을 입력하면 결과 화면에서 목표를 계산합니다."
+        step="1단계"
+        title="신체정보 입력"
+      />
 
       <div className="fieldGroup">
-        <NumberField
+        <TextField
+          hasError={fieldErrors.heightCm != null}
+          help={fieldErrors.heightCm}
           label="키"
-          unit="cm"
-          value={profile.heightCm}
-          onChange={(value) => updateNumber("heightCm", value)}
+          labelOption="sustain"
+          placeholder="키를 입력하세요"
+          suffix="cm"
+          value={fieldValues.heightCm}
+          variant="box"
+          onChange={updateNumberField("heightCm")}
         />
-        <NumberField
+        <TextField
+          hasError={fieldErrors.weightKg != null}
+          help={fieldErrors.weightKg}
           label="몸무게"
-          unit="kg"
-          value={profile.weightKg}
-          onChange={(value) => updateNumber("weightKg", value)}
+          labelOption="sustain"
+          placeholder="몸무게를 입력하세요"
+          suffix="kg"
+          value={fieldValues.weightKg}
+          variant="box"
+          onChange={updateNumberField("weightKg")}
         />
-        <NumberField
+        <TextField
+          hasError={fieldErrors.age != null}
+          help={fieldErrors.age}
           label="나이"
-          unit="세"
-          value={profile.age}
-          onChange={(value) => updateNumber("age", value)}
+          labelOption="sustain"
+          placeholder="나이를 입력하세요"
+          suffix="세"
+          value={fieldValues.age}
+          variant="box"
+          onChange={updateNumberField("age")}
         />
-        <NumberField
-          label="체지방률"
-          unit="%"
-          value={profile.bodyFatPercentage ?? 0}
-          optionalText="선택"
-          onChange={(value) =>
-            onChange({
-              ...profile,
-              bodyFatPercentage: value === "" ? undefined : Number(value),
-            })
-          }
+        <TextField
+          hasError={fieldErrors.bodyFatPercentage != null}
+          help={fieldErrors.bodyFatPercentage}
+          label="체지방률(선택)"
+          labelOption="sustain"
+          placeholder="체지방률을 입력하세요"
+          suffix="%"
+          value={fieldValues.bodyFatPercentage}
+          variant="box"
+          onChange={updateNumberField("bodyFatPercentage")}
         />
       </div>
 
       <div className="choiceGroup" aria-label="성별 선택">
-        <button
-          className={
-            profile.gender === "male" ? "choiceButton selected" : "choiceButton"
-          }
-          type="button"
-          onClick={() => updateGender("male")}
+        <Button
+          variant={selectedGender === "male" ? "fill" : "weak"}
+          onClick={() => setSelectedGender("male")}
         >
           남성
-        </button>
-        <button
-          className={
-            profile.gender === "female"
-              ? "choiceButton selected"
-              : "choiceButton"
-          }
-          type="button"
-          onClick={() => updateGender("female")}
+        </Button>
+        <Button
+          variant={selectedGender === "female" ? "fill" : "weak"}
+          onClick={() => setSelectedGender("female")}
         >
           여성
-        </button>
+        </Button>
       </div>
 
-      {!isProfileValid ? (
-        <p className="formError">키, 몸무게, 나이는 0보다 큰 값으로 입력해주세요.</p>
-      ) : null}
-
-      <Button
-        color="dark"
-        disabled={!isProfileValid}
-        size="large"
-        onClick={onNext}
-      >
-        목표 선택하기
-      </Button>
+      <div className="selectGroup">
+        <Button disabled={!isProfileValid} size="large" onClick={onNext}>
+          목표 선택하기
+        </Button>
+      </div>
     </section>
-  );
-}
-
-interface NumberFieldProps {
-  label: string;
-  unit: string;
-  value: number;
-  optionalText?: string;
-  onChange: (value: string) => void;
-}
-
-// 숫자를 입력하는 작은 재사용 컴포넌트입니다.
-// label은 입력 이름, unit은 cm/kg 같은 단위입니다.
-function NumberField({
-  label,
-  unit,
-  value,
-  optionalText,
-  onChange,
-}: NumberFieldProps) {
-  return (
-    <label className="numberField">
-      <span>
-        {label}
-        {optionalText ? <em>{optionalText}</em> : null}
-      </span>
-      <div>
-        <input
-          inputMode="decimal"
-          min="0"
-          type="number"
-          value={value || ""}
-          onChange={(event) => onChange(event.target.value)}
-        />
-        <strong>{unit}</strong>
-      </div>
-    </label>
   );
 }

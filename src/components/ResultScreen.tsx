@@ -1,6 +1,7 @@
-import { Button } from "@toss/tds-mobile";
+﻿import { Button } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../constants/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
+import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type {
   AIDayMealPlan,
   AIMealPlanResponse,  
@@ -71,10 +72,20 @@ export function ResultScreen({
           dateStyle: "medium",
           timeStyle: "short",
         });
+  const shouldShowFallbackFailure =
+    !isAiLoading && aiError != null && aiMealPlanResponse == null;
 
   return (
     <section className="screen">
-      {isAiLoading ? (
+      {shouldShowFallbackFailure ? (
+        <AiMealPlanFailureScreen
+          aiError={aiError}
+          target={target}
+          onRetryAiGenerate={onRetryAiGenerate}
+        />
+      ) : null}
+
+      {!shouldShowFallbackFailure && (isAiLoading || aiError != null) ? (
         <AiMealPlanPanel
           aiError={aiError}
           aiMealPlanResponse={aiMealPlanResponse}
@@ -84,92 +95,99 @@ export function ResultScreen({
       ) : null}
       {!isAiLoading && aiMealPlanResponse != null ? (
         <>
-          <div className="sectionHeader">
-            <p className="stepText">{isSavedView ? "저장된 식단" : "3단계"}</p>
-            <h2>{GOAL_LABELS[goal]} 결과</h2>
-            <p>
-              {profile.heightCm}cm, {profile.weightKg}kg 기준 목표와 가장 가까운{" "}
-              {mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.
-            </p>
-            {savedDate ? <p className="savedAtText">저장 날짜: {savedDate}</p> : null}
-          </div>
+          <ScreenSectionHeader
+            description={`${profile.heightCm}cm, ${profile.weightKg}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
+            step={isSavedView ? "저장된 식단" : "3단계"}
+            title={`${GOAL_LABELS[goal]} 결과`}
+          >
+            {savedDate ? (
+              <p className="savedAtText">저장 날짜: {savedDate}</p>
+            ) : null}
+          </ScreenSectionHeader>
+          <section className="mealPlanSummary">
+            <div className="mealPlanSummaryInner">
+              <div className="nutritionSummary">                
+                <div className="caloriePanel">
+                  <span>목표 칼로리</span>
+                  <strong>{target.calories.toLocaleString()} kcal</strong>
+                </div>
 
-          <div className="caloriePanel">
-            <span>목표 칼로리</span>
-            <strong>{target.calories.toLocaleString()} kcal</strong>
-          </div>
+                <div className="metricGrid">
+                  <MetricItem label="BMR" value={target.bmr} unit="kcal" />
+                  <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
+                </div>
 
-          <div className="metricGrid">
-            <MetricItem label="BMR" value={target.bmr} unit="kcal" />
-            <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
-          </div>
+                <div className="macroGrid">
+                  <MacroItem label="단백질" value={target.proteinGram} />
+                  <MacroItem label="탄수화물" value={target.carbsGram} />
+                  <MacroItem label="지방" value={target.fatGram} />
+                </div>
 
-          <div className="macroGrid">
-            <MacroItem label="단백질" value={target.proteinGram} />
-            <MacroItem label="탄수화물" value={target.carbsGram} />
-            <MacroItem label="지방" value={target.fatGram} />
-          </div>
+                {onSave ? (
+                  <div className="saveButtonWrapper" style={{ display: "grid"}}>
+                    <Button color="dark" disabled={isAiLoading} onClick={onSave}>
+                      이 식단 저장하기
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
 
-          {onSave ? (
-            <Button color="dark" disabled={isAiLoading} onClick={onSave}>
-              이 식단 저장하기
-            </Button>
-          ) : null}
+              <AiMealPlanPanel
+                aiError={aiError}
+                aiMealPlanResponse={aiMealPlanResponse}
+                isAiLoading={isAiLoading}
+                onRetryAiGenerate={onRetryAiGenerate}
+              />
 
-          <AiMealPlanPanel
-            aiError={aiError}
-            aiMealPlanResponse={aiMealPlanResponse}
-            isAiLoading={isAiLoading}
-            onRetryAiGenerate={onRetryAiGenerate}
-          />
+              <div className="durationPanel">
+                <h3>식단 기간</h3>
+                <div className="durationButtons" aria-label="식단 기간 선택">
+                  {PLAN_DURATIONS.map((duration) => (
+                    <button
+                      className={
+                        duration === planDuration
+                          ? "durationButton selected"
+                          : "durationButton"
+                      }
+                      disabled={isSavedView || isAiLoading}
+                      key={duration}
+                      type="button"
+                      onClick={() => onDurationChange(duration)}
+                    >
+                      {duration}일
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          <div className="durationPanel">
-            <h3>식단 기간</h3>
-            <div className="durationButtons" aria-label="식단 기간 선택">
-              {PLAN_DURATIONS.map((duration) => (
-                <button
-                  className={
-                    duration === planDuration
-                      ? "durationButton selected"
-                      : "durationButton"
-                  }
-                  disabled={isSavedView || isAiLoading}
-                  key={duration}
-                  type="button"
-                  onClick={() => onDurationChange(duration)}
-                >
-                  {duration}일
-                </button>
-              ))}
+              <div className="mealList">
+                <div className="mealListHeader">
+                  <h3>날짜별 식단</h3>
+                  <span>평균 {mealPlan.averageCalories.toLocaleString()} kcal</span>
+                </div>
+
+                {mealPlan.days.map((dayMeal) => (
+                  <DayMealCard
+                    dayMeal={dayMeal}
+                    favoriteFoodIds={favoriteFoodIds}
+                    key={dayMeal.id}
+                    onFavoriteFoodToggle={onFavoriteFoodToggle}
+                  />
+                    ))}
+              </div>
+              
+              <div className="shoppingList">
+                <div className="mealListHeader">
+                  <h3>장보기 리스트</h3>
+                  <span>{shoppingList.length}개 재료</span>
+                </div>
+
+                {shoppingList.map((item) => (
+                  <ShoppingListRow item={item} key={item.id} />
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div className="mealList">
-            <div className="mealListHeader">
-          <h3>날짜별 식단</h3>
-          <span>평균 {mealPlan.averageCalories.toLocaleString()} kcal</span>
-            </div>
-
-        {mealPlan.days.map((dayMeal) => (
-          <DayMealCard
-            dayMeal={dayMeal}
-            favoriteFoodIds={favoriteFoodIds}
-            key={dayMeal.id}
-            onFavoriteFoodToggle={onFavoriteFoodToggle}
-          />
-            ))}
-          </div>
-
-          <div className="shoppingList">
-            <div className="mealListHeader">
-              <h3>장보기 리스트</h3>
-              <span>{shoppingList.length}개 재료</span>
-            </div>
-
-            {shoppingList.map((item) => (
-              <ShoppingListRow item={item} key={item.id} />
-            ))}
-          </div>
+          </section>
         </>
       ) : null}
       
@@ -194,6 +212,53 @@ interface AiMealPlanPanelProps {
 
 // AI 응답을 보여주는 패널입니다.
 // 아직 실제 API를 호출하지 않고, Promise 기반 mock JSON만 렌더링합니다.
+interface AiMealPlanFailureScreenProps {
+  aiError: string;
+  target: NutritionTarget;
+  onRetryAiGenerate: () => void;
+}
+
+function AiMealPlanFailureScreen({
+  aiError,
+  target,
+  onRetryAiGenerate,
+}: AiMealPlanFailureScreenProps) {
+  return (
+    <section className="aiFailureScreen" role="alert">
+      <div>
+        <p className="stepText">AI 식단 생성 실패</p>
+        <h2>식단을 불러오지 못했어요</h2>
+        <p>
+          서버 응답이 없거나 일시적인 오류가 발생했습니다. 입력한 신체정보와
+          목표는 유지되니 다시 시도할 수 있어요.
+        </p>
+      </div>
+
+      <div className="caloriePanel">
+        <span>목표 칼로리</span>
+        <strong>{target.calories.toLocaleString()} kcal</strong>
+      </div>
+
+      <div className="metricGrid">
+        <MetricItem label="BMR" value={target.bmr} unit="kcal" />
+        <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
+      </div>
+
+      <div className="macroGrid">
+        <MacroItem label="단백질" value={target.proteinGram} />
+        <MacroItem label="탄수화물" value={target.carbsGram} />
+        <MacroItem label="지방" value={target.fatGram} />
+      </div>
+
+      <p className="failureReason">{aiError}</p>
+
+      <Button color="dark" onClick={onRetryAiGenerate}>
+        다시 생성하기
+      </Button>
+    </section>
+  );
+}
+
 function AiMealPlanPanel({
   isAiLoading,
   aiError,
@@ -248,6 +313,13 @@ if (isAiLoading) {
 
   return (
     <section className="aiPanel">
+      <div className="aiPanelHeader">
+        <div>
+          <h3>AI 식단 결과</h3>
+          <p>{aiMealPlanResponse.summary}</p>
+        </div>
+        <span>{aiMealPlanResponse.schemaVersion}</span>
+      </div>
 
       <div className="aiMetaGrid">        
         <div>

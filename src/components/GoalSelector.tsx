@@ -1,5 +1,6 @@
 import { Button } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../constants/fitplate";
+import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type { GoalType } from "../types/fitplate";
 
 interface GoalSelectorProps {
@@ -9,27 +10,27 @@ interface GoalSelectorProps {
   onNext: () => void;
 }
 
-// 목표 선택 컴포넌트입니다.
-// 목표 값도 App의 state로 관리하고, 여기서는 선택 이벤트만 App으로 전달합니다.
+const GOALS: GoalType[] = ["lose", "maintain", "gain"];
+
 export function GoalSelector({
   selectedGoal,
   onChange,
   onBack,
   onNext,
 }: GoalSelectorProps) {
-  const goals = Object.keys(GOAL_LABELS) as GoalType[];
-
   return (
-    <section className="screen">
-      <div className="sectionHeader">
-        <p className="stepText">2단계</p>
-        <h2>목표 선택</h2>
-        <p>감량, 유지, 증량 중 하나를 선택하세요.</p>
-      </div>
+    <section className="screen goalSelectorScreen">
+      <ScreenSectionHeader
+        className="goalSelectorHeader"
+        description="감량, 유지, 증량 중 하나를 선택하세요."
+        step="2단계"
+        title="목표 선택"
+      />
 
       <div className="goalList">
-        {goals.map((goal) => (
+        {GOALS.map((goal) => (
           <button
+            aria-pressed={goal === selectedGoal}
             className={goal === selectedGoal ? "goalCard selected" : "goalCard"}
             key={goal}
             type="button"
@@ -45,7 +46,7 @@ export function GoalSelector({
         <Button variant="weak" onClick={onBack}>
           이전
         </Button>
-        <Button color="dark" onClick={onNext}>
+        <Button color="primary" variant="fill" onClick={onNext}>
           결과 보기
         </Button>
       </div>

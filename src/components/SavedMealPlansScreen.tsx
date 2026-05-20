@@ -1,5 +1,6 @@
 import { Button } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../constants/fitplate";
+import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type { SavedMealPlan } from "../types/fitplate";
 
 interface SavedMealPlansScreenProps {
@@ -9,8 +10,6 @@ interface SavedMealPlansScreenProps {
   onView: (savedMealPlan: SavedMealPlan) => void;
 }
 
-// 저장된 식단 목록 화면입니다.
-// localStorage 데이터는 App에서 읽고, 이 컴포넌트는 화면 표시와 버튼 이벤트만 담당합니다.
 export function SavedMealPlansScreen({
   savedMealPlans,
   onBack,
@@ -19,33 +18,33 @@ export function SavedMealPlansScreen({
 }: SavedMealPlansScreenProps) {
   return (
     <section className="screen">
-      <div className="sectionHeader">
-        <p className="stepText">저장 목록</p>
-        <h2>저장된 식단</h2>
-        <p>브라우저 localStorage에 저장된 식단만 표시됩니다.</p>
+      <ScreenSectionHeader
+        description="브라우저 localStorage에 저장된 식단만 표시합니다."
+        step="저장 목록"
+        title="저장된 식단"
+      />
+
+      <div className="savedMealPlansContent">
+        {savedMealPlans.length === 0 ? (
+          <div className="emptySavedList">
+            <strong>아직 저장된 식단이 없어요</strong>
+            <p>결과 화면에서 식단을 저장하면 여기에 표시됩니다.</p>
+          </div>
+        ) : (
+          <div className="savedPlanList">
+            {savedMealPlans.map((savedMealPlan) => (
+              <SavedMealPlanCard
+                key={savedMealPlan.id}
+                savedMealPlan={savedMealPlan}
+                onDelete={onDelete}
+                onView={onView}
+              />
+            ))}
+          </div>
+        )}
+
+        <Button variant="weak" onClick={onBack}>돌아가기</Button>
       </div>
-
-      {savedMealPlans.length === 0 ? (
-        <div className="emptySavedList">
-          <strong>아직 저장된 식단이 없어요</strong>
-          <p>결과 화면에서 식단을 저장하면 여기에 표시됩니다.</p>
-        </div>
-      ) : (
-        <div className="savedPlanList">
-          {savedMealPlans.map((savedMealPlan) => (
-            <SavedMealPlanCard
-              key={savedMealPlan.id}
-              savedMealPlan={savedMealPlan}
-              onDelete={onDelete}
-              onView={onView}
-            />
-          ))}
-        </div>
-      )}
-
-      <Button variant="weak" onClick={onBack}>
-        돌아가기
-      </Button>
     </section>
   );
 }
@@ -56,8 +55,6 @@ interface SavedMealPlanCardProps {
   onView: (savedMealPlan: SavedMealPlan) => void;
 }
 
-// 저장된 식단 카드입니다.
-// 저장 날짜와 핵심 정보를 보여주고, 다시 보기와 삭제 액션을 제공합니다.
 function SavedMealPlanCard({
   savedMealPlan,
   onDelete,

@@ -36,6 +36,8 @@ export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
       });
 
       setAiMealPlanResponse(response);
+
+      return response;
     } catch (error) {
       console.error("AI 식단 생성 실패:", error);
       setAiError(
@@ -43,6 +45,8 @@ export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
           ? error.message
           : "AI 식단 생성 중 알 수 없는 오류가 발생했습니다.",
       );
+
+      return null;
     } finally {
       setIsAiLoading(false);
     }

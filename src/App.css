@@ -222,6 +222,11 @@ button:focus{
   grid-template-columns: repeat(3, 1fr);
 }
 
+.autoSaveNotice{
+  display:flex;
+  justify-content: center;
+}
+
 .metricItem,
 .macroItem {
   display: flex;
@@ -249,6 +254,7 @@ button:focus{
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding:0 24px;
 }
 
 .durationPanel h3 {
@@ -528,7 +534,7 @@ button:focus{
 
 .foodRow div {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 3px;
   min-width: 0;
 }
@@ -598,10 +604,8 @@ button:focus{
 }
 
 .shoppingListRow div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
+  display: flex;  
+  gap: 10px;  
 }
 
 .shoppingListRow strong {

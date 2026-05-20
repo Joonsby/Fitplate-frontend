@@ -83,10 +83,22 @@ function App() {
     restoreAiMealPlan,
   } = useAiMealPlan({ profile, goal });
 
-  const goToGeneratedResult = () => {
+  const goToGeneratedResult = async () => {
     setViewingSavedMealPlan(null);
     setStep("result");
-    void generateAiMealPlan(selectedMealPlan, nutritionTarget);
+
+    const response = await generateAiMealPlan(selectedMealPlan, nutritionTarget);
+
+    const nextSavedMealPlans = saveMealPlan({
+      profile,
+      goal,
+      target: nutritionTarget,
+      planDuration,
+      mealPlan: selectedMealPlan,
+      aiMealPlanResponse: response ?? undefined,
+    });
+
+    setSavedMealPlans(nextSavedMealPlans);
   };
 
   const goToSavedPlans = () => {
@@ -99,19 +111,6 @@ function App() {
     setViewingSavedMealPlan(null);
     resetAiMealPlan();
     setStep("favoriteFoods");
-  };
-
-  const handleSaveCurrentMealPlan = () => {
-    const nextSavedMealPlans = saveMealPlan({
-      profile,
-      goal,
-      target: nutritionTarget,
-      planDuration,
-      mealPlan: selectedMealPlan,
-      aiMealPlanResponse: aiMealPlanResponse ?? undefined,
-    });
-
-    setSavedMealPlans(nextSavedMealPlans);
   };
 
   const handleDeleteSavedMealPlan = (id: string) => {
@@ -139,18 +138,10 @@ function App() {
     setFavoriteFoods(deleteFavoriteFood(id));
   };
 
-  const handleDurationChange = (duration: PlanDuration) => {
-    setPlanDuration(duration);
-    const nextMealPlan = selectClosestMealPlan(nutritionTarget.calories, duration);
-    void generateAiMealPlan(nextMealPlan, nutritionTarget);
-  };
-
   const resultProfile = viewingSavedMealPlan?.profile ?? profile;
   const resultGoal = viewingSavedMealPlan?.goal ?? goal;
   const resultTarget = viewingSavedMealPlan?.target ?? nutritionTarget;
-  const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? selectedMealPlan;
-  const resultPlanDuration =
-    viewingSavedMealPlan?.planDuration ?? planDuration;
+  const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? selectedMealPlan;  
   const resultAiMealPlanResponse =
     viewingSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
 
@@ -188,8 +179,10 @@ function App() {
       {step === "goal" ? (
         <GoalSelector
           selectedGoal={goal}
+          selectedDuration={planDuration}
           onBack={() => setStep("profile")}
-          onChange={setGoal}
+          onGoalChange={setGoal}
+          onDurationChange={setPlanDuration}
           onNext={goToGeneratedResult}
         />
       ) : null}
@@ -219,13 +212,11 @@ function App() {
           goal={resultGoal}
           isAiLoading={isAiLoading}
           isSavedView={viewingSavedMealPlan != null}
-          mealPlan={resultMealPlan}
-          planDuration={resultPlanDuration}
+          mealPlan={resultMealPlan}          
           profile={resultProfile}
           savedAt={viewingSavedMealPlan?.savedAt}
           target={resultTarget}
-          onBack={() => setStep(viewingSavedMealPlan ? "savedPlans" : "goal")}
-          onDurationChange={handleDurationChange}
+          onBack={() => setStep(viewingSavedMealPlan ? "savedPlans" : "goal")}          
           onFavoriteFoodToggle={handleToggleFavoriteFood}
           onRetryAiGenerate={() =>
             void generateAiMealPlan(resultMealPlan, resultTarget)
@@ -234,10 +225,7 @@ function App() {
             setViewingSavedMealPlan(null);
             resetAiMealPlan();
             setStep("profile");
-          }}
-          onSave={
-            viewingSavedMealPlan == null ? handleSaveCurrentMealPlan : undefined
-          }
+          }}          
         />
       ) : null}
     </main>

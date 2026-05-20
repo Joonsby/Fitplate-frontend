@@ -1,5 +1,4 @@
-﻿import { Button, Toast } from "@toss/tds-mobile";
-import { useState } from "react";
+﻿import { Button, Badge } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../constants/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
@@ -11,35 +10,30 @@ import type {
   GoalType,
   MealFood,
   MealPlan,
-  NutritionTarget,
-  PlanDuration,  
+  NutritionTarget,  
   ShoppingListItem,
   UserProfile,
 } from "../types/fitplate";
-import { createFavoriteFoodId } from "../utils/favoriteFoodStorage";
 import { aggregateShoppingList } from "../utils/shoppingListAggregator";
 
 interface ResultScreenProps {
   profile: UserProfile;
   goal: GoalType;
   target: NutritionTarget;
-  mealPlan: MealPlan;
-  planDuration: PlanDuration;
+  mealPlan: MealPlan;  
   favoriteFoods: FavoriteFood[];
   isSavedView: boolean;
   isAiLoading: boolean;
   aiError: string | null;
   aiMealPlanResponse: AIMealPlanResponse | null;
-  savedAt?: string;
-  onDurationChange: (duration: PlanDuration) => void;
+  savedAt?: string;  
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
   onBack: () => void;
-  onRestart: () => void;
-  onSave?: () => void;
+  onRestart: () => void;  
 }
 
-const PLAN_DURATIONS: PlanDuration[] = [3, 7, 14];
+
 
 // 결과 화면 컴포넌트입니다.
 // 규칙 기반 식단과 AI 응답을 함께 보여줍니다.
@@ -47,25 +41,22 @@ export function ResultScreen({
   profile,
   goal,
   target,
-  mealPlan,
-  planDuration,  
+  mealPlan,  
   favoriteFoods,
   isSavedView,
   isAiLoading,
   aiError,
   aiMealPlanResponse,
-  savedAt,
-  onDurationChange,  
+  savedAt,  
   onFavoriteFoodToggle,
   onRetryAiGenerate,
   onBack,
-  onRestart,
-  onSave,
+  onRestart,  
 }: ResultScreenProps) {    
-  const [isSaveToastOpen, setIsSaveToastOpen] = useState(false);
+  
   const shoppingList = aggregateShoppingList(mealPlan);
-  const favoriteFoodIds = new Set(
-    favoriteFoods.map((favoriteFood) => favoriteFood.id),
+  const favoriteFoodNames = new Set(
+    favoriteFoods.map((favoriteFood) => favoriteFood.name),
   );
   const savedDate =
     savedAt == null
@@ -74,12 +65,7 @@ export function ResultScreen({
           dateStyle: "medium",
           timeStyle: "short",
         });
-  const shouldShowFallbackFailure =
-    !isAiLoading && aiError != null && aiMealPlanResponse == null;
-  const handleSaveMealPlan = () => {
-    onSave?.();
-    setIsSaveToastOpen(true);
-  };
+  const shouldShowFallbackFailure = !isAiLoading && aiError != null && aiMealPlanResponse == null;  
 
   return (
     <section className="screen">
@@ -129,13 +115,9 @@ export function ResultScreen({
                   <MacroItem label="지방" value={target.fatGram} />
                 </div>
 
-                {onSave ? (
-                  <div className="saveButtonWrapper" style={{ display: "grid"}}>
-                    <Button disabled={isAiLoading} onClick={handleSaveMealPlan}>
-                      이 식단 저장하기
-                    </Button>
-                  </div>
-                ) : null}
+                <div className="autoSaveNotice">
+                  <Badge size="large" color="blue" variant="weak">생성된 식단은 자동으로 저장되었어요.</Badge>
+                </div>
               </div>
 
               <AiMealPlanPanel
@@ -144,27 +126,6 @@ export function ResultScreen({
                 isAiLoading={isAiLoading}
                 onRetryAiGenerate={onRetryAiGenerate}
               />
-
-              <div className="durationPanel">
-                <h3>식단 기간</h3>
-                <div className="durationButtons" aria-label="식단 기간 선택">
-                  {PLAN_DURATIONS.map((duration) => (
-                    <button
-                      className={
-                        duration === planDuration
-                          ? "durationButton selected"
-                          : "durationButton"
-                      }
-                      disabled={isSavedView || isAiLoading}
-                      key={duration}
-                      type="button"
-                      onClick={() => onDurationChange(duration)}
-                    >
-                      {duration}일
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               <div className="mealList">
                 <div className="mealListHeader">
@@ -175,7 +136,7 @@ export function ResultScreen({
                 {mealPlan.days.map((dayMeal) => (
                   <DayMealCard
                     dayMeal={dayMeal}
-                    favoriteFoodIds={favoriteFoodIds}
+                    favoriteFoodNames={favoriteFoodNames}
                     key={dayMeal.id}
                     onFavoriteFoodToggle={onFavoriteFoodToggle}
                   />
@@ -189,7 +150,12 @@ export function ResultScreen({
                 </div>
 
                 {shoppingList.map((item) => (
-                  <ShoppingListRow item={item} key={item.id} />
+                  <ShoppingListRow
+                    isFavorite={favoriteFoodNames.has(item.name)}
+                    item={item}
+                    key={item.id}
+                    onFavoriteFoodToggle={onFavoriteFoodToggle}
+                  />
                 ))}
               </div>
             </div>
@@ -205,17 +171,6 @@ export function ResultScreen({
           처음부터
         </Button>
       </div>
-
-      <Toast
-        duration={3000}
-        leftAddon={
-          <Toast.Lottie src="https://static.toss.im/lotties-common/check-green-spot.json" />
-        }
-        open={isSaveToastOpen}
-        position="top"
-        text="식단이 저장되었어요"
-        onClose={() => setIsSaveToastOpen(false)}
-      />
     </section>
   );
 }
@@ -387,14 +342,14 @@ function AiDayCard({ day }: AiDayCardProps) {
 
 interface DayMealCardProps {
   dayMeal: DayMeal;
-  favoriteFoodIds: Set<string>;
+  favoriteFoodNames: Set<string>;
   onFavoriteFoodToggle: (food: MealFood) => void;
 }
 
 // 하루치 식단을 카드로 보여주는 컴포넌트입니다.
 function DayMealCard({
   dayMeal,
-  favoriteFoodIds,
+  favoriteFoodNames,
   onFavoriteFoodToggle,
 }: DayMealCardProps) {
   return (
@@ -415,7 +370,7 @@ function DayMealCard({
             {meal.foods.map((food) => (
               <FoodRow
                 food={food}
-                isFavorite={favoriteFoodIds.has(createFavoriteFoodId(food))}
+                isFavorite={favoriteFoodNames.has(food.name)}
                 key={food.id}
                 onFavoriteFoodToggle={onFavoriteFoodToggle}
               />
@@ -469,11 +424,25 @@ function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
 }
 
 interface ShoppingListRowProps {
+  isFavorite: boolean;
   item: ShoppingListItem;
+  onFavoriteFoodToggle: (food: MealFood) => void;
 }
 
 // 중복 재료를 합친 장보기 리스트 한 줄입니다.
-function ShoppingListRow({ item }: ShoppingListRowProps) {
+function ShoppingListRow({
+  isFavorite,
+  item,
+  onFavoriteFoodToggle,
+}: ShoppingListRowProps) {
+  const favoriteFood: MealFood = {
+    id: item.id,
+    name: item.name,
+    amount: item.amountText,
+    calories: item.totalCalories,
+    shoppingCategory: item.shoppingCategory,
+  };
+
   return (
     <div className="shoppingListRow">
       <div>
@@ -483,14 +452,26 @@ function ShoppingListRow({ item }: ShoppingListRowProps) {
           {item.totalCalories.toLocaleString()} kcal
         </span>
       </div>
-      <a
-        className="buyFoodButton"
-        href={SHOPPING_LINKS[item.shoppingCategory]}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        구매하기
-      </a>
+      <div className="foodRowActions">
+        <button
+          aria-label={`${item.name} 즐겨찾기`}
+          className={
+            isFavorite ? "favoriteFoodButton selected" : "favoriteFoodButton"
+          }
+          type="button"
+          onClick={() => onFavoriteFoodToggle(favoriteFood)}
+        >
+          ★
+        </button>
+        <a
+          className="buyFoodButton"
+          href={SHOPPING_LINKS[item.shoppingCategory]}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          구매하기
+        </a>
+      </div>
     </div>
   );
 }

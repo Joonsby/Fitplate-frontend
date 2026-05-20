@@ -172,7 +172,7 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
       </div>
 
       <div className="selectGroup">
-        <Button disabled={!isProfileValid} size="large" onClick={onNext}>
+        <Button disabled={!isProfileValid} onClick={onNext}>
           목표 선택하기
         </Button>
       </div>

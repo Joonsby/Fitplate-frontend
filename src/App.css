@@ -22,8 +22,7 @@
   padding-top: 6px;
 }
 
-.appTopSubtitle {
-  max-width: 280px;
+.appTopSubtitle {  
   margin: 8px auto 0;
   color: #333d4b;
   font-size: 17px;
@@ -62,6 +61,14 @@
   gap: 8px;  
 }
 
+.goalSelectorScreen {
+  gap: 12px;
+}
+
+.goalSelectorHeader {
+  padding: 8px 24px 0;
+}
+
 .sectionHeader h2 {
   margin: 0;
   font-size: 24px;
@@ -88,11 +95,17 @@
 }
 
 .fieldGroup,
-.goalList,
 .mealList,
-.shoppingList {
+.shoppingList {  
   display: flex;
   flex-direction: column;  
+}
+
+.goalList{
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 24px;
 }
 
 .numberField {
@@ -121,11 +134,22 @@
 }
 
 .goalCard {
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #333d4b;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 18px;
   text-align: left;
+  width: 100%;
+}
+
+.goalCard.selected {
+  border-color: #3182f6;
+  background: #edf6ff;
 }
 
 .goalCard strong {

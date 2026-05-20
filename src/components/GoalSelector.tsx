@@ -9,20 +9,18 @@ interface GoalSelectorProps {
   onNext: () => void;
 }
 
-// 목표 선택 컴포넌트입니다.
-// 목표 값도 App의 state로 관리하고, 여기서는 선택 이벤트만 App으로 전달합니다.
+const GOALS: GoalType[] = ["lose", "maintain", "gain"];
+
 export function GoalSelector({
   selectedGoal,
   onChange,
   onBack,
   onNext,
 }: GoalSelectorProps) {
-  const goals = Object.keys(GOAL_LABELS) as GoalType[];
-
   return (
-    <section className="screen">
-      <div className="sectionHeader">
-        <Post.H3 color="#3182f6" typography="t7">1단계</Post.H3>
+    <section className="screen goalSelectorScreen">
+      <div className="sectionHeader goalSelectorHeader">
+        <Post.H3 color="#3182f6" typography="t7">2단계</Post.H3>
         <Post.H3>신체정보 입력</Post.H3>
         <Post.Paragraph color="#4a5568" typography="t7">
           감량, 유지, 증량 중 하나를 선택하세요.
@@ -30,15 +28,17 @@ export function GoalSelector({
       </div>
 
       <div className="goalList">
-        {goals.map((goal) => (
-          <Button
+        {GOALS.map((goal) => (
+          <button
+            aria-pressed={goal === selectedGoal}
             className={goal === selectedGoal ? "goalCard selected" : "goalCard"}
-            key={goal}            
+            key={goal}
+            type="button"
             onClick={() => onChange(goal)}
           >
             <strong>{GOAL_LABELS[goal]}</strong>
             <span>{GOAL_DESCRIPTIONS[goal]}</span>
-          </Button>
+          </button>
         ))}
       </div>
 
@@ -46,7 +46,7 @@ export function GoalSelector({
         <Button variant="weak" onClick={onBack}>
           이전
         </Button>
-        <Button variant="fill" onClick={onNext}>
+        <Button color="primary" variant="fill" onClick={onNext}>
           결과 보기
         </Button>
       </div>

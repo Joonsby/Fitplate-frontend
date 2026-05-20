@@ -1,3 +1,7 @@
+button:focus{
+  outline: none !important;
+}
+
 #root {
   width: 100%;
   min-height: 100vh;
@@ -191,13 +195,12 @@
   gap: 8px;
   padding: 22px;
   border-radius: 8px;
-  background: #191f28;
-  color: #ffffff;
+  background: rgba(100, 168, 255, 0.15);
+  border:1px solid #e5e8eb
 }
 
-.caloriePanel span {
-  color: #d1d6db;
-  font-size: 14px;
+.caloriePanel span {    
+  font-size: 14px;  
 }
 
 .caloriePanel strong {
@@ -532,6 +535,7 @@
 
 .foodRow .foodRowActions{
   flex-direction: row;
+  gap: 10px;
 }
 
 .foodRow strong {

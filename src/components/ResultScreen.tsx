@@ -1,4 +1,5 @@
-﻿import { Button } from "@toss/tds-mobile";
+﻿import { Button, Toast } from "@toss/tds-mobile";
+import { useState } from "react";
 import { GOAL_LABELS } from "../constants/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
@@ -61,6 +62,7 @@ export function ResultScreen({
   onRestart,
   onSave,
 }: ResultScreenProps) {    
+  const [isSaveToastOpen, setIsSaveToastOpen] = useState(false);
   const shoppingList = aggregateShoppingList(mealPlan);
   const favoriteFoodIds = new Set(
     favoriteFoods.map((favoriteFood) => favoriteFood.id),
@@ -74,6 +76,10 @@ export function ResultScreen({
         });
   const shouldShowFallbackFailure =
     !isAiLoading && aiError != null && aiMealPlanResponse == null;
+  const handleSaveMealPlan = () => {
+    onSave?.();
+    setIsSaveToastOpen(true);
+  };
 
   return (
     <section className="screen">
@@ -125,7 +131,7 @@ export function ResultScreen({
 
                 {onSave ? (
                   <div className="saveButtonWrapper" style={{ display: "grid"}}>
-                    <Button color="dark" disabled={isAiLoading} onClick={onSave}>
+                    <Button disabled={isAiLoading} onClick={handleSaveMealPlan}>
                       이 식단 저장하기
                     </Button>
                   </div>
@@ -199,6 +205,17 @@ export function ResultScreen({
           처음부터
         </Button>
       </div>
+
+      <Toast
+        duration={3000}
+        leftAddon={
+          <Toast.Lottie src="https://static.toss.im/lotties-common/check-green-spot.json" />
+        }
+        open={isSaveToastOpen}
+        position="top"
+        text="식단이 저장되었어요"
+        onClose={() => setIsSaveToastOpen(false)}
+      />
     </section>
   );
 }

@@ -1,4 +1,4 @@
-import { Button } from "@toss/tds-mobile";
+import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../constants/fitplate";
 import type { GoalType } from "../types/fitplate";
 
@@ -22,22 +22,23 @@ export function GoalSelector({
   return (
     <section className="screen">
       <div className="sectionHeader">
-        <p className="stepText">2단계</p>
-        <h2>목표 선택</h2>
-        <p>감량, 유지, 증량 중 하나를 선택하세요.</p>
+        <Post.H3 color="#3182f6" typography="t7">1단계</Post.H3>
+        <Post.H3>신체정보 입력</Post.H3>
+        <Post.Paragraph color="#4a5568" typography="t7">
+          감량, 유지, 증량 중 하나를 선택하세요.
+        </Post.Paragraph>
       </div>
 
       <div className="goalList">
         {goals.map((goal) => (
-          <button
+          <Button
             className={goal === selectedGoal ? "goalCard selected" : "goalCard"}
-            key={goal}
-            type="button"
+            key={goal}            
             onClick={() => onChange(goal)}
           >
             <strong>{GOAL_LABELS[goal]}</strong>
             <span>{GOAL_DESCRIPTIONS[goal]}</span>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -45,7 +46,7 @@ export function GoalSelector({
         <Button variant="weak" onClick={onBack}>
           이전
         </Button>
-        <Button color="dark" onClick={onNext}>
+        <Button variant="fill" onClick={onNext}>
           결과 보기
         </Button>
       </div>

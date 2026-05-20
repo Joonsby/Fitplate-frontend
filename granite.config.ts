@@ -3,9 +3,9 @@ import { defineConfig } from "@apps-in-toss/web-framework/config";
 export default defineConfig({
   appName: "Fitplate",
   brand: {
-    displayName: "Fitplace", // 화면에 노출될 앱의 한글 이름으로 바꿔주세요.
-    primaryColor: "#FF8A65", // 화면에 노출될 앱의 기본 색상으로 바꿔주세요.
-    icon: "", // 화면에 노출될 앱의 아이콘 이미지 주소로 바꿔주세요.
+    displayName: "Fitplate",
+    primaryColor: "#3182F6", // TDS Button color="primary"에 적용되는 앱 기본 브랜드 색상입니다.
+    icon: "",
   },
   web: {
     host: "localhost",

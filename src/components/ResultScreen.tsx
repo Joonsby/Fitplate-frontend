@@ -71,10 +71,20 @@ export function ResultScreen({
           dateStyle: "medium",
           timeStyle: "short",
         });
+  const shouldShowFallbackFailure =
+    !isAiLoading && aiError != null && aiMealPlanResponse == null;
 
   return (
     <section className="screen">
-      {isAiLoading ? (
+      {shouldShowFallbackFailure ? (
+        <AiMealPlanFailureScreen
+          aiError={aiError}
+          target={target}
+          onRetryAiGenerate={onRetryAiGenerate}
+        />
+      ) : null}
+
+      {!shouldShowFallbackFailure && (isAiLoading || aiError != null) ? (
         <AiMealPlanPanel
           aiError={aiError}
           aiMealPlanResponse={aiMealPlanResponse}
@@ -194,6 +204,53 @@ interface AiMealPlanPanelProps {
 
 // AI 응답을 보여주는 패널입니다.
 // 아직 실제 API를 호출하지 않고, Promise 기반 mock JSON만 렌더링합니다.
+interface AiMealPlanFailureScreenProps {
+  aiError: string;
+  target: NutritionTarget;
+  onRetryAiGenerate: () => void;
+}
+
+function AiMealPlanFailureScreen({
+  aiError,
+  target,
+  onRetryAiGenerate,
+}: AiMealPlanFailureScreenProps) {
+  return (
+    <section className="aiFailureScreen" role="alert">
+      <div>
+        <p className="stepText">AI 식단 생성 실패</p>
+        <h2>식단을 불러오지 못했어요</h2>
+        <p>
+          서버 응답이 없거나 일시적인 오류가 발생했습니다. 입력한 신체정보와
+          목표는 유지되니 다시 시도할 수 있어요.
+        </p>
+      </div>
+
+      <div className="caloriePanel">
+        <span>목표 칼로리</span>
+        <strong>{target.calories.toLocaleString()} kcal</strong>
+      </div>
+
+      <div className="metricGrid">
+        <MetricItem label="BMR" value={target.bmr} unit="kcal" />
+        <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
+      </div>
+
+      <div className="macroGrid">
+        <MacroItem label="단백질" value={target.proteinGram} />
+        <MacroItem label="탄수화물" value={target.carbsGram} />
+        <MacroItem label="지방" value={target.fatGram} />
+      </div>
+
+      <p className="failureReason">{aiError}</p>
+
+      <Button color="dark" onClick={onRetryAiGenerate}>
+        다시 생성하기
+      </Button>
+    </section>
+  );
+}
+
 function AiMealPlanPanel({
   isAiLoading,
   aiError,
@@ -248,6 +305,13 @@ if (isAiLoading) {
 
   return (
     <section className="aiPanel">
+      <div className="aiPanelHeader">
+        <div>
+          <h3>AI 식단 결과</h3>
+          <p>{aiMealPlanResponse.summary}</p>
+        </div>
+        <span>{aiMealPlanResponse.schemaVersion}</span>
+      </div>
 
       <div className="aiMetaGrid">        
         <div>

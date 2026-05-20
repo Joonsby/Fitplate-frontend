@@ -42,7 +42,7 @@ function App() {
 
   // 신체정보 입력값을 저장하는 state입니다.
   // API, DB, localStorage 없이 브라우저 메모리에만 보관됩니다.
-  const [profile, setProfile] = useState<UserProfile>({
+  const [profile] = useState<UserProfile>({
     heightCm: 170,
     weightKg: 68,
     age: 30,
@@ -101,6 +101,7 @@ function App() {
         });
       setAiMealPlanResponse(response);
     } catch (error) {
+      console.error("AI 식단 생성 실패:", error);
       setAiError(
         error instanceof Error
           ? error.message
@@ -198,10 +199,10 @@ function App() {
       />
 
       <div className="topShortcutGrid">
-        <Button variant="weak" onClick={openSavedPlans}>
+        <Button color="primary" variant="weak" onClick={openSavedPlans}>
           저장된 식단
         </Button>
-        <Button variant="weak" onClick={openFavoriteFoods}>
+        <Button color="primary" variant="weak" onClick={openFavoriteFoods}>
           즐겨찾기 음식
         </Button>
       </div>
@@ -209,7 +210,6 @@ function App() {
       {step === "profile" ? (
         <UserProfileForm
           profile={profile}
-          onChange={setProfile}
           onNext={() => setStep("goal")}
         />
       ) : null}

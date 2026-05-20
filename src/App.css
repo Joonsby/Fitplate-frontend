@@ -50,9 +50,34 @@
   gap: 8px;
 }
 
-.screen {
+.screen,
+.savedMealPlansContent,
+.favoriteFoodsContent {
   display: flex;
   flex-direction: column;  
+}
+
+.savedMealPlansContent,
+.favoriteFoodsContent{
+  gap:12px;
+  padding: 8px 24px;
+}
+
+.mealPlanSummary{
+  padding: 10px 0;
+}
+
+.mealPlanSummaryInner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 24px;
+}
+
+.nutritionSummary{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .sectionHeader {
@@ -63,10 +88,6 @@
 
 .goalSelectorScreen {
   gap: 12px;
-}
-
-.goalSelectorHeader {
-  padding: 8px 24px 0;
 }
 
 .sectionHeader h2 {
@@ -96,22 +117,20 @@
 
 .fieldGroup,
 .mealList,
-.shoppingList {  
-  display: flex;
-  flex-direction: column;  
-}
-
-.goalList{
+.shoppingList,
+.goalList {  
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 10px;
+}
+
+.goalList{    
   padding: 0 24px;
 }
 
 .numberField {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  align-items: center;  
   gap: 16px;
   min-height: 64px;
   padding: 0 16px;
@@ -126,6 +145,10 @@
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   padding: 8px 24px;
+}
+
+.buttonRow{
+  padding-bottom:40px;
 }
 
 .selectGroup {
@@ -505,6 +528,10 @@
   flex-direction: column;
   gap: 3px;
   min-width: 0;
+}
+
+.foodRow .foodRowActions{
+  flex-direction: row;
 }
 
 .foodRow strong {

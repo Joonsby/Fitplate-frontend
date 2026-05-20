@@ -1,6 +1,7 @@
-import { Button, Post, TextField } from "@toss/tds-mobile";
+import { Button, TextField } from "@toss/tds-mobile";
 import { useState } from "react";
 import type { ChangeEvent } from "react";
+import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type { Gender, UserProfile } from "../types/fitplate";
 
 interface UserProfileFormProps {
@@ -13,8 +14,8 @@ type ProfileFieldName = "heightCm" | "weightKg" | "age" | "bodyFatPercentage";
 type ProfileFieldValues = Record<ProfileFieldName, string>;
 type ProfileFieldErrors = Partial<Record<ProfileFieldName, string>>;
 
-const NUMBER_TYPE_ERROR_MESSAGE = "숫자만 입력할 수 있어요";
-const NEGATIVE_NUMBER_ERROR_MESSAGE = "0이상의 숫자만 입력할 수 있어요";
+const NUMBER_TYPE_ERROR_MESSAGE = "숫자만 입력할 수 있어요.";
+const NEGATIVE_NUMBER_ERROR_MESSAGE = "0보다 큰 숫자만 입력할 수 있어요.";
 
 function validateNumberField(value: string): string | null {
   const trimmedValue = value.trim();
@@ -34,8 +35,6 @@ function validateNumberField(value: string): string | null {
   return null;
 }
 
-// 신체정보 입력 화면입니다.
-// 입력값은 부모 state에 매번 저장하지 않고, 이 화면 안에서 값과 에러만 관리합니다.
 export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
   const [selectedGender, setSelectedGender] = useState<Gender>(profile.gender);
   const [fieldValues, setFieldValues] = useState<ProfileFieldValues>({
@@ -72,13 +71,11 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
 
   return (
     <section className="screen">
-      <div className="sectionHeader">
-        <Post.H3 color="#3182f6" typography="t7">1단계</Post.H3>
-        <Post.H3>신체정보 입력</Post.H3>
-        <Post.Paragraph color="#4a5568" typography="t7">
-          키, 몸무게, 나이, 성별을 입력하면 결과 화면에서 목표를 계산합니다.
-        </Post.Paragraph>
-      </div>
+      <ScreenSectionHeader
+        description="키, 몸무게, 나이, 성별을 입력하면 결과 화면에서 목표를 계산합니다."
+        step="1단계"
+        title="신체정보 입력"
+      />
 
       <div className="fieldGroup">
         <TextField
@@ -143,7 +140,9 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
       </div>
 
       <div className="selectGroup">
-        <Button disabled={!isProfileValid} size="large" onClick={onNext}>목표 선택하기</Button>
+        <Button disabled={!isProfileValid} size="large" onClick={onNext}>
+          목표 선택하기
+        </Button>
       </div>
     </section>
   );

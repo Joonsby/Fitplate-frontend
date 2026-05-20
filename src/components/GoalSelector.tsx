@@ -1,5 +1,6 @@
-import { Button, Post } from "@toss/tds-mobile";
+import { Button } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../constants/fitplate";
+import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type { GoalType } from "../types/fitplate";
 
 interface GoalSelectorProps {
@@ -19,13 +20,12 @@ export function GoalSelector({
 }: GoalSelectorProps) {
   return (
     <section className="screen goalSelectorScreen">
-      <div className="sectionHeader goalSelectorHeader">
-        <Post.H3 color="#3182f6" typography="t7">2단계</Post.H3>
-        <Post.H3>신체정보 입력</Post.H3>
-        <Post.Paragraph color="#4a5568" typography="t7">
-          감량, 유지, 증량 중 하나를 선택하세요.
-        </Post.Paragraph>
-      </div>
+      <ScreenSectionHeader
+        className="goalSelectorHeader"
+        description="감량, 유지, 증량 중 하나를 선택하세요."
+        step="2단계"
+        title="목표 선택"
+      />
 
       <div className="goalList">
         {GOALS.map((goal) => (

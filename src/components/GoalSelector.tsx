@@ -1,20 +1,24 @@
 import { Button } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../constants/fitplate";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
-import type { GoalType } from "../types/fitplate";
+import type { GoalType, PlanDuration } from "../types/fitplate";
 
 interface GoalSelectorProps {
   selectedGoal: GoalType;
-  onChange: (goal: GoalType) => void;
+  selectedDuration: PlanDuration;
+  onGoalChange: (goal: GoalType) => void;
+  onDurationChange: (duration: PlanDuration) => void;
   onBack: () => void;
   onNext: () => void;
 }
-
+const PLAN_DURATIONS: PlanDuration[] = [3, 7, 14];
 const GOALS: GoalType[] = ["lose", "maintain", "gain"];
 
 export function GoalSelector({
   selectedGoal,
-  onChange,
+  selectedDuration,
+  onGoalChange,
+  onDurationChange,
   onBack,
   onNext,
 }: GoalSelectorProps) {
@@ -22,25 +26,46 @@ export function GoalSelector({
     <section className="screen goalSelectorScreen">
       <ScreenSectionHeader
         className="goalSelectorHeader"
-        description="감량, 유지, 증량 중 하나를 선택하세요."
         step="2단계"
         title="목표 선택"
+        description="AI 식단 생성 전에 목표와 기간을 먼저 확정합니다."
       />
 
       <div className="goalList">
         {GOALS.map((goal) => (
           <button
+            key={goal}
             aria-pressed={goal === selectedGoal}
             className={goal === selectedGoal ? "goalCard selected" : "goalCard"}
-            key={goal}
             type="button"
-            onClick={() => onChange(goal)}
+            onClick={() => onGoalChange(goal)}
           >
             <strong>{GOAL_LABELS[goal]}</strong>
             <span>{GOAL_DESCRIPTIONS[goal]}</span>
           </button>
         ))}
-      </div>
+      </div>      
+
+      <div className="durationPanel">
+        <h3>식단 기간</h3>
+
+        <div className="durationButtons">
+          {PLAN_DURATIONS.map((duration) => (
+            <button
+              key={duration}
+              type="button"
+              className={
+                selectedDuration === duration
+                  ? "durationButton selected"
+                  : "durationButton"
+              }
+              onClick={() => onDurationChange(duration)}
+            >
+              {duration}일
+            </button>
+          ))}
+        </div>
+      </div>   
 
       <div className="buttonRow">
         <Button variant="weak" onClick={onBack}>

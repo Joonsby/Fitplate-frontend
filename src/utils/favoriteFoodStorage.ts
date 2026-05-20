@@ -4,8 +4,8 @@ const STORAGE_KEY = "fitplate.favoriteFoods";
 
 // 음식 이름과 카테고리로 즐겨찾기 id를 만듭니다.
 // 같은 이름이라도 카테고리가 다르면 다른 항목으로 볼 수 있게 합니다.
-export function createFavoriteFoodId(food: Pick<MealFood, "name" | "shoppingCategory">): string {
-  return `${food.shoppingCategory}:${food.name}`;
+export function createFavoriteFoodId(food: Pick<MealFood, "name">): string {
+  return food.name;
 }
 
 // localStorage에서 즐겨찾기 음식 목록을 읽습니다.
@@ -51,12 +51,12 @@ export function toggleFavoriteFood(food: MealFood): FavoriteFood[] {
   const favoriteFoods = getFavoriteFoods();
   const favoriteFoodId = createFavoriteFoodId(food);
   const existingFavoriteFood = favoriteFoods.find(
-    (favoriteFood) => favoriteFood.id === favoriteFoodId,
+    (favoriteFood) => favoriteFood.name === food.name,
   );
 
   if (existingFavoriteFood != null) {
     const nextFavoriteFoods = favoriteFoods.filter(
-      (favoriteFood) => favoriteFood.id !== favoriteFoodId,
+      (favoriteFood) => favoriteFood.name !== food.name,
     );
 
     setFavoriteFoods(nextFavoriteFoods);

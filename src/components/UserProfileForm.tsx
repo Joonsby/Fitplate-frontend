@@ -37,6 +37,9 @@ function validateNumberField(value: string): string | null {
 
 export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
   const [selectedGender, setSelectedGender] = useState<Gender>(profile.gender);
+  const [focusedField, setFocusedField] = useState<ProfileFieldName | null>(
+    null,
+  );
   const [fieldValues, setFieldValues] = useState<ProfileFieldValues>({
     heightCm: String(profile.heightCm),
     weightKg: String(profile.weightKg),
@@ -62,6 +65,21 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
       }));
     };
 
+  const focusNumberField =
+    (fieldName: ProfileFieldName) =>
+    () => {
+      setFocusedField(fieldName);
+    };
+
+  const blurNumberField = () => {
+    setFocusedField(null);
+  };
+
+  const getTextFieldClassName = (fieldName: ProfileFieldName) =>
+    focusedField === fieldName
+      ? "profileTextField isFocused"
+      : "profileTextField";
+
   const hasFieldError = Object.values(fieldErrors).some(Boolean);
   const hasRequiredEmptyField =
     fieldValues.heightCm.trim() === "" ||
@@ -79,6 +97,7 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
 
       <div className="fieldGroup">
         <TextField
+          containerProps={{ className: getTextFieldClassName("heightCm") }}
           hasError={fieldErrors.heightCm != null}
           help={fieldErrors.heightCm}
           label="키"
@@ -87,9 +106,12 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
           suffix="cm"
           value={fieldValues.heightCm}
           variant="box"
+          onBlur={blurNumberField}
           onChange={updateNumberField("heightCm")}
+          onFocus={focusNumberField("heightCm")}
         />
         <TextField
+          containerProps={{ className: getTextFieldClassName("weightKg") }}
           hasError={fieldErrors.weightKg != null}
           help={fieldErrors.weightKg}
           label="몸무게"
@@ -98,9 +120,12 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
           suffix="kg"
           value={fieldValues.weightKg}
           variant="box"
+          onBlur={blurNumberField}
           onChange={updateNumberField("weightKg")}
+          onFocus={focusNumberField("weightKg")}
         />
         <TextField
+          containerProps={{ className: getTextFieldClassName("age") }}
           hasError={fieldErrors.age != null}
           help={fieldErrors.age}
           label="나이"
@@ -109,9 +134,14 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
           suffix="세"
           value={fieldValues.age}
           variant="box"
+          onBlur={blurNumberField}
           onChange={updateNumberField("age")}
+          onFocus={focusNumberField("age")}
         />
         <TextField
+          containerProps={{
+            className: getTextFieldClassName("bodyFatPercentage"),
+          }}
           hasError={fieldErrors.bodyFatPercentage != null}
           help={fieldErrors.bodyFatPercentage}
           label="체지방률(선택)"
@@ -120,7 +150,9 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
           suffix="%"
           value={fieldValues.bodyFatPercentage}
           variant="box"
+          onBlur={blurNumberField}
           onChange={updateNumberField("bodyFatPercentage")}
+          onFocus={focusNumberField("bodyFatPercentage")}
         />
       </div>
 

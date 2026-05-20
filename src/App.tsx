@@ -7,13 +7,11 @@ import { GoalSelector } from "./components/GoalSelector";
 import { ResultScreen } from "./components/ResultScreen";
 import { SavedMealPlansScreen } from "./components/SavedMealPlansScreen";
 import { UserProfileForm } from "./components/UserProfileForm";
+import { useAiMealPlan } from "./hooks/useAiMealPlan";
 import type {
-  AIMealPlanResponse,
   FavoriteFood,
   GoalType,
   MealFood,
-  MealPlan,
-  NutritionTarget,
   PlanDuration,
   SavedMealPlan,
   UserProfile,
@@ -25,7 +23,6 @@ import {
   toggleFavoriteFood,
 } from "./utils/favoriteFoodStorage";
 import { selectClosestMealPlan } from "./utils/mealPlanSelector";
-import { generateMealPlanFromApi } from "./api/mealPlanApi";
 import { calculateNutritionTarget } from "./utils/nutritionCalculator";
 import {
   deleteSavedMealPlan,
@@ -68,14 +65,7 @@ function App() {
   const [viewingSavedMealPlan, setViewingSavedMealPlan] =
     useState<SavedMealPlan | null>(null);
 
-  // AI 응답 상태입니다.
-  // 실제 API를 붙일 때도 이 세 가지 상태(응답/로딩/에러)를 그대로 재사용할 수 있습니다.
-  const [aiMealPlanResponse, setAiMealPlanResponse] =
-    useState<AIMealPlanResponse | null>(null);
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
-
-  // 결과 화면에서 보여줄 칼로리와 탄단지 계산값입니다.
+    // 결과 화면에서 보여줄 칼로리와 탄단지 계산값입니다.
   const nutritionTarget = calculateNutritionTarget(profile, goal);
 
   // 목표 칼로리와 선택 기간에 가장 가까운 기간 식단을 선택합니다.
@@ -84,47 +74,30 @@ function App() {
     planDuration,
   );
 
-  const generateMockAiResult = async (
-    mealPlan: MealPlan,
-    target: NutritionTarget,
-  ) => {
-    setIsAiLoading(true);
-    setAiError(null);
-    setAiMealPlanResponse(null);
+  const {
+    aiMealPlanResponse,
+    isAiLoading,
+    aiError,
+    generateAiMealPlan,
+    resetAiMealPlan,
+    restoreAiMealPlan,
+  } = useAiMealPlan({ profile, goal });
 
-    try {
-          const response = await generateMealPlanFromApi({
-          profile,
-          goal,
-          durationDays: mealPlan.durationDays,
-          targetCalories: target.calories,
-        });
-      setAiMealPlanResponse(response);
-    } catch (error) {
-      console.error("AI 식단 생성 실패:", error);
-      setAiError(
-        error instanceof Error
-          ? error.message
-          : "mock AI 식단 생성 중 알 수 없는 오류가 발생했습니다.",
-      );
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
-
-  const openGeneratedResult = () => {
+  const goToGeneratedResult = () => {
     setViewingSavedMealPlan(null);
     setStep("result");
-    void generateMockAiResult(selectedMealPlan, nutritionTarget);
+    void generateAiMealPlan(selectedMealPlan, nutritionTarget);
   };
 
-  const openSavedPlans = () => {
+  const goToSavedPlans = () => {
     setViewingSavedMealPlan(null);
+    resetAiMealPlan();
     setStep("savedPlans");
   };
 
-  const openFavoriteFoods = () => {
+  const goToFavoriteFoods = () => {
     setViewingSavedMealPlan(null);
+    resetAiMealPlan();
     setStep("favoriteFoods");
   };
 
@@ -154,9 +127,7 @@ function App() {
 
   const handleViewSavedMealPlan = (savedMealPlan: SavedMealPlan) => {
     setViewingSavedMealPlan(savedMealPlan);
-    setAiMealPlanResponse(savedMealPlan.aiMealPlanResponse ?? null);
-    setAiError(null);
-    setIsAiLoading(false);
+    restoreAiMealPlan(savedMealPlan.aiMealPlanResponse ?? null);
     setStep("result");
   };
 
@@ -171,7 +142,7 @@ function App() {
   const handleDurationChange = (duration: PlanDuration) => {
     setPlanDuration(duration);
     const nextMealPlan = selectClosestMealPlan(nutritionTarget.calories, duration);
-    void generateMockAiResult(nextMealPlan, nutritionTarget);
+    void generateAiMealPlan(nextMealPlan, nutritionTarget);
   };
 
   const resultProfile = viewingSavedMealPlan?.profile ?? profile;
@@ -199,10 +170,10 @@ function App() {
       />
 
       <div className="topShortcutGrid">
-        <Button color="primary" variant="weak" onClick={openSavedPlans}>
+        <Button color="primary" variant="weak" onClick={goToSavedPlans}>
           저장된 식단
         </Button>
-        <Button color="primary" variant="weak" onClick={openFavoriteFoods}>
+        <Button color="primary" variant="weak" onClick={goToFavoriteFoods}>
           즐겨찾기 음식
         </Button>
       </div>
@@ -219,7 +190,7 @@ function App() {
           selectedGoal={goal}
           onBack={() => setStep("profile")}
           onChange={setGoal}
-          onNext={openGeneratedResult}
+          onNext={goToGeneratedResult}
         />
       ) : null}
 
@@ -257,10 +228,11 @@ function App() {
           onDurationChange={handleDurationChange}
           onFavoriteFoodToggle={handleToggleFavoriteFood}
           onRetryAiGenerate={() =>
-            void generateMockAiResult(resultMealPlan, resultTarget)
+            void generateAiMealPlan(resultMealPlan, resultTarget)
           }
           onRestart={() => {
             setViewingSavedMealPlan(null);
+            resetAiMealPlan();
             setStep("profile");
           }}
           onSave={

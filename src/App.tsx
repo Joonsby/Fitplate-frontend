@@ -1,5 +1,5 @@
-import { Button, Top } from "@toss/tds-mobile";
 import { useState } from "react";
+import { Button, Top } from "@toss/tds-mobile";
 import "./App.css";
 import logoImage from "./assets/images/logo.png";
 import { FavoriteFoodsScreen } from "./components/FavoriteFoodsScreen";
@@ -33,6 +33,7 @@ import {
 type Step = "profile" | "goal" | "result" | "savedPlans" | "favoriteFoods";
 
 function App() {
+
   // 현재 어떤 화면을 보여줄지 관리하는 state입니다.
   // 별도 라우터나 상태관리 라이브러리 없이 MVP 흐름만 단순하게 처리합니다.
   const [step, setStep] = useState<Step>("profile");

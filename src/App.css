@@ -74,7 +74,7 @@ button:focus{
 .mealPlanSummaryInner {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
   padding: 0 24px;
 }
 
@@ -302,6 +302,10 @@ button:focus{
 .aiPanel.error {
   border-color: #ffd6d9;
   background: #fff7f8;
+}
+
+.aiFailureSection{
+  padding:24px;
 }
 
 .aiFailureScreen {
@@ -753,6 +757,10 @@ button:focus{
   border-color: #3182f6;
   background: #edf6ff;
   color: #1b64da;
+}
+
+.loadingPanelSection{
+  padding:24px;
 }
 
 .loadingPanel {

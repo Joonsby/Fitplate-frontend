@@ -223,7 +223,11 @@ function AiMealPlanFailureScreen({
           <MacroItem label="지방" value={target.fatGram} />
         </div>
 
-        <p className="failureReason">{aiError}</p>
+        <p className="failureReason">
+          {aiError.split("\n").map((line, i) => (
+            <span key={i}>{line}<br /></span>
+          ))}
+        </p>
 
         <Button color="dark" onClick={onRetryAiGenerate}>
           다시 생성하기
@@ -270,7 +274,11 @@ if (isAiLoading) {
     return (
       <section className="aiPanel error">
         <h3>AI 응답 오류</h3>
-        <p>{aiError}</p>
+        <p>
+          {aiError.split("\n").map((line, i) => (
+            <span key={i}>{line}<br /></span>
+          ))}
+        </p>
         <button type="button" onClick={onRetryAiGenerate}>
           다시 생성하기
         </button>

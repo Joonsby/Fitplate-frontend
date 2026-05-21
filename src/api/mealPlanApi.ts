@@ -258,7 +258,7 @@ export async function generateMealPlanFromApi({
   } catch (error) {
     console.error("식단 생성 API 네트워크 오류:", error);
     throw new Error(
-      "AI 식단 생성 서버에 연결하지 못했습니다. 서버 상태를 확인한 뒤 다시 시도해주세요.",
+      `AI 식단 생성 서버에 연결하지 못했습니다.\n 서버 상태를 확인한 뒤 다시 시도해주세요.`
     );
   }
 

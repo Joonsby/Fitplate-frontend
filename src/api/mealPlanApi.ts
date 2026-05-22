@@ -41,11 +41,11 @@ interface BackendMealPlanResponse {
  *   백엔드 없이도 테스트할 수 있습니다.
  *
  * false로 바꾸면:
- * - http://3.219.126.219:8080/api/meal-plan 으로 실제 요청을 보냅니다.
+ * - http://localhost:8080/api/meal-plan 으로 실제 요청을 보냅니다.
  * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
  *   통째로 삭제하면 됩니다.
  */
-const USE_TEMPORARY_MEAL_PLAN_DATA = false;
+const USE_TEMPORARY_MEAL_PLAN_DATA = true;
 
 /**
  * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.

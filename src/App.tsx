@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { Button, Top } from "@toss/tds-mobile";
 import "./App.css";
 import logoImage from "./assets/images/logo.png";
@@ -30,13 +31,8 @@ import {
   saveMealPlan,
 } from "./utils/savedMealPlanStorage";
 
-type Step = "profile" | "goal" | "result" | "savedPlans" | "favoriteFoods";
 
 function App() {
-
-  // 현재 어떤 화면을 보여줄지 관리하는 state입니다.
-  // 별도 라우터나 상태관리 라이브러리 없이 MVP 흐름만 단순하게 처리합니다.
-  const [step, setStep] = useState<Step>("profile");
 
   // 신체정보 입력값을 저장하는 state입니다.
   // API, DB, localStorage 없이 브라우저 메모리에만 보관됩니다.
@@ -84,9 +80,24 @@ function App() {
     restoreAiMealPlan,
   } = useAiMealPlan({ profile, goal });
 
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const isResultPage = location.pathname === "/result";
+
+  const resultMealPlanId = location.pathname.startsWith("/result/")
+  ? location.pathname.replace("/result/", "")
+  : null;
+
+  const routeSavedMealPlan =
+  resultMealPlanId == null
+    ? null
+    : savedMealPlans.find((plan) => plan.id === resultMealPlanId) ?? null;
+
   const goToGeneratedResult = async () => {
     setViewingSavedMealPlan(null);
-    setStep("result");
+    navigate("/result");    
 
     const response = await generateAiMealPlan(selectedMealPlan, nutritionTarget);
 
@@ -99,19 +110,24 @@ function App() {
       aiMealPlanResponse: response ?? undefined,
     });
 
+    const latestSavedMealPlan = nextSavedMealPlans[0];
+
+    navigate(`/result/${latestSavedMealPlan.id}`);
+
+
     setSavedMealPlans(nextSavedMealPlans);
   };
 
   const goToSavedPlans = () => {
     setViewingSavedMealPlan(null);
     resetAiMealPlan();
-    setStep("savedPlans");
+    navigate("/saved-plans");
   };
 
   const goToFavoriteFoods = () => {
     setViewingSavedMealPlan(null);
     resetAiMealPlan();
-    setStep("favoriteFoods");
+    navigate("/favorite-foods");
   };
 
   const handleDeleteSavedMealPlan = (id: string) => {
@@ -121,14 +137,13 @@ function App() {
 
     if (viewingSavedMealPlan?.id === id) {
       setViewingSavedMealPlan(null);
-      setStep("savedPlans");
     }
   };
 
   const handleViewSavedMealPlan = (savedMealPlan: SavedMealPlan) => {
     setViewingSavedMealPlan(savedMealPlan);
     restoreAiMealPlan(savedMealPlan.aiMealPlanResponse ?? null);
-    setStep("result");
+    navigate(`/result/${savedMealPlan.id}`);
   };
 
   const handleToggleFavoriteFood = (food: MealFood) => {
@@ -139,12 +154,16 @@ function App() {
     setFavoriteFoods(deleteFavoriteFood(id));
   };
 
-  const resultProfile = viewingSavedMealPlan?.profile ?? profile;
-  const resultGoal = viewingSavedMealPlan?.goal ?? goal;
-  const resultTarget = viewingSavedMealPlan?.target ?? nutritionTarget;
-  const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? selectedMealPlan;  
-  const resultAiMealPlanResponse =
-    viewingSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
+  const onBack = () => {
+    navigate(-1);
+  }
+
+  const activeSavedMealPlan = viewingSavedMealPlan ?? routeSavedMealPlan;
+  const resultProfile = activeSavedMealPlan?.profile ?? profile;
+  const resultGoal = activeSavedMealPlan?.goal ?? goal;
+  const resultTarget = activeSavedMealPlan?.target ?? nutritionTarget;
+  const resultMealPlan = activeSavedMealPlan?.mealPlan ?? selectedMealPlan;
+  const resultAiMealPlanResponse = activeSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
 
   return (
     <main className="appShell">
@@ -160,75 +179,95 @@ function App() {
           </div>
         }
       />
-
-      <div className="topShortcutGrid">
-        <Button color="primary" variant="weak" onClick={goToSavedPlans}>
-          저장된 식단
-        </Button>
-        <Button color="primary" variant="weak" onClick={goToFavoriteFoods}>
-          즐겨찾기 음식
-        </Button>
-      </div>
-
-      {step === "profile" ? (
-        <UserProfileForm
-          profile={profile}
-          onNext={() => setStep("goal")}
-        />
-      ) : null}
-
-      {step === "goal" ? (
-        <GoalSelector
-          selectedGoal={goal}
-          selectedDuration={planDuration}
-          onBack={() => setStep("profile")}
-          onGoalChange={setGoal}
-          onDurationChange={setPlanDuration}
-          onNext={goToGeneratedResult}
-        />
-      ) : null}
-
-      {step === "savedPlans" ? (
-        <SavedMealPlansScreen
-          savedMealPlans={savedMealPlans}
-          onBack={() => setStep("profile")}
-          onDelete={handleDeleteSavedMealPlan}
-          onView={handleViewSavedMealPlan}
-        />
-      ) : null}
-
-      {step === "favoriteFoods" ? (
-        <FavoriteFoodsScreen
-          favoriteFoods={favoriteFoods}
-          onBack={() => setStep("profile")}
-          onDelete={handleDeleteFavoriteFood}
-        />
-      ) : null}
-
-      {step === "result" ? (
-        <ResultScreen
-          aiError={aiError}
-          aiMealPlanResponse={resultAiMealPlanResponse}
-          favoriteFoods={favoriteFoods}
-          goal={resultGoal}
-          isAiLoading={isAiLoading}
-          isSavedView={viewingSavedMealPlan != null}
-          mealPlan={resultMealPlan}          
-          profile={resultProfile}
-          savedAt={viewingSavedMealPlan?.savedAt}
-          target={resultTarget}
-          onBack={() => setStep(viewingSavedMealPlan ? "savedPlans" : "goal")}          
-          onFavoriteFoodToggle={handleToggleFavoriteFood}
-          onRetryAiGenerate={() =>
-            void generateAiMealPlan(resultMealPlan, resultTarget)
+      {!(isResultPage && isAiLoading) && (
+        <div className="topShortcutGrid">
+          <Button color="primary" variant="weak" onClick={goToSavedPlans}>
+            저장된 식단
+          </Button>
+          <Button color="primary" variant="weak" onClick={goToFavoriteFoods}>
+            즐겨찾기 음식
+          </Button>
+        </div>
+      )}      
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <UserProfileForm
+              profile={profile}
+              onNext={() => navigate("/goal")}
+            />
           }
-          onRestart={() => {
-            setViewingSavedMealPlan(null);
-            resetAiMealPlan();
-            setStep("profile");
-          }}          
         />
-      ) : null}
+
+        <Route
+          path="/goal"
+          element={
+            <GoalSelector
+              selectedGoal={goal}
+              selectedDuration={planDuration}
+              onBack={onBack}
+              onGoalChange={setGoal}
+              onDurationChange={setPlanDuration}
+              onNext={goToGeneratedResult}
+            />
+          }
+        />
+
+        <Route
+          path="/result/:mealPlanId"
+          element={
+            <ResultScreen
+              aiError={aiError}
+              aiMealPlanResponse={resultAiMealPlanResponse}
+              favoriteFoods={favoriteFoods}
+              goal={resultGoal}
+              isAiLoading={isAiLoading}          
+              isSavedView={activeSavedMealPlan != null}
+              mealPlan={resultMealPlan}
+              profile={resultProfile}
+              savedAt={activeSavedMealPlan?.savedAt}
+              target={resultTarget}          
+              onLoginRequired={() => alert("로그인 기능은 아직 구현되지 않았습니다.")}
+              onSaveMealPlan={() => {
+                if (viewingSavedMealPlan) {
+                  alert("이미 저장된 식단입니다.");
+                  return;
+                }
+              }}
+              onFavoriteFoodToggle={handleToggleFavoriteFood}
+              onRetryAiGenerate={() =>
+                void generateAiMealPlan(resultMealPlan, resultTarget)
+              }
+              onBack={onBack}
+              onRestart={() => {navigate("/")}}          
+            />
+          }
+        />
+
+        <Route
+          path="/saved-plans"
+          element={
+            <SavedMealPlansScreen
+              savedMealPlans={savedMealPlans}
+              onBack={onBack}
+              onDelete={handleDeleteSavedMealPlan}
+              onView={handleViewSavedMealPlan}
+            />
+          }
+        />
+
+        <Route
+          path="/favorite-foods"
+          element={
+            <FavoriteFoodsScreen
+              favoriteFoods={favoriteFoods}
+              onBack={onBack}
+              onDelete={handleDeleteFavoriteFood}
+            />
+          }
+        />
+      </Routes>      
     </main>
   );
 }

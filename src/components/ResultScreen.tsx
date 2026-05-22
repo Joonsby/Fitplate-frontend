@@ -1,4 +1,4 @@
-﻿import { Button, Badge } from "@toss/tds-mobile";
+﻿import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../constants/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
@@ -16,6 +16,8 @@ import type {
 } from "../types/fitplate";
 import { aggregateShoppingList } from "../utils/shoppingListAggregator";
 
+
+
 interface ResultScreenProps {
   profile: UserProfile;
   goal: GoalType;
@@ -27,6 +29,8 @@ interface ResultScreenProps {
   aiError: string | null;
   aiMealPlanResponse: AIMealPlanResponse | null;
   savedAt?: string;  
+  onLoginRequired: () => void;
+  onSaveMealPlan?: () => void;
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
   onBack: () => void;
@@ -38,22 +42,21 @@ interface ResultScreenProps {
 // 결과 화면 컴포넌트입니다.
 // 규칙 기반 식단과 AI 응답을 함께 보여줍니다.
 export function ResultScreen({
-  profile,
-  goal,
-  target,
-  mealPlan,  
-  favoriteFoods,
-  isSavedView,
-  isAiLoading,
   aiError,
   aiMealPlanResponse,
+  favoriteFoods,
+  goal,
+  isAiLoading,
+  isSavedView,
+  mealPlan,  
+  profile,
   savedAt,  
+  target,
   onFavoriteFoodToggle,
   onRetryAiGenerate,
   onBack,
   onRestart,  
-}: ResultScreenProps) {    
-  
+}: ResultScreenProps) {
   const shoppingList = aggregateShoppingList(mealPlan);
   const favoriteFoodNames = new Set(
     favoriteFoods.map((favoriteFood) => favoriteFood.name),
@@ -68,7 +71,7 @@ export function ResultScreen({
   const shouldShowFallbackFailure = !isAiLoading && aiError != null && aiMealPlanResponse == null;  
 
   return (
-    <section className="screen">
+    <section className="screen">      
       {shouldShowFallbackFailure ? (
         <AiMealPlanFailureScreen
           aiError={aiError}
@@ -86,16 +89,16 @@ export function ResultScreen({
         />
       ) : null}
       {!isAiLoading && aiMealPlanResponse != null ? (
-        <>
+        <>         
           <ScreenSectionHeader
             description={`${profile.heightCm}cm, ${profile.weightKg}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
             step={isSavedView ? "저장된 식단" : "3단계"}
             title={`${GOAL_LABELS[goal]} 결과`}
           >
             {savedDate ? (
-              <p className="savedAtText">저장 날짜: {savedDate}</p>
+              <Post.H3 color="#3182f6" typography="t7" className="savedAtText">저장 날짜: {savedDate}</Post.H3>
             ) : null}
-          </ScreenSectionHeader>
+          </ScreenSectionHeader>          
           <section className="mealPlanSummary">
             <div className="mealPlanSummaryInner">
               <div className="nutritionSummary">                
@@ -113,11 +116,9 @@ export function ResultScreen({
                   <MacroItem label="단백질" value={target.proteinGram} />
                   <MacroItem label="탄수화물" value={target.carbsGram} />
                   <MacroItem label="지방" value={target.fatGram} />
-                </div>
+                </div>     
+               <Button>식단 저장하기</Button>
 
-                <div className="autoSaveNotice">
-                  <Badge size="large" color="blue" variant="weak">생성된 식단은 자동으로 저장되었어요.</Badge>
-                </div>
               </div>
 
               <AiMealPlanPanel
@@ -141,7 +142,7 @@ export function ResultScreen({
                     onFavoriteFoodToggle={onFavoriteFoodToggle}
                   />
                     ))}
-              </div>
+              </div>             
               
               <div className="shoppingList">
                 <div className="mealListHeader">

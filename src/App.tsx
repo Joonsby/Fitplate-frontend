@@ -9,6 +9,12 @@ import { ResultScreen } from "./components/ResultScreen";
 import { SavedMealPlansScreen } from "./components/SavedMealPlansScreen";
 import { UserProfileForm } from "./components/UserProfileForm";
 import { useAiMealPlan } from "./hooks/useAiMealPlan";
+import {
+  addMealPlanFavorite,
+  createSavedMealPlan,
+  deleteMealPlanFavorite,
+  deleteSavedMealPlanById,
+} from "./api/mealPlanStorageApi";
 import type {
   FavoriteFood,
   GoalType,
@@ -17,25 +23,14 @@ import type {
   SavedMealPlan,
   UserProfile,
 } from "./types/fitplate";
-import {
-  deleteFavoriteFood,
-  getFavoriteFoods,
-  sortFavoriteFoods,
-  toggleFavoriteFood,
-} from "./utils/favoriteFoodStorage";
 import { selectClosestMealPlan } from "./utils/mealPlanSelector";
 import { calculateNutritionTarget } from "./utils/nutritionCalculator";
-import {
-  deleteSavedMealPlan,
-  getSavedMealPlans,
-  saveMealPlan,
-} from "./utils/savedMealPlanStorage";
 
 
 function App() {
 
   // 신체정보 입력값을 저장하는 state입니다.
-  // API, DB, localStorage 없이 브라우저 메모리에만 보관됩니다.
+  // 아직 프로필 조회 API가 없어서 브라우저 메모리에만 보관됩니다.
   const [profile] = useState<UserProfile>({
     heightCm: 170,
     weightKg: 68,
@@ -49,14 +44,10 @@ function App() {
   // 결과 화면에서 선택하는 식단 기간입니다.
   const [planDuration, setPlanDuration] = useState<PlanDuration>(3);
 
-  // localStorage에서 읽어온 저장 식단 목록입니다.
   const [savedMealPlans, setSavedMealPlans] =
-    useState<SavedMealPlan[]>(getSavedMealPlans);
+    useState<SavedMealPlan[]>([]);
 
-  // localStorage에서 읽어온 즐겨찾기 음식 목록입니다.
-  const [favoriteFoods, setFavoriteFoods] = useState<FavoriteFood[]>(() =>
-    sortFavoriteFoods(getFavoriteFoods()),
-  );
+  const [favoriteFoods, setFavoriteFoods] = useState<FavoriteFood[]>([]);
 
   // 저장 목록에서 "다시 보기"를 누른 식단입니다.
   const [viewingSavedMealPlan, setViewingSavedMealPlan] =
@@ -99,23 +90,7 @@ function App() {
     setViewingSavedMealPlan(null);
     navigate("/result");    
 
-    const response = await generateAiMealPlan(selectedMealPlan, nutritionTarget);
-
-    const nextSavedMealPlans = saveMealPlan({
-      profile,
-      goal,
-      target: nutritionTarget,
-      planDuration,
-      mealPlan: selectedMealPlan,
-      aiMealPlanResponse: response ?? undefined,
-    });
-
-    const latestSavedMealPlan = nextSavedMealPlans[0];
-
-    navigate(`/result/${latestSavedMealPlan.id}`);
-
-
-    setSavedMealPlans(nextSavedMealPlans);
+    await generateAiMealPlan(selectedMealPlan, nutritionTarget);
   };
 
   const goToSavedPlans = () => {
@@ -130,10 +105,52 @@ function App() {
     navigate("/favorite-foods");
   };
 
-  const handleDeleteSavedMealPlan = (id: string) => {
-    const nextSavedMealPlans = deleteSavedMealPlan(id);
+  const handleSaveMealPlan = async () => {
+    if (viewingSavedMealPlan != null) {
+      alert("이미 저장된 식단입니다.");
+      return;
+    }
 
-    setSavedMealPlans(nextSavedMealPlans);
+    try {
+      const savedMealPlan = await createSavedMealPlan({
+        profile: resultProfile,
+        goal: resultGoal,
+        target: resultTarget,
+        planDuration,
+        mealPlan: resultMealPlan,
+        aiMealPlanResponse: resultAiMealPlanResponse ?? undefined,
+      });
+
+      setSavedMealPlans((currentSavedMealPlans) => [
+        savedMealPlan,
+        ...currentSavedMealPlans.filter((plan) => plan.id !== savedMealPlan.id),
+      ]);
+    } catch (error) {
+      console.error("식단 저장 실패:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "식단 저장 중 알 수 없는 오류가 발생했습니다.",
+      );
+    }
+  };
+
+  const handleDeleteSavedMealPlan = async (id: string) => {
+    try {
+      await deleteSavedMealPlanById(id);
+    } catch (error) {
+      console.error("식단 삭제 실패:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "식단 삭제 중 알 수 없는 오류가 발생했습니다.",
+      );
+      return;
+    }
+
+    setSavedMealPlans((currentSavedMealPlans) =>
+      currentSavedMealPlans.filter((savedMealPlan) => savedMealPlan.id !== id),
+    );
 
     if (viewingSavedMealPlan?.id === id) {
       setViewingSavedMealPlan(null);
@@ -146,12 +163,59 @@ function App() {
     navigate(`/result/${savedMealPlan.id}`);
   };
 
-  const handleToggleFavoriteFood = (food: MealFood) => {
-    setFavoriteFoods(toggleFavoriteFood(food));
+  const handleToggleFavoriteFood = async (food: MealFood) => {
+    const mealPlanId = activeSavedMealPlan?.id ?? resultMealPlan.id;
+    const existingFavoriteFood = favoriteFoods.find(
+      (favoriteFood) => favoriteFood.name === food.name,
+    );
+
+    try {
+      if (existingFavoriteFood != null) {
+        await deleteMealPlanFavorite(mealPlanId);
+        setFavoriteFoods((currentFavoriteFoods) =>
+          currentFavoriteFoods.filter(
+            (favoriteFood) => favoriteFood.name !== food.name,
+          ),
+        );
+        return;
+      }
+
+      const favoriteFood = await addMealPlanFavorite({ mealPlanId, food });
+
+      setFavoriteFoods((currentFavoriteFoods) => [
+        favoriteFood,
+        ...currentFavoriteFoods.filter(
+          (currentFavoriteFood) => currentFavoriteFood.name !== food.name,
+        ),
+      ]);
+    } catch (error) {
+      console.error("즐겨찾기 변경 실패:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "즐겨찾기 변경 중 알 수 없는 오류가 발생했습니다.",
+      );
+    }
   };
 
-  const handleDeleteFavoriteFood = (id: string) => {
-    setFavoriteFoods(deleteFavoriteFood(id));
+  const handleDeleteFavoriteFood = async (id: string) => {
+    const mealPlanId = id.includes(":") ? id.split(":")[0] : resultMealPlan.id;
+
+    try {
+      await deleteMealPlanFavorite(mealPlanId);
+    } catch (error) {
+      console.error("즐겨찾기 삭제 실패:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "즐겨찾기 삭제 중 알 수 없는 오류가 발생했습니다.",
+      );
+      return;
+    }
+
+    setFavoriteFoods((currentFavoriteFoods) =>
+      currentFavoriteFoods.filter((favoriteFood) => favoriteFood.id !== id),
+    );
   };
 
   const onBack = () => {
@@ -164,6 +228,28 @@ function App() {
   const resultTarget = activeSavedMealPlan?.target ?? nutritionTarget;
   const resultMealPlan = activeSavedMealPlan?.mealPlan ?? selectedMealPlan;
   const resultAiMealPlanResponse = activeSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
+  const resultScreen = (
+    <ResultScreen
+      aiError={aiError}
+      aiMealPlanResponse={resultAiMealPlanResponse}
+      favoriteFoods={favoriteFoods}
+      goal={resultGoal}
+      isAiLoading={isAiLoading}
+      isSavedView={activeSavedMealPlan != null}
+      mealPlan={resultMealPlan}
+      profile={resultProfile}
+      savedAt={activeSavedMealPlan?.savedAt}
+      target={resultTarget}
+      onLoginRequired={() => alert("로그인 기능은 아직 구현되지 않았습니다.")}
+      onSaveMealPlan={() => void handleSaveMealPlan()}
+      onFavoriteFoodToggle={handleToggleFavoriteFood}
+      onRetryAiGenerate={() =>
+        void generateAiMealPlan(resultMealPlan, resultTarget)
+      }
+      onBack={onBack}
+      onRestart={() => {navigate("/")}}
+    />
+  );
 
   return (
     <main className="appShell">
@@ -214,35 +300,11 @@ function App() {
           }
         />
 
+        <Route path="/result" element={resultScreen} />
+
         <Route
           path="/result/:mealPlanId"
-          element={
-            <ResultScreen
-              aiError={aiError}
-              aiMealPlanResponse={resultAiMealPlanResponse}
-              favoriteFoods={favoriteFoods}
-              goal={resultGoal}
-              isAiLoading={isAiLoading}          
-              isSavedView={activeSavedMealPlan != null}
-              mealPlan={resultMealPlan}
-              profile={resultProfile}
-              savedAt={activeSavedMealPlan?.savedAt}
-              target={resultTarget}          
-              onLoginRequired={() => alert("로그인 기능은 아직 구현되지 않았습니다.")}
-              onSaveMealPlan={() => {
-                if (viewingSavedMealPlan) {
-                  alert("이미 저장된 식단입니다.");
-                  return;
-                }
-              }}
-              onFavoriteFoodToggle={handleToggleFavoriteFood}
-              onRetryAiGenerate={() =>
-                void generateAiMealPlan(resultMealPlan, resultTarget)
-              }
-              onBack={onBack}
-              onRestart={() => {navigate("/")}}          
-            />
-          }
+          element={resultScreen}
         />
 
         <Route

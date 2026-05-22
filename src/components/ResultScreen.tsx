@@ -54,6 +54,7 @@ export function ResultScreen({
   target,
   onFavoriteFoodToggle,
   onRetryAiGenerate,
+  onSaveMealPlan,
   onBack,
   onRestart,  
 }: ResultScreenProps) {
@@ -117,7 +118,7 @@ export function ResultScreen({
                   <MacroItem label="탄수화물" value={target.carbsGram} />
                   <MacroItem label="지방" value={target.fatGram} />
                 </div>     
-               <Button>식단 저장하기</Button>
+               <Button onClick={onSaveMealPlan}>식단 저장하기</Button>
 
               </div>
 
@@ -402,7 +403,6 @@ interface FoodRowProps {
 }
 
 // 식단 안의 음식 한 줄을 보여주는 컴포넌트입니다.
-// 별 버튼은 localStorage 기반 즐겨찾기 토글에 연결됩니다.
 function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
   return (
     <div className="foodRow">

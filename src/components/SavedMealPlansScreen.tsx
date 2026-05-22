@@ -19,7 +19,7 @@ export function SavedMealPlansScreen({
   return (
     <section className="screen">
       <ScreenSectionHeader
-        description="브라우저 localStorage에 저장된 식단만 표시합니다."
+        description="저장된 식단을 확인하고 다시 볼 수 있습니다."
         step="저장 목록"
         title="저장된 식단"
       />

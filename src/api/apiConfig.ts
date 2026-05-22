@@ -7,12 +7,17 @@
 // 배포 환경에서는 실제 서버 URL로 교체하면 됩니다.
 export const API_BASE_URL = "http://localhost:8080";
 
-// 식단 계획 API 엔드포인트입니다.
+// API 엔드포인트입니다.
 export const API_ENDPOINTS = {
   MEAL_PLAN: "/api/meal-plan",
+  MEAL_PLANS: "/api/meal-plans",
 } as const;
 
 // endpoint를 받아 전체 API URL을 만드는 헬퍼 함수입니다.
 export const getApiUrl = (endpoint: string): string => {
   return `${API_BASE_URL}${endpoint}`;
+};
+
+export const getMealPlanFavoriteUrl = (mealPlanId: string): string => {
+  return getApiUrl(`${API_ENDPOINTS.MEAL_PLANS}/${mealPlanId}/favorite`);
 };

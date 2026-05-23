@@ -51,8 +51,7 @@ export async function mockGenerateMealPlan({
     throw new Error("목표 칼로리가 올바르지 않아 mock AI 식단을 만들 수 없습니다.");
   }
 
-  return {
-    schemaVersion: "fitplate.aiMealPlan.v1",
+  return {    
     source: "mock",
     generatedAt: new Date().toISOString(),
     targetCalories: target.calories,

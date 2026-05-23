@@ -299,12 +299,9 @@ if (isAiLoading) {
 
   return (
     <section className="aiPanel">
-      <div className="aiPanelHeader">
-        <div>
-          <h3>AI 식단 결과</h3>
-          <p>{aiMealPlanResponse.summary}</p>
-        </div>
-        <span>{aiMealPlanResponse.schemaVersion}</span>
+      <div className="aiPanelHeader">        
+        <h3>AI 식단 결과</h3>
+        <p>{aiMealPlanResponse.summary}</p>        
       </div>
 
       <div className="aiMetaGrid">        

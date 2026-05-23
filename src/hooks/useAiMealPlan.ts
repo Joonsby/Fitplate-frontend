@@ -8,6 +8,25 @@ import type {
   UserProfile,
 } from "../types/fitplate";
 
+const SESSION_KEY = "fitplate_aiMealPlanResponse";
+
+function loadFromSession(): AIMealPlanResponse | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as AIMealPlanResponse) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveToSession(response: AIMealPlanResponse | null): void {
+  if (response == null) {
+    sessionStorage.removeItem(SESSION_KEY);
+  } else {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(response));
+  }
+}
+
 interface UseAiMealPlanParams {
   profile: UserProfile;
   goal: GoalType;
@@ -15,9 +34,14 @@ interface UseAiMealPlanParams {
 
 export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
   const [aiMealPlanResponse, setAiMealPlanResponse] =
-    useState<AIMealPlanResponse | null>(null);
+    useState<AIMealPlanResponse | null>(loadFromSession);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+
+  const setAndSave = (response: AIMealPlanResponse | null) => {
+    saveToSession(response);
+    setAiMealPlanResponse(response);
+  };
 
   const generateAiMealPlan = async (
     mealPlan: MealPlan,
@@ -25,7 +49,7 @@ export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
   ) => {
     setIsAiLoading(true);
     setAiError(null);
-    setAiMealPlanResponse(null);
+    setAndSave(null);
 
     try {
       const response = await generateMealPlanFromApi({
@@ -35,7 +59,7 @@ export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
         targetCalories: target.calories,
       });
 
-      setAiMealPlanResponse(response);
+      setAndSave(response);
 
       return response;
     } catch (error) {
@@ -53,13 +77,13 @@ export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
   };
 
   const resetAiMealPlan = () => {
-    setAiMealPlanResponse(null);
+    setAndSave(null);
     setAiError(null);
     setIsAiLoading(false);
   };
 
   const restoreAiMealPlan = (response: AIMealPlanResponse | null) => {
-    setAiMealPlanResponse(response);
+    setAndSave(response);
     setAiError(null);
     setIsAiLoading(false);
   };

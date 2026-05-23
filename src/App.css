@@ -411,6 +411,7 @@ button:focus{
 
 .aiPanelHeader {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   gap: 12px;
 }

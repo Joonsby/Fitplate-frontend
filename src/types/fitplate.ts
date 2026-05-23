@@ -133,8 +133,7 @@ export interface AIDayMealPlan {
 
 // mock AI 식단 응답 전체 타입입니다.
 // schemaVersion은 나중에 JSON 구조를 바꿀 때 버전을 구분하기 위해 둡니다.
-export interface AIMealPlanResponse {
-  schemaVersion: "fitplate.aiMealPlan.v1";
+export interface AIMealPlanResponse {  
   source: "mock";
   generatedAt: string;
   targetCalories: number;

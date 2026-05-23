@@ -1,0 +1,157 @@
+import { useNavigate } from "react-router-dom";
+import { ResultScreen } from "../components/ResultScreen";
+import {
+  addMealPlanFavorite,
+  createSavedMealPlan,
+  deleteMealPlanFavorite,
+} from "../api/mealPlanStorageApi";
+import type {
+  AIMealPlanResponse,
+  FavoriteFood,
+  GoalType,
+  MealFood,
+  MealPlan,
+  NutritionTarget,
+  PlanDuration,
+  SavedMealPlan,
+  UserProfile,
+} from "../types/fitplate";
+
+interface ResultPageProps {
+  profile: UserProfile;
+  goal: GoalType;
+  planDuration: PlanDuration;
+  nutritionTarget: NutritionTarget;
+  selectedMealPlan: MealPlan;
+  viewingSavedMealPlan: SavedMealPlan | null;
+  favoriteFoods: FavoriteFood[];
+  setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
+  setSavedMealPlans: React.Dispatch<React.SetStateAction<SavedMealPlan[]>>;
+  aiMealPlanResponse: AIMealPlanResponse | null;
+  aiError: string | null;
+  isAiLoading: boolean;
+  generateAiMealPlan: (
+    mealPlan: MealPlan,
+    target: NutritionTarget,
+  ) => Promise<AIMealPlanResponse | null>;
+  onBack: () => void;
+}
+
+export function ResultPage({
+  profile,
+  goal,
+  planDuration,
+  nutritionTarget,
+  selectedMealPlan,
+  viewingSavedMealPlan,
+  favoriteFoods,
+  setFavoriteFoods,
+  setSavedMealPlans,
+  aiMealPlanResponse,
+  aiError,
+  isAiLoading,
+  generateAiMealPlan,
+  onBack,
+}: ResultPageProps) {
+  const navigate = useNavigate();
+
+  const resultProfile = viewingSavedMealPlan?.profile ?? profile;
+  const resultGoal = viewingSavedMealPlan?.goal ?? goal;
+  const resultTarget = viewingSavedMealPlan?.target ?? nutritionTarget;
+  const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? selectedMealPlan;
+  const resultAiMealPlanResponse =
+    viewingSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
+
+  const handleSaveMealPlan = async () => {
+    if (viewingSavedMealPlan != null) {
+      alert("이미 저장된 식단입니다.");
+      return;
+    }
+
+    try {
+      const savedMealPlan = await createSavedMealPlan({
+        profile: resultProfile,
+        goal: resultGoal,
+        target: resultTarget,
+        planDuration,
+        mealPlan: resultMealPlan,
+        aiMealPlanResponse: resultAiMealPlanResponse ?? undefined,
+      });
+
+      setSavedMealPlans((currentSavedMealPlans) => [
+        savedMealPlan,
+        ...currentSavedMealPlans.filter((plan) => plan.id !== savedMealPlan.id),
+      ]);
+
+      alert("식단을 저장했습니다.");
+    } catch (error) {
+      console.error("식단 저장 실패:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "식단 저장 중 알 수 없는 오류가 발생했습니다.",
+      );
+    }
+  };
+
+  const handleToggleFavoriteFood = async (food: MealFood) => {
+    const mealPlanId = viewingSavedMealPlan?.id ?? resultMealPlan.id;
+
+    const existingFavoriteFood = favoriteFoods.find(
+      (favoriteFood) => favoriteFood.name === food.name,
+    );
+
+    try {
+      if (existingFavoriteFood != null) {
+        await deleteMealPlanFavorite(mealPlanId);
+
+        setFavoriteFoods((currentFavoriteFoods) =>
+          currentFavoriteFoods.filter(
+            (favoriteFood) => favoriteFood.name !== food.name,
+          ),
+        );
+
+        return;
+      }
+
+      const favoriteFood = await addMealPlanFavorite({ mealPlanId, food });
+
+      setFavoriteFoods((currentFavoriteFoods) => [
+        favoriteFood,
+        ...currentFavoriteFoods.filter(
+          (currentFavoriteFood) => currentFavoriteFood.name !== food.name,
+        ),
+      ]);
+    } catch (error) {
+      console.error("즐겨찾기 변경 실패:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "즐겨찾기 변경 중 알 수 없는 오류가 발생했습니다.",
+      );
+    }
+  };
+
+  return (
+    <ResultScreen
+      aiError={aiError}
+      aiMealPlanResponse={resultAiMealPlanResponse}
+      favoriteFoods={favoriteFoods}
+      goal={resultGoal}
+      isAiLoading={isAiLoading}
+      isSavedView={viewingSavedMealPlan != null}
+      mealPlan={resultMealPlan}
+      profile={resultProfile}
+      savedAt={viewingSavedMealPlan?.savedAt}
+      target={resultTarget}
+      onLoginRequired={() => alert("로그인 기능은 아직 구현되지 않았습니다.")}
+      onSaveMealPlan={() => void handleSaveMealPlan()}
+      onFavoriteFoodToggle={handleToggleFavoriteFood}
+      onRetryAiGenerate={() =>
+        void generateAiMealPlan(resultMealPlan, resultTarget)
+      }
+      onBack={onBack}
+      onRestart={() => navigate("/")}
+    />
+  );
+}

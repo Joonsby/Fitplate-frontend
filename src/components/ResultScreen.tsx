@@ -1,4 +1,4 @@
-﻿import { Button, Badge } from "@toss/tds-mobile";
+﻿import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../constants/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
@@ -16,6 +16,8 @@ import type {
 } from "../types/fitplate";
 import { aggregateShoppingList } from "../utils/shoppingListAggregator";
 
+
+
 interface ResultScreenProps {
   profile: UserProfile;
   goal: GoalType;
@@ -27,6 +29,8 @@ interface ResultScreenProps {
   aiError: string | null;
   aiMealPlanResponse: AIMealPlanResponse | null;
   savedAt?: string;  
+  onLoginRequired: () => void;
+  onSaveMealPlan?: () => void;
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
   onBack: () => void;
@@ -38,22 +42,22 @@ interface ResultScreenProps {
 // 결과 화면 컴포넌트입니다.
 // 규칙 기반 식단과 AI 응답을 함께 보여줍니다.
 export function ResultScreen({
-  profile,
-  goal,
-  target,
-  mealPlan,  
-  favoriteFoods,
-  isSavedView,
-  isAiLoading,
   aiError,
   aiMealPlanResponse,
+  favoriteFoods,
+  goal,
+  isAiLoading,
+  isSavedView,
+  mealPlan,  
+  profile,
   savedAt,  
+  target,
   onFavoriteFoodToggle,
   onRetryAiGenerate,
+  onSaveMealPlan,
   onBack,
   onRestart,  
-}: ResultScreenProps) {    
-  
+}: ResultScreenProps) {
   const shoppingList = aggregateShoppingList(mealPlan);
   const favoriteFoodNames = new Set(
     favoriteFoods.map((favoriteFood) => favoriteFood.name),
@@ -68,7 +72,7 @@ export function ResultScreen({
   const shouldShowFallbackFailure = !isAiLoading && aiError != null && aiMealPlanResponse == null;  
 
   return (
-    <section className="screen">
+    <section className="screen">      
       {shouldShowFallbackFailure ? (
         <AiMealPlanFailureScreen
           aiError={aiError}
@@ -86,16 +90,16 @@ export function ResultScreen({
         />
       ) : null}
       {!isAiLoading && aiMealPlanResponse != null ? (
-        <>
+        <>         
           <ScreenSectionHeader
             description={`${profile.heightCm}cm, ${profile.weightKg}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
             step={isSavedView ? "저장된 식단" : "3단계"}
             title={`${GOAL_LABELS[goal]} 결과`}
           >
             {savedDate ? (
-              <p className="savedAtText">저장 날짜: {savedDate}</p>
+              <Post.H3 color="#3182f6" typography="t7" className="savedAtText">저장 날짜: {savedDate}</Post.H3>
             ) : null}
-          </ScreenSectionHeader>
+          </ScreenSectionHeader>          
           <section className="mealPlanSummary">
             <div className="mealPlanSummaryInner">
               <div className="nutritionSummary">                
@@ -113,11 +117,9 @@ export function ResultScreen({
                   <MacroItem label="단백질" value={target.proteinGram} />
                   <MacroItem label="탄수화물" value={target.carbsGram} />
                   <MacroItem label="지방" value={target.fatGram} />
-                </div>
+                </div>     
+               <Button onClick={onSaveMealPlan}>식단 저장하기</Button>
 
-                <div className="autoSaveNotice">
-                  <Badge size="large" color="blue" variant="weak">생성된 식단은 자동으로 저장되었어요.</Badge>
-                </div>
               </div>
 
               <AiMealPlanPanel
@@ -141,7 +143,7 @@ export function ResultScreen({
                     onFavoriteFoodToggle={onFavoriteFoodToggle}
                   />
                     ))}
-              </div>
+              </div>             
               
               <div className="shoppingList">
                 <div className="mealListHeader">
@@ -195,38 +197,44 @@ function AiMealPlanFailureScreen({
   target,
   onRetryAiGenerate,
 }: AiMealPlanFailureScreenProps) {
-  return (
-    <section className="aiFailureScreen" role="alert">
-      <div>
-        <p className="stepText">AI 식단 생성 실패</p>
-        <h2>식단을 불러오지 못했어요</h2>
-        <p>
-          서버 응답이 없거나 일시적인 오류가 발생했습니다. 입력한 신체정보와
-          목표는 유지되니 다시 시도할 수 있어요.
+  return (    
+    <section className="aiFailureSection">
+      <div className="aiFailureScreen" role="alert">
+        <div>
+          <p className="stepText">AI 식단 생성 실패</p>
+          <h2>식단을 불러오지 못했어요</h2>
+          <p>
+            서버 응답이 없거나 일시적인 오류가 발생했습니다. 입력한 신체정보와
+            목표는 유지되니 다시 시도할 수 있어요.
+          </p>
+        </div>
+
+        <div className="caloriePanel">
+          <span>목표 칼로리</span>
+          <strong>{target.calories.toLocaleString()} kcal</strong>
+        </div>
+
+        <div className="metricGrid">
+          <MetricItem label="BMR" value={target.bmr} unit="kcal" />
+          <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
+        </div>
+
+        <div className="macroGrid">
+          <MacroItem label="단백질" value={target.proteinGram} />
+          <MacroItem label="탄수화물" value={target.carbsGram} />
+          <MacroItem label="지방" value={target.fatGram} />
+        </div>
+
+        <p className="failureReason">
+          {aiError.split("\n").map((line, i) => (
+            <span key={i}>{line}<br /></span>
+          ))}
         </p>
+
+        <Button color="dark" onClick={onRetryAiGenerate}>
+          다시 생성하기
+        </Button>
       </div>
-
-      <div className="caloriePanel">
-        <span>목표 칼로리</span>
-        <strong>{target.calories.toLocaleString()} kcal</strong>
-      </div>
-
-      <div className="metricGrid">
-        <MetricItem label="BMR" value={target.bmr} unit="kcal" />
-        <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
-      </div>
-
-      <div className="macroGrid">
-        <MacroItem label="단백질" value={target.proteinGram} />
-        <MacroItem label="탄수화물" value={target.carbsGram} />
-        <MacroItem label="지방" value={target.fatGram} />
-      </div>
-
-      <p className="failureReason">{aiError}</p>
-
-      <Button color="dark" onClick={onRetryAiGenerate}>
-        다시 생성하기
-      </Button>
     </section>
   );
 }
@@ -239,24 +247,26 @@ function AiMealPlanPanel({
 }: AiMealPlanPanelProps) {
 if (isAiLoading) {
   return (
-    <section className="aiPanel loadingPanel">
-      <div className="loadingSpinner" />
+    <section className="loadingPanelSection">
+      <div className="aiPanel loadingPanel">
+        <div className="loadingSpinner" />
 
-      <h3>AI가 식단을 생성하고 있어요</h3>
-      <p>신체정보와 목표를 바탕으로 맞춤 식단을 구성하는 중입니다.</p>
+        <h3>AI가 식단을 생성하고 있어요</h3>
+        <p>신체정보와 목표를 바탕으로 맞춤 식단을 구성하는 중입니다.</p>
 
-      <div className="adBox">
-        <span className="adLabel">AD</span>
+        <div className="adBox">
+          <span className="adLabel">AD</span>
 
-        <strong>단백질 식단 준비 중이라면?</strong>
+          <strong>단백질 식단 준비 중이라면?</strong>
 
-        <p>
-          닭가슴살, 현미밥, 샐러드 재료를 미리 준비해보세요.
-        </p>
+          <p>
+            닭가슴살, 현미밥, 샐러드 재료를 미리 준비해보세요.
+          </p>
 
-        <button type="button">
-          추천 재료 보기
-        </button>
+          <button type="button">
+            추천 재료 보기
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -266,7 +276,11 @@ if (isAiLoading) {
     return (
       <section className="aiPanel error">
         <h3>AI 응답 오류</h3>
-        <p>{aiError}</p>
+        <p>
+          {aiError.split("\n").map((line, i) => (
+            <span key={i}>{line}<br /></span>
+          ))}
+        </p>
         <button type="button" onClick={onRetryAiGenerate}>
           다시 생성하기
         </button>
@@ -389,7 +403,6 @@ interface FoodRowProps {
 }
 
 // 식단 안의 음식 한 줄을 보여주는 컴포넌트입니다.
-// 별 버튼은 localStorage 기반 즐겨찾기 토글에 연결됩니다.
 function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
   return (
     <div className="foodRow">

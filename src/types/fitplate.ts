@@ -144,8 +144,7 @@ export interface AIMealPlanResponse {
   days: AIDayMealPlan[];
 }
 
-// localStorage에 저장할 식단 타입입니다.
-// 다시 보기 화면에 필요한 값을 한 번에 저장하기 위해 프로필, 목표, 계산값, 식단을 함께 담습니다.
+// 다시 보기 화면에 필요한 저장 식단 타입입니다.
 export interface SavedMealPlan {
   id: string;
   savedAt: string;

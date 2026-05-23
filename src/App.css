@@ -74,7 +74,7 @@ button:focus{
 .mealPlanSummaryInner {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
   padding: 0 24px;
 }
 
@@ -224,8 +224,29 @@ button:focus{
 
 .autoSaveNotice{
   display:flex;
+  justify-content: center;  
+}
+
+.loginSaveNotice{
+  display:flex;
+  flex-direction: column;  
+  gap: 12px;
+  border:1px solid #e5e8eb;
+  padding :24px;
+  border-radius: 8px;
+}
+
+.loginSaveNotice p{
+  font-size: 14px;
+  text-align: center;
+  color: #4e5968;
+}
+
+.loginNoticeHeader{
+  display:flex;
   justify-content: center;
 }
+
 
 .metricItem,
 .macroItem {
@@ -302,6 +323,10 @@ button:focus{
 .aiPanel.error {
   border-color: #ffd6d9;
   background: #fff7f8;
+}
+
+.aiFailureSection{
+  padding:24px;
 }
 
 .aiFailureScreen {
@@ -753,6 +778,10 @@ button:focus{
   border-color: #3182f6;
   background: #edf6ff;
   color: #1b64da;
+}
+
+.loadingPanelSection{
+  padding:24px;
 }
 
 .loadingPanel {

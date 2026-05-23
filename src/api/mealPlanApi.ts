@@ -6,6 +6,8 @@
   UserProfile,
 } from "../types/fitplate";
 
+import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
+
 interface BackendMeal {
   name: string;
   calories: number;
@@ -43,7 +45,7 @@ interface BackendMealPlanResponse {
  * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
  *   통째로 삭제하면 됩니다.
  */
-const USE_TEMPORARY_MEAL_PLAN_DATA = true;
+const USE_TEMPORARY_MEAL_PLAN_DATA = false;
 
 /**
  * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.
@@ -246,7 +248,7 @@ export async function generateMealPlanFromApi({
   let response: Response;
 
   try {
-    response = await fetch("http://localhost:8080/api/meal-plan", {
+    response = await fetch(`${getApiUrl(API_ENDPOINTS.MEAL_PLAN)}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -256,7 +258,7 @@ export async function generateMealPlanFromApi({
   } catch (error) {
     console.error("식단 생성 API 네트워크 오류:", error);
     throw new Error(
-      "AI 식단 생성 서버에 연결하지 못했습니다. 서버 상태를 확인한 뒤 다시 시도해주세요.",
+      `AI 식단 생성 서버에 연결하지 못했습니다.\n 서버 상태를 확인한 뒤 다시 시도해주세요.`
     );
   }
 

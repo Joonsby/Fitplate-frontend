@@ -73,7 +73,6 @@ function App() {
 
       <Routes>
         <Route path="/" element={<HomePage profile={profile} />} />
-
         <Route
           path="/goal"
           element={
@@ -90,7 +89,6 @@ function App() {
             />
           }
         />
-
         <Route
           path="/result"
           element={
@@ -112,7 +110,6 @@ function App() {
             />
           }
         />
-
         <Route
           path="/saved-plans"
           element={
@@ -125,7 +122,6 @@ function App() {
             />
           }
         />
-
         <Route
           path="/favorite-foods"
           element={

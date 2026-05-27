@@ -1,4 +1,6 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useRef} from "react";
+import { appLogin } from "@apps-in-toss/web-framework";
 import "./App.css";
 import { AppTopTitle } from "./components/AppTopTitle";
 import { HomePage } from "./pages/HomePage";
@@ -14,6 +16,35 @@ import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  const hasRunRef = useRef(false);
+
+  useEffect(() => {
+    if (hasRunRef.current) return;
+    hasRunRef.current = true;
+
+    async function checkLogin() {
+      try {
+        const { authorizationCode, referrer } = await appLogin();
+
+        const response = await fetch("http://localhost:8080/api/auth/toss-login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ authorizationCode, referrer }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`로그인 실패: ${response.status}`);
+        }
+
+      } catch (error) {
+        console.error("[TossLogin] 실패", error);
+      }
+    }
+
+    checkLogin();
+  }, []);
 
   const {
     profile,

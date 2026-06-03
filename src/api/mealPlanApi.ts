@@ -5,8 +5,8 @@
   ShoppingCategory,
   UserProfile,
 } from "../types/fitplate";
-
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
+import { getAccessToken } from "./authToken";
 
 interface BackendMeal {
   name: string;
@@ -27,6 +27,22 @@ interface BackendMealPlanResponse {
   days: BackendDay[];
 }
 
+interface BackendMealPlanGenerateResponse {
+  height: number;
+  weight: number;
+  age: number;
+  gender: string;
+  goal: string;
+  periodDays: PlanDuration;
+  targetCalories: number;
+  bmr: number;
+  tdee: number;
+  proteinGram: number;
+  carbsGram: number;
+  fatGram: number;
+  aiMealPlanResponse: BackendMealPlanResponse;
+}
+
 /**
  * 임시 식단 데이터 사용 여부입니다.
  *
@@ -45,7 +61,7 @@ interface BackendMealPlanResponse {
  * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
  *   통째로 삭제하면 됩니다.
  */
-const USE_TEMPORARY_MEAL_PLAN_DATA = true;
+const USE_TEMPORARY_MEAL_PLAN_DATA = false;
 
 /**
  * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.
@@ -247,10 +263,15 @@ export async function generateMealPlanFromApi({
   let response: Response;
 
   try {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      throw new Error("인증 토큰이 없습니다. 로그인 상태를 확인해주세요.");
+    }
     response = await fetch(`${getApiUrl(API_ENDPOINTS.MEAL_PLAN)}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
       },
       body: JSON.stringify(requestBody),
     });
@@ -277,7 +298,7 @@ if (!response.ok) {
   );
 }
 
-  const data = (await response.json()) as BackendMealPlanResponse;  
+  const data = (await response.json()) as BackendMealPlanGenerateResponse;
   console.log("백엔드로부터 받은 식단 응답:", data);
-  return mapBackendMealPlan(data, targetCalories, durationDays);
+  return mapBackendMealPlan(data.aiMealPlanResponse, data.targetCalories, data.periodDays);
 }

@@ -1,5 +1,5 @@
 ﻿import { Button, Post } from "@toss/tds-mobile";
-import { GOAL_LABELS } from "../constants/fitplate";
+import { GOAL_LABELS } from "../types/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type {

@@ -10,6 +10,7 @@ import type {
   UserProfile,
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl, getMealPlanFavoriteUrl } from "./apiConfig";
+import { getAccessToken } from "./authToken";
 
 export interface CreateSavedMealPlanInput {
   profile: UserProfile;
@@ -18,6 +19,12 @@ export interface CreateSavedMealPlanInput {
   planDuration: PlanDuration;
   mealPlan: MealPlan;
   aiMealPlanResponse?: AIMealPlanResponse;
+}
+
+export interface SaveMealPlanRequest {
+  goal: GoalType;
+  periodDays: number;
+  aiMealPlanResponse: AIMealPlanResponse;
 }
 
 function createClientId(prefix: string): string {
@@ -69,12 +76,19 @@ async function readOptionalJson(response: Response): Promise<unknown> {
 export async function createSavedMealPlan(
   input: CreateSavedMealPlanInput,
 ): Promise<SavedMealPlan> {
-  const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLANS), {
+  const accessToken = getAccessToken();
+  const requestBody = {
+    goal: input.goal,
+    periodDays: input.planDuration,
+    aiMealPlanResponse: input.aiMealPlanResponse,
+  };  
+  const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${accessToken}`,
     },
-    body: JSON.stringify(input),
+    body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
@@ -90,7 +104,7 @@ export async function deleteSavedMealPlanById(
   mealPlanId: string,
 ): Promise<void> {
   const response = await fetch(
-    getApiUrl(`${API_ENDPOINTS.MEAL_PLANS}/${mealPlanId}`),
+    getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}`),
     {
       method: "DELETE",
     },

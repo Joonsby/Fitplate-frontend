@@ -10,7 +10,9 @@ export const API_BASE_URL = "http://localhost:8080";
 // API 엔드포인트입니다.
 export const API_ENDPOINTS = {
   MEAL_PLAN: "/api/meal-plan",
-  MEAL_PLANS: "/api/meal-plans",
+  MEAL_PLAN_SAVE: "/api/meal-plan/save",
+  AUTH_DEV_LOGIN: "/api/auth/dev-login",
+  AUTH_TOSS_LOGIN: "/api/auth/toss-login",
 } as const;
 
 // endpoint를 받아 전체 API URL을 만드는 헬퍼 함수입니다.
@@ -19,5 +21,5 @@ export const getApiUrl = (endpoint: string): string => {
 };
 
 export const getMealPlanFavoriteUrl = (mealPlanId: string): string => {
-  return getApiUrl(`${API_ENDPOINTS.MEAL_PLANS}/${mealPlanId}/favorite`);
+  return getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}/favorite`);
 };

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Toast } from "@toss/tds-mobile";
 import { useNavigate } from "react-router-dom";
 import { ResultScreen } from "../components/ResultScreen";
 import {
@@ -54,6 +56,13 @@ export function ResultPage({
   onBack,
 }: ResultPageProps) {
   const navigate = useNavigate();
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastText, setToastText] = useState("");
+
+  const showToast = (text: string) => {
+    setToastText(text);
+    setToastOpen(true);
+  };
 
   const resultProfile = viewingSavedMealPlan?.profile ?? profile;
   const resultGoal = viewingSavedMealPlan?.goal ?? goal;
@@ -64,7 +73,7 @@ export function ResultPage({
 
   const handleSaveMealPlan = async () => {
     if (viewingSavedMealPlan != null) {
-      alert("이미 저장된 식단입니다.");
+      showToast("이미 저장된 식단입니다.");
       return;
     }
 
@@ -83,7 +92,7 @@ export function ResultPage({
         ...currentSavedMealPlans.filter((plan) => plan.id !== savedMealPlan.id),
       ]);
 
-      alert("식단을 저장했습니다.");
+      showToast("식단을 저장했습니다.");
     } catch (error) {
       console.error("식단 저장 실패:", error);
       alert(
@@ -133,7 +142,16 @@ export function ResultPage({
   };
 
   return (
-    <ResultScreen
+    <>
+      <Toast
+        position="top"
+        open={toastOpen}
+        text={toastText}
+        leftAddon={<Toast.Lottie src="https://static.toss.im/lotties-common/check-green-spot.json" />}
+        duration={3000}
+        onClose={() => setToastOpen(false)}
+      />
+      <ResultScreen
       aiError={aiError}
       aiMealPlanResponse={resultAiMealPlanResponse}
       favoriteFoods={favoriteFoods}
@@ -144,7 +162,7 @@ export function ResultPage({
       profile={resultProfile}
       savedAt={viewingSavedMealPlan?.savedAt}
       target={resultTarget}
-      onLoginRequired={() => alert("로그인 기능은 아직 구현되지 않았습니다.")}
+      onLoginRequired={() => showToast("로그인 기능은 아직 구현되지 않았습니다.")}
       onSaveMealPlan={() => void handleSaveMealPlan()}
       onFavoriteFoodToggle={handleToggleFavoriteFood}
       onRetryAiGenerate={() =>
@@ -153,5 +171,6 @@ export function ResultPage({
       onBack={onBack}
       onRestart={() => navigate("/")}
     />
+    </>
   );
 }

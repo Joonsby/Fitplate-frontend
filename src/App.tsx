@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useRef} from "react";
+import { useEffect, useState, useCallback } from "react";
 import { appLogin } from "@apps-in-toss/web-framework";
 import "./App.css";
 import { AppTopTitle } from "./components/AppTopTitle";
@@ -12,39 +12,55 @@ import { useAiMealPlan } from "./hooks/useAiMealPlan";
 import { useMealPlanSelection } from "./hooks/useMealPlanSelection";
 import { useSavedMealPlans } from "./hooks/useSavedMealPlans";
 import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
+import { Loader, Result, Asset } from "@toss/tds-mobile";
+
+type LoginStatus = "loading" | "success" | "error";
+
+const IS_APP = false; // 앱 로그인 여부 (개발 편의를 위해 false로 설정, 실제 배포 시 true로 변경)
 
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const hasRunRef = useRef(false);
+  const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");
 
-  useEffect(() => {
-    if (hasRunRef.current) return;
-    hasRunRef.current = true;
+  const checkLogin = useCallback(async () => {
+  setLoginStatus("loading");
 
-    async function checkLogin() {
-      try {
-        const { authorizationCode, referrer } = await appLogin();
+  try {
+    let response: Response;
 
-        const response = await fetch("http://localhost:8080/api/auth/toss-login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ authorizationCode, referrer }),
-        });
+    if (IS_APP) {
+      const { authorizationCode, referrer } = await appLogin();
 
-        if (!response.ok) {
-          throw new Error(`로그인 실패: ${response.status}`);
-        }
-
-      } catch (error) {
-        console.error("[TossLogin] 실패", error);
-      }
+      response = await fetch("http://localhost:8080/api/auth/toss-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ authorizationCode, referrer }),
+      });
+    } else {
+      response = await fetch("http://localhost:8080/api/auth/dev-login", {
+        method: "POST",
+      });
     }
 
+    if (!response.ok) {
+      throw new Error(`로그인 실패: ${response.status}`);
+    }
+
+    const data = await response.json();
+    localStorage.setItem("fitplate_access_token",data.accessToken);    
+    setLoginStatus("success");
+  } catch (error) {
+    console.error("[Login] 실패", error);
+    setLoginStatus("error");
+  }
+}, []);
+
+  useEffect(() => {
     checkLogin();
-  }, []);
+  }, [checkLogin]);
 
   const {
     profile,
@@ -74,6 +90,27 @@ function App() {
     resetAiMealPlan,
     restoreAiMealPlan,
   } = useAiMealPlan({ profile, goal });
+
+  if (loginStatus === "loading") {
+    return (
+      <main className="appShell" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>        
+        <Loader size="large" label="로그인 중..." />
+      </main>
+    );
+  }
+
+  if (loginStatus === "error") {
+    return (
+      <main className="appShell" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
+        <Result
+          figure={<Asset.Icon name="icn-info-line" frameShape={Asset.frameShape.CleanH24} />}
+          title="로그인 실패"
+          description={`로그인에 실패했습니다 다시 시도해주세요`}
+          button={<Result.Button onClick={checkLogin}>재시도</Result.Button>}
+        />        
+      </main>
+    );
+  }
 
   const isResultPage = location.pathname === "/result";
 

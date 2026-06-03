@@ -19,15 +19,13 @@ interface GoalPageProps {
   onGeneratedStart: () => void;
   generateAiMealPlan: (
     mealPlan: MealPlan,
-    target: NutritionTarget,
   ) => Promise<AIMealPlanResponse | null>;
 }
 
 export function GoalPage({
   goal,
   planDuration,
-  selectedMealPlan,
-  nutritionTarget,
+  selectedMealPlan,  
   onGoalChange,
   onDurationChange,
   onBack,
@@ -40,7 +38,7 @@ export function GoalPage({
     onGeneratedStart();
     navigate("/result");
 
-    await generateAiMealPlan(selectedMealPlan, nutritionTarget);
+    await generateAiMealPlan(selectedMealPlan);
   };
 
   return (

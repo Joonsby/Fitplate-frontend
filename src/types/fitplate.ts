@@ -105,42 +105,44 @@ export interface ShoppingListItem {
   shoppingCategory: ShoppingCategory;
 }
 
-// AI 응답 안의 음식 항목 타입입니다.
-// 실제 API를 붙일 때도 이 구조를 지키면 화면 코드를 크게 바꾸지 않아도 됩니다.
-export interface AIMealFood {
-  name: string;
-  amount: string;
-  calories: number;
-  reason: string;
-  shoppingCategory: ShoppingCategory;
-}
-
 // AI 응답 안의 한 끼 식사 타입입니다.
 export interface AIMeal {
-  mealType: "breakfast" | "lunch" | "dinner";
-  title: string;
+  name: string;
   calories: number;
-  foods: AIMealFood[];
+  carbohydrate: number;
+  protein: number;
+  fat: number;
 }
 
 // AI 응답 안의 하루 식단 타입입니다.
 export interface AIDayMealPlan {
-  day: number;
-  title: string;
-  totalCalories: number;
-  meals: AIMeal[];
+  dayNumber: number;
+  breakfast: AIMeal;
+  lunch: AIMeal;
+  dinner: AIMeal;
 }
 
 // mock AI 식단 응답 전체 타입입니다.
 // schemaVersion은 나중에 JSON 구조를 바꿀 때 버전을 구분하기 위해 둡니다.
-export interface AIMealPlanResponse {  
-  source: "mock";
-  generatedAt: string;
-  targetCalories: number;
-  durationDays: PlanDuration;
-  summary: string;
-  cautions: string[];
+export interface AIMealPlanResponse {
   days: AIDayMealPlan[];
+}
+
+// 백엔드 식단 생성 API 전체 응답 타입입니다.
+export interface MealPlanGenerateResponse {
+  age: number;
+  height: number;
+  weight: number;
+  gender: "MALE" | "FEMALE";
+  goal: "WEIGHT_LOSS" | "MAINTAIN" | "WEIGHT_GAIN";
+  bmr: number;
+  tdee: number;
+  targetCalories: number;
+  proteinGram: number;
+  carbsGram: number;
+  fatGram: number;
+  periodDays: PlanDuration;
+  aiMealPlanResponse: AIMealPlanResponse;
 }
 
 // 다시 보기 화면에 필요한 저장 식단 타입입니다.
@@ -159,6 +161,16 @@ export interface SavedMealPlan {
 export interface SaveMealPlanRequest {
   goal: GoalType;
   periodDays: number;
+  aiMealPlanResponse: AIMealPlanResponse;
+}
+
+// ResultPage 복원에 필요한 전체 데이터를 localStorage에 보관하는 스냅샷 타입입니다.
+export interface ResultSnapshot {
+  profile: UserProfile;
+  goal: GoalType;
+  nutritionTarget: NutritionTarget;
+  planDuration: PlanDuration;
+  mealPlan: MealPlan;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 

@@ -1,31 +1,11 @@
-﻿import type {
+﻿import type {  
   AIMealPlanResponse,
   GoalType,
   PlanDuration,
-  ShoppingCategory,
   UserProfile,
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
 import { getAccessToken } from "./authToken";
-
-interface BackendMeal {
-  name: string;
-  calories: number;
-  protein: number;
-  carbohydrate: number;
-  fat: number;
-}
-
-interface BackendDay {
-  dayNumber: number;
-  breakfast: BackendMeal;
-  lunch: BackendMeal;
-  dinner: BackendMeal;
-}
-
-interface BackendMealPlanResponse {
-  days: BackendDay[];
-}
 
 interface BackendMealPlanGenerateResponse {
   height: number;
@@ -39,8 +19,8 @@ interface BackendMealPlanGenerateResponse {
   tdee: number;
   proteinGram: number;
   carbsGram: number;
-  fatGram: number;
-  aiMealPlanResponse: BackendMealPlanResponse;
+  fatGram: number;  
+  aiMealPlanResponse: AIMealPlanResponse;
 }
 
 /**
@@ -61,7 +41,7 @@ interface BackendMealPlanGenerateResponse {
  * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
  *   통째로 삭제하면 됩니다.
  */
-const USE_TEMPORARY_MEAL_PLAN_DATA = false;
+const USE_TEMPORARY_MEAL_PLAN_DATA = true;
 
 /**
  * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.
@@ -75,92 +55,96 @@ const USE_TEMPORARY_MEAL_PLAN_DATA = false;
  * 샘플 숫자입니다. 의학적/영양학적 처방 값이 아니므로 실제 서비스용 추천값으로
  * 사용하면 안 됩니다.
  */
-const TEMPORARY_MEAL_TEMPLATES: Array<{
-  breakfast: BackendMeal;
-  lunch: BackendMeal;
-  dinner: BackendMeal;
-}> = [
-  {
-    breakfast: {
-      name: "그릭요거트 바나나 볼",
-      calories: 420,
-      protein: 24,
-      carbohydrate: 58,
-      fat: 10,
-    },
-    lunch: {
-      name: "닭가슴살 현미밥 정식",
-      calories: 640,
-      protein: 42,
-      carbohydrate: 78,
-      fat: 15,
-    },
-    dinner: {
-      name: "연어 구이와 고구마 샐러드",
-      calories: 560,
-      protein: 36,
-      carbohydrate: 48,
-      fat: 22,
-    },
+const TEMPORARY_MEAL_PLAN_RESPONSE: BackendMealPlanGenerateResponse = {
+  age: 30,
+  bmr: 1598,
+  carbsGram: 295,
+  fatGram: 60,
+  gender: "MALE",
+  goal: "MAINTAIN",
+  height: 170,
+  periodDays: 3,
+  proteinGram: 109,
+  targetCalories: 2157,
+  tdee: 2157,
+  weight: 68,
+  aiMealPlanResponse: {
+    days: [
+      {
+        dayNumber: 1,
+        breakfast: {
+          name: "현미밥과 북어국, 계란후라이, 시금치나물",
+          calories: 560,
+          carbohydrate: 80,
+          fat: 16,
+          protein: 22.5,
+        },
+        lunch: {
+          name: "잡곡밥과 제육볶음, 상추쌈, 된장찌개",
+          calories: 820,
+          carbohydrate: 105,
+          fat: 26,
+          protein: 42,
+        },
+        dinner: {
+          name: "흑미밥과 삼치구이, 두부구이, 콩나물국",
+          calories: 720,
+          carbohydrate: 88,
+          fat: 24,
+          protein: 38,
+        },
+      },
+      {
+        dayNumber: 2,
+        breakfast: {
+          name: "소고기야채죽과 삶은 달걀, 백김치",
+          calories: 510,
+          carbohydrate: 78,
+          fat: 13,
+          protein: 20,
+        },
+        lunch: {
+          name: "전주비빔밥(소고기, 계란후라이 포함)과 미역국",
+          calories: 840,
+          carbohydrate: 115,
+          fat: 26.5,
+          protein: 35,
+        },
+        dinner: {
+          name: "현미밥과 해물순두부찌개, 조기구이, 애호박볶음",
+          calories: 750,
+          carbohydrate: 92,
+          fat: 24.5,
+          protein: 40,
+        },
+      },
+      {
+        dayNumber: 3,
+        breakfast: {
+          name: "잡곡밥과 야채계란말이, 소고기무국, 구운 김",
+          calories: 580,
+          carbohydrate: 82,
+          fat: 17,
+          protein: 25,
+        },
+        lunch: {
+          name: "현미밥과 안동찜닭, 시금치나물, 동치미",
+          calories: 810,
+          carbohydrate: 98,
+          fat: 26,
+          protein: 45,
+        },
+        dinner: {
+          name: "곤드레나물밥과 소불고기, 버섯구이, 배추된장국",
+          calories: 710,
+          carbohydrate: 85,
+          fat: 24,
+          protein: 38,
+        },
+      },
+    ],
   },
-  {
-    breakfast: {
-      name: "계란 토스트와 사과",
-      calories: 450,
-      protein: 26,
-      carbohydrate: 55,
-      fat: 14,
-    },
-    lunch: {
-      name: "소불고기 채소덮밥",
-      calories: 690,
-      protein: 38,
-      carbohydrate: 86,
-      fat: 20,
-    },
-    dinner: {
-      name: "닭가슴살 샐러드와 견과",
-      calories: 520,
-      protein: 44,
-      carbohydrate: 32,
-      fat: 24,
-    },
-  },
-  {
-    breakfast: {
-      name: "오트밀 과일 요거트",
-      calories: 430,
-      protein: 22,
-      carbohydrate: 64,
-      fat: 9,
-    },
-    lunch: {
-      name: "연어 현미밥 포케",
-      calories: 660,
-      protein: 39,
-      carbohydrate: 74,
-      fat: 21,
-    },
-    dinner: {
-      name: "계란 닭가슴살 볶음밥",
-      calories: 590,
-      protein: 41,
-      carbohydrate: 62,
-      fat: 18,
-    },
-  },
-];
-
-function createTemporaryBackendMealPlanResponse(
-  durationDays: PlanDuration,
-): BackendMealPlanResponse {
-  return {
-    days: Array.from({ length: durationDays }, (_, index) => ({
-      dayNumber: index + 1,
-      ...TEMPORARY_MEAL_TEMPLATES[index % TEMPORARY_MEAL_TEMPLATES.length],
-    })),
-  };
-}
+};
 
 function mapGoalToBackend(goal: GoalType): string {
   if (goal === "lose") return "WEIGHT_LOSS";
@@ -172,75 +156,15 @@ function mapGenderToBackend(gender: UserProfile["gender"]): string {
   return gender === "male" ? "MALE" : "FEMALE";
 }
 
-function guessShoppingCategory(name: string): ShoppingCategory {
-  if (name.includes("닭") || name.includes("불고기")) return "chicken";
-  if (name.includes("밥") || name.includes("현미")) return "rice";
-  if (name.includes("계란")) return "egg";
-  if (name.includes("연어") || name.includes("생선")) return "fish";
-  if (name.includes("고구마")) return "sweetPotato";
-  if (name.includes("요거트")) return "yogurt";
-  if (name.includes("과일") || name.includes("바나나") || name.includes("사과")) return "fruit";
-  if (name.includes("견과")) return "nuts";
-  return "vegetable";
-}
-
-function mapBackendMealPlan(
-  backend: BackendMealPlanResponse,
-  targetCalories: number,
-  durationDays: PlanDuration,
-): AIMealPlanResponse {
-  return {    
-    source: "mock",
-    generatedAt: new Date().toISOString(),
-    targetCalories,
-    durationDays,
-    summary: `${targetCalories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한 ${durationDays}일 식단입니다.`,
-    cautions: [
-      "의학적 진단이나 치료 목적의 식단이 아닙니다.",
-      "알레르기와 개인 질환이 있다면 전문가와 상담하세요.",
-    ],
-    days: backend.days.map((day) => {
-      const meals = [
-        { mealType: "breakfast" as const, title: "아침", meal: day.breakfast },
-        { mealType: "lunch" as const, title: "점심", meal: day.lunch },
-        { mealType: "dinner" as const, title: "저녁", meal: day.dinner },
-      ];
-
-      return {
-        day: day.dayNumber,
-        title: `${day.dayNumber}일차`,
-        totalCalories: meals.reduce((sum, item) => sum + item.meal.calories, 0),
-        meals: meals.map((item) => ({
-          mealType: item.mealType,
-          title: item.title,
-          calories: item.meal.calories,
-          foods: [
-            {
-              name: item.meal.name,
-              amount: "1인분",
-              calories: item.meal.calories,
-              shoppingCategory: guessShoppingCategory(item.meal.name),
-              reason: `단백질 ${item.meal.protein}g, 탄수화물 ${item.meal.carbohydrate}g, 지방 ${item.meal.fat}g 구성입니다.`,
-            },
-          ],
-        })),
-      };
-    }),
-  };
-}
-
 export async function generateMealPlanFromApi({
   profile,
   goal,
-  durationDays,
-  targetCalories,
+  durationDays,  
 }: {
   profile: UserProfile;
   goal: GoalType;
-  durationDays: PlanDuration;
-  targetCalories: number;
-}): Promise<AIMealPlanResponse> {
-
+  durationDays: PlanDuration;  
+}): Promise<BackendMealPlanGenerateResponse> {
   const requestBody = {
     height: profile.heightCm,
     weight: profile.weightKg,
@@ -254,10 +178,8 @@ export async function generateMealPlanFromApi({
   console.log("백엔드로 보낼 식단 생성 요청:", requestBody);
 
   if (USE_TEMPORARY_MEAL_PLAN_DATA) {
-    const temporaryData = createTemporaryBackendMealPlanResponse(durationDays);
-
-    console.log("임시 식단 데이터를 사용합니다:", temporaryData);
-    return mapBackendMealPlan(temporaryData, targetCalories, durationDays);
+    console.log(JSON.stringify(TEMPORARY_MEAL_PLAN_RESPONSE, null, 2));
+    return TEMPORARY_MEAL_PLAN_RESPONSE;
   }
   
   let response: Response;
@@ -299,6 +221,6 @@ if (!response.ok) {
 }
 
   const data = (await response.json()) as BackendMealPlanGenerateResponse;
-  console.log("백엔드로부터 받은 식단 응답:", data);
-  return mapBackendMealPlan(data.aiMealPlanResponse, data.targetCalories, data.periodDays);
+  console.log("백엔드로부터 받은 식단 응답:", data);  
+  return data;
 }

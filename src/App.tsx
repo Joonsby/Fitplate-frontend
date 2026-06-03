@@ -83,13 +83,14 @@ function App() {
   const { favoriteFoods, setFavoriteFoods } = useFavoriteFoods();
 
   const {
+    resultSnapshot,
     aiMealPlanResponse,
     isAiLoading,
     aiError,
     generateAiMealPlan,
     resetAiMealPlan,
     restoreAiMealPlan,
-  } = useAiMealPlan({ profile, goal });
+  } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
 
   if (loginStatus === "loading") {
     return (
@@ -170,6 +171,7 @@ function App() {
               favoriteFoods={favoriteFoods}
               setFavoriteFoods={setFavoriteFoods}
               setSavedMealPlans={setSavedMealPlans}
+              resultSnapshot={resultSnapshot}
               aiMealPlanResponse={aiMealPlanResponse}
               aiError={aiError}
               isAiLoading={isAiLoading}

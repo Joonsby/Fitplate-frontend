@@ -15,6 +15,7 @@ import type {
   MealPlan,
   NutritionTarget,
   PlanDuration,
+  ResultSnapshot,
   SavedMealPlan,
   UserProfile,
 } from "../types/fitplate";
@@ -29,12 +30,12 @@ interface ResultPageProps {
   favoriteFoods: FavoriteFood[];
   setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
   setSavedMealPlans: React.Dispatch<React.SetStateAction<SavedMealPlan[]>>;
+  resultSnapshot: ResultSnapshot | null;
   aiMealPlanResponse: AIMealPlanResponse | null;
   aiError: string | null;
   isAiLoading: boolean;
   generateAiMealPlan: (
     mealPlan: MealPlan,
-    target: NutritionTarget,
   ) => Promise<AIMealPlanResponse | null>;
   onBack: () => void;
 }
@@ -49,6 +50,7 @@ export function ResultPage({
   favoriteFoods,
   setFavoriteFoods,
   setSavedMealPlans,
+  resultSnapshot,
   aiMealPlanResponse,
   aiError,
   isAiLoading,
@@ -64,10 +66,11 @@ export function ResultPage({
     setToastOpen(true);
   };
 
-  const resultProfile = viewingSavedMealPlan?.profile ?? profile;
-  const resultGoal = viewingSavedMealPlan?.goal ?? goal;
-  const resultTarget = viewingSavedMealPlan?.target ?? nutritionTarget;
-  const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? selectedMealPlan;
+  // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → localStorage 스냅샷 우선, 최후 fallback → React 상태
+  const resultProfile = viewingSavedMealPlan?.profile ?? resultSnapshot?.profile ?? profile;
+  const resultGoal = viewingSavedMealPlan?.goal ?? resultSnapshot?.goal ?? goal;
+  const resultTarget = viewingSavedMealPlan?.target ?? resultSnapshot?.nutritionTarget ?? nutritionTarget;
+  const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? resultSnapshot?.mealPlan ?? selectedMealPlan;
   const resultAiMealPlanResponse =
     viewingSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
 
@@ -166,7 +169,7 @@ export function ResultPage({
       onSaveMealPlan={() => void handleSaveMealPlan()}
       onFavoriteFoodToggle={handleToggleFavoriteFood}
       onRetryAiGenerate={() =>
-        void generateAiMealPlan(resultMealPlan, resultTarget)
+        void generateAiMealPlan(resultMealPlan)
       }
       onBack={onBack}
       onRestart={() => navigate("/")}

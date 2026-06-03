@@ -1,3 +1,4 @@
+// ResultPage 복원에 필요한 스냅샷을 localStorage에 저장하고 불러오는 훅입니다.
 import { useState } from "react";
 import { generateMealPlanFromApi } from "../api/mealPlanApi";
 import type {
@@ -5,63 +6,67 @@ import type {
   GoalType,
   MealPlan,
   NutritionTarget,
+  PlanDuration,
+  ResultSnapshot,
   UserProfile,
 } from "../types/fitplate";
 
-const SESSION_KEY = "fitplate_aiMealPlanResponse";
+const SNAPSHOT_KEY = "fitplate_result_snapshot";
 
-function loadFromSession(): AIMealPlanResponse | null {
+function loadSnapshot(): ResultSnapshot | null {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    return raw ? (JSON.parse(raw) as AIMealPlanResponse) : null;
+    const raw = localStorage.getItem(SNAPSHOT_KEY);
+    return raw ? (JSON.parse(raw) as ResultSnapshot) : null;
   } catch {
     return null;
   }
 }
 
-function saveToSession(response: AIMealPlanResponse | null): void {
-  if (response == null) {
-    sessionStorage.removeItem(SESSION_KEY);
-  } else {
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(response));
-  }
+function saveSnapshot(snapshot: ResultSnapshot): void {
+  localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
 }
 
 interface UseAiMealPlanParams {
   profile: UserProfile;
   goal: GoalType;
+  nutritionTarget: NutritionTarget;
+  planDuration: PlanDuration;
 }
 
-export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
-  const [aiMealPlanResponse, setAiMealPlanResponse] =
-    useState<AIMealPlanResponse | null>(loadFromSession);
+export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: UseAiMealPlanParams) {
+  const [resultSnapshot, setResultSnapshot] = useState<ResultSnapshot | null>(loadSnapshot);
+  // UI 상태(로딩/에러 게이팅)용 별도 상태 — 스냅샷과 분리해 로딩·에러 화면이 정상 작동하도록 합니다.
+  const [aiMealPlanResponse, setAiMealPlanResponse] = useState<AIMealPlanResponse | null>(
+    () => loadSnapshot()?.aiMealPlanResponse ?? null,
+  );
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
-  const setAndSave = (response: AIMealPlanResponse | null) => {
-    saveToSession(response);
-    setAiMealPlanResponse(response);
-  };
-
-  const generateAiMealPlan = async (
-    mealPlan: MealPlan,
-    target: NutritionTarget,
-  ) => {
+  const generateAiMealPlan = async (mealPlan: MealPlan) => {
     setIsAiLoading(true);
     setAiError(null);
-    setAndSave(null);
+    setAiMealPlanResponse(null); // 로딩 스피너 표시를 위해 null로 초기화
 
     try {
       const response = await generateMealPlanFromApi({
         profile,
         goal,
         durationDays: mealPlan.durationDays,
-        targetCalories: target.calories,
       });
 
-      setAndSave(response);
+      const snapshot: ResultSnapshot = {
+        profile,
+        goal,
+        nutritionTarget,
+        planDuration,
+        mealPlan,
+        aiMealPlanResponse: response.aiMealPlanResponse,
+      };
+      saveSnapshot(snapshot);
+      setResultSnapshot(snapshot);
+      setAiMealPlanResponse(response.aiMealPlanResponse);
 
-      return response;
+      return response.aiMealPlanResponse;
     } catch (error) {
       console.error("AI 식단 생성 실패:", error);
       setAiError(
@@ -76,19 +81,24 @@ export function useAiMealPlan({ profile, goal }: UseAiMealPlanParams) {
     }
   };
 
+  // localStorage에서 스냅샷을 복원합니다. null로 초기화하지 않아 뒤로가기 후에도 데이터가 유지됩니다.
   const resetAiMealPlan = () => {
-    setAndSave(null);
+    const snapshot = loadSnapshot();
+    setResultSnapshot(snapshot);
+    setAiMealPlanResponse(snapshot?.aiMealPlanResponse ?? null);
     setAiError(null);
     setIsAiLoading(false);
   };
 
+  // 저장된 식단 보기 전용입니다. localStorage는 건드리지 않아 신선한 스냅샷이 보존됩니다.
   const restoreAiMealPlan = (response: AIMealPlanResponse | null) => {
-    setAndSave(response);
+    setAiMealPlanResponse(response);
     setAiError(null);
     setIsAiLoading(false);
   };
 
   return {
+    resultSnapshot,
     aiMealPlanResponse,
     isAiLoading,
     aiError,

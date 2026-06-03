@@ -4,7 +4,7 @@ import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type {
   AIDayMealPlan,
-  AIMealPlanResponse,  
+  AIMealPlanResponse,
   DayMeal,
   FavoriteFood,
   GoalType,
@@ -16,6 +16,10 @@ import type {
 } from "../types/fitplate";
 import { aggregateShoppingList } from "../utils/shoppingListAggregator";
 
+const CAUTIONS = [
+  "의학적 진단이나 치료 목적의 식단이 아닙니다.",
+  "알레르기와 개인 질환이 있다면 전문가와 상담하세요.",
+]
 
 
 interface ResultScreenProps {
@@ -36,8 +40,6 @@ interface ResultScreenProps {
   onBack: () => void;
   onRestart: () => void;  
 }
-
-
 
 // 결과 화면 컴포넌트입니다.
 // 규칙 기반 식단과 AI 응답을 함께 보여줍니다.
@@ -86,6 +88,8 @@ export function ResultScreen({
           aiError={aiError}
           aiMealPlanResponse={aiMealPlanResponse}
           isAiLoading={isAiLoading}
+          target={target}
+          mealPlan={mealPlan}
           onRetryAiGenerate={onRetryAiGenerate}
         />
       ) : null}
@@ -126,6 +130,8 @@ export function ResultScreen({
                 aiError={aiError}
                 aiMealPlanResponse={aiMealPlanResponse}
                 isAiLoading={isAiLoading}
+                target={target}
+                mealPlan={mealPlan}
                 onRetryAiGenerate={onRetryAiGenerate}
               />
 
@@ -181,6 +187,8 @@ interface AiMealPlanPanelProps {
   isAiLoading: boolean;
   aiError: string | null;
   aiMealPlanResponse: AIMealPlanResponse | null;
+  target: NutritionTarget;
+  mealPlan: MealPlan;
   onRetryAiGenerate: () => void;
 }
 
@@ -243,6 +251,8 @@ function AiMealPlanPanel({
   isAiLoading,
   aiError,
   aiMealPlanResponse,
+  target,
+  mealPlan,
   onRetryAiGenerate,
 }: AiMealPlanPanelProps) {
 if (isAiLoading) {
@@ -301,28 +311,31 @@ if (isAiLoading) {
     <section className="aiPanel">
       <div className="aiPanelHeader">        
         <h3>AI 식단 결과</h3>
-        <p>{aiMealPlanResponse.summary}</p>        
+        <p>
+            {target.calories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한{" "}
+            {mealPlan.durationDays}일 식단입니다.
+        </p>
       </div>
 
       <div className="aiMetaGrid">        
         <div>
           <span>기간</span>
-          <strong>{aiMealPlanResponse.durationDays}일</strong>
+          <strong>{mealPlan.durationDays}일</strong>
         </div>
         <div>
           <span>목표</span>
-          <strong>{aiMealPlanResponse.targetCalories.toLocaleString()} kcal</strong>
+          <strong>{target.calories.toLocaleString()} kcal</strong>
         </div>
       </div>
 
-      <div className="aiDayList">
-        {aiMealPlanResponse.days.map((day) => (
-          <AiDayCard day={day} key={day.day} />
-        ))}
-      </div>
+    <div className="aiDayList">
+      {aiMealPlanResponse.days.map((day) => (
+        <AiDayCard day={day} key={day.dayNumber} />
+      ))}
+    </div>
 
       <ul className="aiCautionList">
-        {aiMealPlanResponse.cautions.map((caution) => (
+        {CAUTIONS.map((caution) => (
           <li key={caution}>{caution}</li>
         ))}
       </ul>
@@ -336,17 +349,19 @@ interface AiDayCardProps {
 
 // AI JSON 응답 중 하루 식단을 간단히 보여주는 카드입니다.
 function AiDayCard({ day }: AiDayCardProps) {
+  const totalCalories =
+    day.breakfast.calories + day.lunch.calories + day.dinner.calories;
+
   return (
     <article className="aiDayCard">
       <div className="dayMealHeader">
-        <strong>{day.title}</strong>
-        <span>{day.totalCalories.toLocaleString()} kcal</span>
+        <strong>{day.dayNumber}일차</strong>
+        <span>{totalCalories.toLocaleString()} kcal</span>
       </div>
-      {day.meals.map((meal) => (
-        <p key={`${day.day}-${meal.mealType}`}>
-          {meal.title}: {meal.foods.map((food) => food.name).join(", ")}
-        </p>
-      ))}
+
+      <p>아침: {day.breakfast.name}</p>
+      <p>점심: {day.lunch.name}</p>
+      <p>저녁: {day.dinner.name}</p>
     </article>
   );
 }

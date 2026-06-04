@@ -1,4 +1,4 @@
-// ResultPage 복원에 필요한 스냅샷을 localStorage에 저장하고 불러오는 훅입니다.
+// ResultPage 복원에 필요한 스냅샷을 sessionStorage에 저장하고 불러오는 훅입니다.
 import { useState } from "react";
 import { generateMealPlanFromApi } from "../api/mealPlanApi";
 import type {
@@ -15,7 +15,7 @@ const SNAPSHOT_KEY = "fitplate_result_snapshot";
 
 function loadSnapshot(): ResultSnapshot | null {
   try {
-    const raw = localStorage.getItem(SNAPSHOT_KEY);
+    const raw = sessionStorage.getItem(SNAPSHOT_KEY);
     return raw ? (JSON.parse(raw) as ResultSnapshot) : null;
   } catch {
     return null;
@@ -23,7 +23,7 @@ function loadSnapshot(): ResultSnapshot | null {
 }
 
 function saveSnapshot(snapshot: ResultSnapshot): void {
-  localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
+  sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
 }
 
 interface UseAiMealPlanParams {
@@ -81,7 +81,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     }
   };
 
-  // localStorage에서 스냅샷을 복원합니다. null로 초기화하지 않아 뒤로가기 후에도 데이터가 유지됩니다.
+  // sessionStorage에서 스냅샷을 복원합니다. null로 초기화하지 않아 뒤로가기 후에도 데이터가 유지됩니다.
   const resetAiMealPlan = () => {
     const snapshot = loadSnapshot();
     setResultSnapshot(snapshot);
@@ -90,7 +90,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     setIsAiLoading(false);
   };
 
-  // 저장된 식단 보기 전용입니다. localStorage는 건드리지 않아 신선한 스냅샷이 보존됩니다.
+  // 저장된 식단 보기 전용입니다. sessionStorage는 건드리지 않아 신선한 스냅샷이 보존됩니다.
   const restoreAiMealPlan = (response: AIMealPlanResponse | null) => {
     setAiMealPlanResponse(response);
     setAiError(null);

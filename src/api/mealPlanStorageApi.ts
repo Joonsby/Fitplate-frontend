@@ -92,7 +92,17 @@ export async function createSavedMealPlan(
   });
 
   if (!response.ok) {
-    throw new Error("식단 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    const errorBody = await readOptionalJson(response);
+
+    const message =
+      errorBody != null &&
+      typeof errorBody === "object" &&
+      "message" in errorBody &&
+      typeof errorBody.message === "string"
+        ? errorBody.message
+        : "식단 저장에 실패했습니다. 잠시 후 다시 시도해주세요.";
+
+    throw new Error(message);
   }
 
   const responseBody = await readOptionalJson(response);

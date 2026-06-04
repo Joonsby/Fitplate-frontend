@@ -60,13 +60,15 @@ export function ResultPage({
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
   const [toastText, setToastText] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">("info");
 
-  const showToast = (text: string) => {
+  const showToast = (text: string, type: "success" | "error" | "info" = "info") => {
     setToastText(text);
+    setToastType(type);
     setToastOpen(true);
   };
 
-  // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → localStorage 스냅샷 우선, 최후 fallback → React 상태
+  // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → sessionStorage 스냅샷 우선, 최후 fallback → React 상태
   const resultProfile = viewingSavedMealPlan?.profile ?? resultSnapshot?.profile ?? profile;
   const resultGoal = viewingSavedMealPlan?.goal ?? resultSnapshot?.goal ?? goal;
   const resultTarget = viewingSavedMealPlan?.target ?? resultSnapshot?.nutritionTarget ?? nutritionTarget;
@@ -95,13 +97,14 @@ export function ResultPage({
         ...currentSavedMealPlans.filter((plan) => plan.id !== savedMealPlan.id),
       ]);
 
-      showToast("식단을 저장했습니다.");
+      showToast("식단을 저장했습니다.", "success");
     } catch (error) {
       console.error("식단 저장 실패:", error);
-      alert(
+      showToast(
         error instanceof Error
           ? error.message
           : "식단 저장 중 알 수 없는 오류가 발생했습니다.",
+        "error",
       );
     }
   };
@@ -150,7 +153,13 @@ export function ResultPage({
         position="top"
         open={toastOpen}
         text={toastText}
-        leftAddon={<Toast.Lottie src="https://static.toss.im/lotties-common/check-green-spot.json" />}
+        leftAddon={
+          toastType === "success"
+            ? <Toast.Lottie src="https://static.toss.im/lotties-common/check-green-spot.json" />
+            : toastType === "error"
+            ? <Toast.Icon name="icon-dynamicIntelli-X-red" />
+            : undefined
+        }
         duration={3000}
         onClose={() => setToastOpen(false)}
       />

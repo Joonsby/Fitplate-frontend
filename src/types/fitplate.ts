@@ -164,7 +164,7 @@ export interface SaveMealPlanRequest {
   aiMealPlanResponse: AIMealPlanResponse;
 }
 
-// ResultPage 복원에 필요한 전체 데이터를 localStorage에 보관하는 스냅샷 타입입니다.
+// ResultPage 복원에 필요한 전체 데이터를 sessionStorage에 보관하는 스냅샷 타입입니다.
 export interface ResultSnapshot {
   profile: UserProfile;
   goal: GoalType;

@@ -173,12 +173,9 @@ export async function generateMealPlanFromApi({
     bodyFatRate: profile.bodyFatPercentage ?? null,
     goal: mapGoalToBackend(goal),
     periodDays: durationDays,
-  };
+  };  
 
-  console.log("백엔드로 보낼 식단 생성 요청:", requestBody);
-
-  if (USE_TEMPORARY_MEAL_PLAN_DATA) {
-    console.log(JSON.stringify(TEMPORARY_MEAL_PLAN_RESPONSE, null, 2));
+  if (USE_TEMPORARY_MEAL_PLAN_DATA) {    
     return TEMPORARY_MEAL_PLAN_RESPONSE;
   }
   
@@ -204,8 +201,6 @@ export async function generateMealPlanFromApi({
     );
   }
 
-console.log("백엔드로부터 받은 원시 응답:", response);
-
 if (!response.ok) {
   const errorText = await response.text();
 
@@ -220,7 +215,6 @@ if (!response.ok) {
   );
 }
 
-  const data = (await response.json()) as BackendMealPlanGenerateResponse;
-  console.log("백엔드로부터 받은 식단 응답:", data);  
+  const data = (await response.json()) as BackendMealPlanGenerateResponse;  
   return data;
 }

@@ -1,6 +1,6 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { appLogin } from "@apps-in-toss/web-framework";
+import { login } from "./api/authApi";
 import "./App.css";
 import { AppTopTitle } from "./components/AppTopTitle";
 import { HomePage } from "./pages/HomePage";
@@ -16,47 +16,23 @@ import { Loader, Result, Asset } from "@toss/tds-mobile";
 
 type LoginStatus = "loading" | "success" | "error";
 
-const IS_APP = false; // 앱 로그인 여부 (개발 편의를 위해 false로 설정, 실제 배포 시 true로 변경)
-
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");
+  const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");  
 
   const checkLogin = useCallback(async () => {
-  setLoginStatus("loading");
+    setLoginStatus("loading");
 
-  try {
-    let response: Response;
-
-    if (IS_APP) {
-      const { authorizationCode, referrer } = await appLogin();
-
-      response = await fetch("http://localhost:8080/api/auth/toss-login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ authorizationCode, referrer }),
-      });
-    } else {
-      response = await fetch("http://localhost:8080/api/auth/dev-login", {
-        method: "POST",
-      });
+    try{
+      const data = await login();
+      sessionStorage.setItem("fitplate_access_token", data.accessToken);
+      setLoginStatus("success");
+    } catch (error) {
+      console.error("[Login] 실패", error);
+      setLoginStatus("error");
     }
-
-    if (!response.ok) {
-      throw new Error(`로그인 실패: ${response.status}`);
-    }
-
-    const data = await response.json();
-    localStorage.setItem("fitplate_access_token",data.accessToken);    
-    setLoginStatus("success");
-  } catch (error) {
-    console.error("[Login] 실패", error);
-    setLoginStatus("error");
-  }
-}, []);
+  }, []);
 
   useEffect(() => {
     checkLogin();

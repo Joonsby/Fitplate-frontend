@@ -9,7 +9,10 @@ interface AppTopTitleProps {
 }
 
 export function AppTopTitle({ isResultPage, isAiLoading, onSavedPlansClick, onFavoriteFoodsClick }: AppTopTitleProps) {
-  const shouldShowShortcut = !(isResultPage && isAiLoading);
+  if (isResultPage && isAiLoading) {
+    return null;
+  }
+
   return (
     <>
       <Top
@@ -24,16 +27,14 @@ export function AppTopTitle({ isResultPage, isAiLoading, onSavedPlansClick, onFa
           </div>
         }
       />
-      {shouldShowShortcut && (
-        <div className="topShortcutGrid">
-          <Button color="primary" variant="weak" onClick={onSavedPlansClick}>
-            저장된 식단
-          </Button>
-          <Button color="primary" variant="weak" onClick={onFavoriteFoodsClick}>
-            즐겨찾기 음식
-          </Button>
-        </div>
-      )}
+      <div className="topShortcutGrid">
+        <Button color="primary" variant="weak" onClick={onSavedPlansClick}>
+          저장된 식단
+        </Button>
+        <Button color="primary" variant="weak" onClick={onFavoriteFoodsClick}>
+          즐겨찾기 음식
+        </Button>
+      </div>
     </>
   );
 }

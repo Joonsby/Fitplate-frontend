@@ -783,11 +783,15 @@ button:focus{
 
 .loadingPanelSection{
   padding:24px;
+  display: flex;
+  align-items: center;
+  min-height: 70vh;
 }
 
 .loadingPanel {
+  width: 100%;
   text-align: center;
-  padding: 28px 20px;
+  padding: 80px 20px;
 }
 
 .loadingSpinner {

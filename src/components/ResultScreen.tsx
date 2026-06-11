@@ -1,4 +1,4 @@
-﻿import { Button, Post } from "@toss/tds-mobile";
+﻿import { Button, Post, Loader } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../types/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
@@ -171,14 +171,16 @@ export function ResultScreen({
         </>
       ) : null}
       
-      <div className="buttonRow">
-        <Button variant="weak" onClick={onBack}>
-          {isSavedView ? "목록으로" : "목표 다시 선택"}
-        </Button>
-        <Button variant="weak" onClick={onRestart}>
-          처음부터
-        </Button>
-      </div>
+      {!isAiLoading ? (
+        <div className="buttonRow">
+          <Button variant="weak" onClick={onBack}>
+            {isSavedView ? "목록으로" : "목표 다시 선택"}
+          </Button>
+          <Button variant="weak" onClick={onRestart}>
+            처음부터
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -257,28 +259,11 @@ function AiMealPlanPanel({
 }: AiMealPlanPanelProps) {
 if (isAiLoading) {
   return (
-    <section className="loadingPanelSection">
-      <div className="aiPanel loadingPanel">
-        <div className="loadingSpinner" />
-
+    <main className="appShell" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "16px" }}>
+        <Loader size="large"/>
         <h3>AI가 식단을 생성하고 있어요</h3>
         <p>신체정보와 목표를 바탕으로 맞춤 식단을 구성하는 중입니다.</p>
-
-        <div className="adBox">
-          <span className="adLabel">AD</span>
-
-          <strong>단백질 식단 준비 중이라면?</strong>
-
-          <p>
-            닭가슴살, 현미밥, 샐러드 재료를 미리 준비해보세요.
-          </p>
-
-          <button type="button">
-            추천 재료 보기
-          </button>
-        </div>
-      </div>
-    </section>
+      </main>
   );
 }
 

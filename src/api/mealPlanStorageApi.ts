@@ -81,7 +81,8 @@ export async function createSavedMealPlan(
     goal: input.goal,
     periodDays: input.planDuration,
     aiMealPlanResponse: input.aiMealPlanResponse,
-  };  
+  };
+  console.log("[식단 저장] request body:", JSON.stringify(requestBody, null, 2));
   const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
     method: "POST",
     headers: {
@@ -113,12 +114,14 @@ export async function createSavedMealPlan(
 export async function deleteSavedMealPlanById(
   mealPlanId: string,
 ): Promise<void> {
+  console.log("[식단 삭제] mealPlanId:", mealPlanId);
   const response = await fetch(
     getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}`),
     {
       method: "DELETE",
     },
   );
+  
 
   if (!response.ok) {
     throw new Error("식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");

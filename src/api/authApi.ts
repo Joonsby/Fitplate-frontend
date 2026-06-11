@@ -1,12 +1,11 @@
 import { appLogin } from "@apps-in-toss/web-framework";
-
-const API_BASE_URL = "http://localhost:8080";
+import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
 
 async function tossLogin(
     authorizationCode: string,
     referrer: string
 ) {
-    const response = await fetch(`${API_BASE_URL}/api/auth/toss-login`, {
+    const response = await fetch(getApiUrl(API_ENDPOINTS.AUTH_TOSS_LOGIN), {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -25,7 +24,7 @@ async function tossLogin(
 }
 
 async function devLogin() {
-    const response = await fetch(`${API_BASE_URL}/api/auth/dev-login`, {
+    const response = await fetch(getApiUrl(API_ENDPOINTS.AUTH_DEV_LOGIN), {
         method: "POST"
     });
 

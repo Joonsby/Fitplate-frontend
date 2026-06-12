@@ -111,6 +111,102 @@ export async function createSavedMealPlan(
   return toSavedMealPlan(input, responseBody);
 }
 
+// GET /api/meal-plan 응답 항목의 형태입니다. SavedMealPlan과 키 구조가 달라 별도로 변환합니다.
+interface ApiSavedMealPlan {
+  mealPlanId: number;
+  goal: GoalType;
+  durationDays: PlanDuration;
+  heightCm: number;
+  weightKg: number;
+  age: number;
+  gender: "MALE" | "FEMALE";
+  targetCalories: number;
+  bmr: number;
+  tdee: number;
+  proteinGram: number;
+  carbsGram: number;
+  fatGram: number;
+  aiResponseJson: string;
+  createdAt: string;
+}
+
+function parseAiResponseJson(aiResponseJson: string): AIMealPlanResponse | undefined {
+  try {
+    return JSON.parse(aiResponseJson) as AIMealPlanResponse;
+  } catch {
+    return undefined;
+  }
+}
+
+function computeAverageCalories(
+  aiMealPlanResponse: AIMealPlanResponse | undefined,
+  fallback: number,
+): number {
+  if (aiMealPlanResponse == null || aiMealPlanResponse.days.length === 0) {
+    return fallback;
+  }
+
+  const total = aiMealPlanResponse.days.reduce(
+    (sum, day) => sum + day.breakfast.calories + day.lunch.calories + day.dinner.calories,
+    0,
+  );
+
+  return Math.round(total / aiMealPlanResponse.days.length);
+}
+
+function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
+  const aiMealPlanResponse = parseAiResponseJson(item.aiResponseJson);
+
+  return {
+    id: String(item.mealPlanId),
+    savedAt: item.createdAt,
+    profile: {
+      heightCm: item.heightCm,
+      weightKg: item.weightKg,
+      age: item.age,
+      gender: item.gender === "FEMALE" ? "female" : "male",
+    },
+    goal: item.goal,
+    target: {
+      bmr: item.bmr,
+      tdee: item.tdee,
+      calories: item.targetCalories,
+      proteinGram: item.proteinGram,
+      carbsGram: item.carbsGram,
+      fatGram: item.fatGram,
+    },
+    planDuration: item.durationDays,
+    mealPlan: {
+      id: String(item.mealPlanId),
+      targetCalories: item.targetCalories,
+      durationDays: item.durationDays,
+      averageCalories: computeAverageCalories(aiMealPlanResponse, item.targetCalories),
+      days: [],
+    },
+    aiMealPlanResponse,
+  };
+}
+
+export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
+  const accessToken = getAccessToken();
+  const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLAN), {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("저장된 식단 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+  }
+
+  const responseBody = await readOptionalJson(response);
+
+  return Array.isArray(responseBody)
+    ? (responseBody as ApiSavedMealPlan[]).map(toSavedMealPlanFromApi)
+    : [];
+}
+
 export async function deleteSavedMealPlanById(
   mealPlanId: string,
 ): Promise<void> {

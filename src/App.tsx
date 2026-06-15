@@ -1,7 +1,6 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { login } from "./api/authApi";
-import { getSavedMealPlans } from "./api/mealPlanStorageApi";
 import "./App.css";
 import { AppTopTitle } from "./components/AppTopTitle";
 import { HomePage } from "./pages/HomePage";
@@ -92,17 +91,9 @@ function App() {
 
   const isResultPage = location.pathname === "/result";
 
-  const goToSavedPlans = async () => {
+  const goToSavedPlans = () => {
     clearViewingSavedMealPlan();
     resetAiMealPlan();
-
-    try {
-      const savedMealPlans = await getSavedMealPlans();
-      setSavedMealPlans(savedMealPlans);
-    } catch (error) {
-      console.error("저장된 식단 목록 조회 실패:", error);
-    }
-
     navigate("/saved-plans");
   };
 

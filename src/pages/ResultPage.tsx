@@ -175,7 +175,7 @@ export function ResultPage({
       savedAt={viewingSavedMealPlan?.savedAt}
       target={resultTarget}
       onLoginRequired={() => showToast("로그인 기능은 아직 구현되지 않았습니다.")}
-      onSaveMealPlan={handleSaveMealPlan}
+      onSaveMealPlan={() => void handleSaveMealPlan()}
       onFavoriteFoodToggle={handleToggleFavoriteFood}
       onRetryAiGenerate={() =>
         void generateAiMealPlan(resultMealPlan)

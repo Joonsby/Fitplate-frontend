@@ -111,6 +111,7 @@ export async function createSavedMealPlan(
   return toSavedMealPlan(input, responseBody);
 }
 
+<<<<<<< HEAD
 // GET /api/meal-plan 응답 항목의 형태입니다. SavedMealPlan과 키 구조가 달라 별도로 변환합니다.
 interface ApiSavedMealPlan {
   id: number;
@@ -207,6 +208,8 @@ export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
     : [];
 }
 
+=======
+>>>>>>> parent of 6d2a8c2 (feat : 저장된 식단 전체 가져오기 기능까지 완료)
 export async function deleteSavedMealPlanById(
   id: string,
 ): Promise<void> {

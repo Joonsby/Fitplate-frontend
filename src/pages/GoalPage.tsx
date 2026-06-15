@@ -10,7 +10,7 @@ import type {
 
 interface GoalPageProps {
   goal: GoalType;
-  planDuration: PlanDuration;
+  durationDays: PlanDuration;
   selectedMealPlan: MealPlan;
   nutritionTarget: NutritionTarget;
   onGoalChange: (goal: GoalType) => void;
@@ -24,7 +24,7 @@ interface GoalPageProps {
 
 export function GoalPage({
   goal,
-  planDuration,
+  durationDays,
   selectedMealPlan,  
   onGoalChange,
   onDurationChange,
@@ -44,7 +44,7 @@ export function GoalPage({
   return (
     <GoalSelector
       selectedGoal={goal}
-      selectedDuration={planDuration}
+      selectedDuration={durationDays}
       onBack={onBack}
       onGoalChange={onGoalChange}
       onDurationChange={onDurationChange}

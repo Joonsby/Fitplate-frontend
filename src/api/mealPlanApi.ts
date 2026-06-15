@@ -19,8 +19,8 @@ interface BackendMealPlanGenerateResponse {
   tdee: number;
   proteinGram: number;
   carbsGram: number;
-  fatGram: number;  
-  aiMealPlanResponse: AIMealPlanResponse;
+  fatGram: number;
+  aiResponse: AIMealPlanResponse;
 }
 
 /**
@@ -68,7 +68,7 @@ const TEMPORARY_MEAL_PLAN_RESPONSE: BackendMealPlanGenerateResponse = {
   targetCalories: 2157,
   tdee: 2157,
   weight: 68,
-  aiMealPlanResponse: {
+  aiResponse: {
     days: [
       {
         dayNumber: 1,

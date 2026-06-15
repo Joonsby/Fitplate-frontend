@@ -42,7 +42,7 @@ export function SavedMealPlansPage({
 
   const handleViewSavedMealPlan = (savedMealPlan: SavedMealPlan) => {
     setViewingSavedMealPlan(savedMealPlan);
-    restoreAiMealPlan(savedMealPlan.aiMealPlanResponse ?? null);
+    restoreAiMealPlan(savedMealPlan.aiResponse ?? null);
     navigate("/result");
   };
 

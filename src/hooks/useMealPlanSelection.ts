@@ -12,21 +12,21 @@ export function useMealPlanSelection() {
   });
 
   const [goal, setGoal] = useState<GoalType>("maintain");
-  const [planDuration, setPlanDuration] = useState<PlanDuration>(3);
+  const [durationDays, setDurationDays] = useState<PlanDuration>(3);
 
   const nutritionTarget = calculateNutritionTarget(profile, goal);
 
   const selectedMealPlan = selectClosestMealPlan(
     nutritionTarget.calories,
-    planDuration,
+    durationDays,
   );
 
   return {
     profile,
     goal,
     setGoal,
-    planDuration,
-    setPlanDuration,
+    durationDays,
+    setDurationDays,
     nutritionTarget,
     selectedMealPlan,
   };

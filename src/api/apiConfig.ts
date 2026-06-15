@@ -20,6 +20,6 @@ export const getApiUrl = (endpoint: string): string => {
   return `${API_BASE_URL}${endpoint}`;
 };
 
-export const getMealPlanFavoriteUrl = (mealPlanId: string): string => {
-  return getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}/favorite`);
+export const getMealPlanFavoriteUrl = (id: string): string => {
+  return getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${id}/favorite`);
 };

@@ -16,15 +16,15 @@ export interface CreateSavedMealPlanInput {
   profile: UserProfile;
   goal: GoalType;
   target: NutritionTarget;
-  planDuration: PlanDuration;
+  durationDays: PlanDuration;
   mealPlan: MealPlan;
-  aiMealPlanResponse?: AIMealPlanResponse;
+  aiResponse?: AIMealPlanResponse;
 }
 
 export interface SaveMealPlanRequest {
   goal: GoalType;
-  periodDays: number;
-  aiMealPlanResponse: AIMealPlanResponse;
+  durationDays: number;
+  aiResponse: AIMealPlanResponse;
 }
 
 function createClientId(prefix: string): string {
@@ -56,10 +56,10 @@ function toSavedMealPlan(
     profile: responseRecord.profile ?? input.profile,
     goal: responseRecord.goal ?? input.goal,
     target: responseRecord.target ?? input.target,
-    planDuration: responseRecord.planDuration ?? input.planDuration,
+    durationDays: responseRecord.durationDays ?? input.durationDays,
     mealPlan: responseRecord.mealPlan ?? input.mealPlan,
-    aiMealPlanResponse:
-      responseRecord.aiMealPlanResponse ?? input.aiMealPlanResponse,
+    aiResponse:
+      responseRecord.aiResponse ?? input.aiResponse,
   };
 }
 
@@ -79,8 +79,8 @@ export async function createSavedMealPlan(
   const accessToken = getAccessToken();
   const requestBody = {
     goal: input.goal,
-    periodDays: input.planDuration,
-    aiMealPlanResponse: input.aiMealPlanResponse,
+    durationDays: input.durationDays,
+    aiResponse: input.aiResponse,
   };
   console.log("[식단 저장] request body:", JSON.stringify(requestBody, null, 2));
   const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
@@ -113,7 +113,7 @@ export async function createSavedMealPlan(
 
 // GET /api/meal-plan 응답 항목의 형태입니다. SavedMealPlan과 키 구조가 달라 별도로 변환합니다.
 interface ApiSavedMealPlan {
-  mealPlanId: number;
+  id: number;
   goal: GoalType;
   durationDays: PlanDuration;
   heightCm: number;
@@ -139,26 +139,26 @@ function parseAiResponseJson(aiResponseJson: string): AIMealPlanResponse | undef
 }
 
 function computeAverageCalories(
-  aiMealPlanResponse: AIMealPlanResponse | undefined,
+  aiResponse: AIMealPlanResponse | undefined,
   fallback: number,
 ): number {
-  if (aiMealPlanResponse == null || aiMealPlanResponse.days.length === 0) {
+  if (aiResponse == null || aiResponse.days.length === 0) {
     return fallback;
   }
 
-  const total = aiMealPlanResponse.days.reduce(
+  const total = aiResponse.days.reduce(
     (sum, day) => sum + day.breakfast.calories + day.lunch.calories + day.dinner.calories,
     0,
   );
 
-  return Math.round(total / aiMealPlanResponse.days.length);
+  return Math.round(total / aiResponse.days.length);
 }
 
 function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
-  const aiMealPlanResponse = parseAiResponseJson(item.aiResponseJson);
+  const aiResponse = parseAiResponseJson(item.aiResponseJson);
 
   return {
-    id: String(item.mealPlanId),
+    id: String(item.id),
     savedAt: item.createdAt,
     profile: {
       heightCm: item.heightCm,
@@ -175,15 +175,15 @@ function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
       carbsGram: item.carbsGram,
       fatGram: item.fatGram,
     },
-    planDuration: item.durationDays,
+    durationDays: item.durationDays,
     mealPlan: {
-      id: String(item.mealPlanId),
+      id: String(item.id),
       targetCalories: item.targetCalories,
       durationDays: item.durationDays,
-      averageCalories: computeAverageCalories(aiMealPlanResponse, item.targetCalories),
+      averageCalories: computeAverageCalories(aiResponse, item.targetCalories),
       days: [],
     },
-    aiMealPlanResponse,
+    aiResponse,
   };
 }
 
@@ -208,11 +208,11 @@ export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
 }
 
 export async function deleteSavedMealPlanById(
-  mealPlanId: string,
+  id: string,
 ): Promise<void> {
-  console.log("[식단 삭제] mealPlanId:", mealPlanId);
+  console.log("[식단 삭제] id:", id);
   const response = await fetch(
-    getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}`),
+    getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${id}`),
     {
       method: "DELETE",
     },
@@ -225,13 +225,13 @@ export async function deleteSavedMealPlanById(
 }
 
 export async function addMealPlanFavorite({
-  mealPlanId,
+  id,
   food,
 }: {
-  mealPlanId: string;
+  id: string;
   food: MealFood;
 }): Promise<FavoriteFood> {
-  const response = await fetch(getMealPlanFavoriteUrl(mealPlanId), {
+  const response = await fetch(getMealPlanFavoriteUrl(id), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -254,7 +254,7 @@ export async function addMealPlanFavorite({
     id:
       typeof responseRecord.id === "string"
         ? responseRecord.id
-        : `${mealPlanId}:${food.name}`,
+        : `${id}:${food.name}`,
     name: responseRecord.name ?? food.name,
     shoppingCategory: responseRecord.shoppingCategory ?? food.shoppingCategory,
     useCount: responseRecord.useCount ?? 1,
@@ -264,9 +264,9 @@ export async function addMealPlanFavorite({
 }
 
 export async function deleteMealPlanFavorite(
-  mealPlanId: string,
+  id: string,
 ): Promise<void> {
-  const response = await fetch(getMealPlanFavoriteUrl(mealPlanId), {
+  const response = await fetch(getMealPlanFavoriteUrl(id), {
     method: "DELETE",
   });
 

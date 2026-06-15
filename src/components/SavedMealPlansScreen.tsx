@@ -65,11 +65,13 @@ function SavedMealPlanCard({
     timeStyle: "short",
   });
 
+  console.log(savedMealPlan);
+
   return (
     <article className="savedPlanCard">
       <div>
         <strong>
-          {GOAL_LABELS[savedMealPlan.goal]} · {savedMealPlan.planDuration}일 식단
+          {GOAL_LABELS[savedMealPlan.goal]} · {savedMealPlan.durationDays}일 식단
         </strong>
         <p>{savedDate}</p>
         <span>

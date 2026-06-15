@@ -43,8 +43,8 @@ function App() {
     profile,
     goal,
     setGoal,
-    planDuration,
-    setPlanDuration,
+    durationDays,
+    setDurationDays,
     nutritionTarget,
     selectedMealPlan,
   } = useMealPlanSelection();
@@ -61,13 +61,13 @@ function App() {
 
   const {
     resultSnapshot,
-    aiMealPlanResponse,
+    aiResponse,
     isAiLoading,
     aiError,
     generateAiMealPlan,
     resetAiMealPlan,
     restoreAiMealPlan,
-  } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
+  } = useAiMealPlan({ profile, goal, nutritionTarget, durationDays });
 
   if (loginStatus === "loading") {
     return (
@@ -132,11 +132,11 @@ function App() {
           element={
             <GoalPage
               goal={goal}
-              planDuration={planDuration}
+              durationDays={durationDays}
               selectedMealPlan={selectedMealPlan}
               nutritionTarget={nutritionTarget}
               onGoalChange={setGoal}
-              onDurationChange={setPlanDuration}
+              onDurationChange={setDurationDays}
               onBack={onBack}
               onGeneratedStart={clearViewingSavedMealPlan}
               generateAiMealPlan={generateAiMealPlan}
@@ -149,7 +149,7 @@ function App() {
             <ResultPage
               profile={profile}
               goal={goal}
-              planDuration={planDuration}
+              durationDays={durationDays}
               nutritionTarget={nutritionTarget}
               selectedMealPlan={selectedMealPlan}
               viewingSavedMealPlan={viewingSavedMealPlan}
@@ -157,7 +157,7 @@ function App() {
               setFavoriteFoods={setFavoriteFoods}
               setSavedMealPlans={setSavedMealPlans}
               resultSnapshot={resultSnapshot}
-              aiMealPlanResponse={aiMealPlanResponse}
+              aiResponse={aiResponse}
               aiError={aiError}
               isAiLoading={isAiLoading}
               generateAiMealPlan={generateAiMealPlan}

@@ -23,7 +23,7 @@ import type {
 interface ResultPageProps {
   profile: UserProfile;
   goal: GoalType;
-  planDuration: PlanDuration;
+  durationDays: PlanDuration;
   nutritionTarget: NutritionTarget;
   selectedMealPlan: MealPlan;
   viewingSavedMealPlan: SavedMealPlan | null;
@@ -31,7 +31,7 @@ interface ResultPageProps {
   setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
   setSavedMealPlans: React.Dispatch<React.SetStateAction<SavedMealPlan[]>>;
   resultSnapshot: ResultSnapshot | null;
-  aiMealPlanResponse: AIMealPlanResponse | null;
+  aiResponse: AIMealPlanResponse | null;
   aiError: string | null;
   isAiLoading: boolean;
   generateAiMealPlan: (
@@ -43,7 +43,7 @@ interface ResultPageProps {
 export function ResultPage({
   profile,
   goal,
-  planDuration,
+  durationDays,
   nutritionTarget,
   selectedMealPlan,
   viewingSavedMealPlan,
@@ -51,7 +51,7 @@ export function ResultPage({
   setFavoriteFoods,
   setSavedMealPlans,
   resultSnapshot,
-  aiMealPlanResponse,
+  aiResponse,
   aiError,
   isAiLoading,
   generateAiMealPlan,
@@ -73,8 +73,8 @@ export function ResultPage({
   const resultGoal = viewingSavedMealPlan?.goal ?? resultSnapshot?.goal ?? goal;
   const resultTarget = viewingSavedMealPlan?.target ?? resultSnapshot?.nutritionTarget ?? nutritionTarget;
   const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? resultSnapshot?.mealPlan ?? selectedMealPlan;
-  const resultAiMealPlanResponse =
-    viewingSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
+  const resultAiResponse =
+    viewingSavedMealPlan?.aiResponse ?? aiResponse;
 
   const handleSaveMealPlan = async () => {
     if (viewingSavedMealPlan != null) {
@@ -87,9 +87,9 @@ export function ResultPage({
         profile: resultProfile,
         goal: resultGoal,
         target: resultTarget,
-        planDuration,
+        durationDays,
         mealPlan: resultMealPlan,
-        aiMealPlanResponse: resultAiMealPlanResponse ?? undefined,
+        aiResponse: resultAiResponse ?? undefined,
       });
 
       setSavedMealPlans((currentSavedMealPlans) => [
@@ -110,7 +110,7 @@ export function ResultPage({
   };
 
   const handleToggleFavoriteFood = async (food: MealFood) => {
-    const mealPlanId = viewingSavedMealPlan?.id ?? resultMealPlan.id;
+    const id = viewingSavedMealPlan?.id ?? resultMealPlan.id;
 
     const existingFavoriteFood = favoriteFoods.find(
       (favoriteFood) => favoriteFood.name === food.name,
@@ -118,7 +118,7 @@ export function ResultPage({
 
     try {
       if (existingFavoriteFood != null) {
-        await deleteMealPlanFavorite(mealPlanId);
+        await deleteMealPlanFavorite(id);
 
         setFavoriteFoods((currentFavoriteFoods) =>
           currentFavoriteFoods.filter(
@@ -129,7 +129,7 @@ export function ResultPage({
         return;
       }
 
-      const favoriteFood = await addMealPlanFavorite({ mealPlanId, food });
+      const favoriteFood = await addMealPlanFavorite({ id, food });
 
       setFavoriteFoods((currentFavoriteFoods) => [
         favoriteFood,
@@ -165,7 +165,7 @@ export function ResultPage({
       />
       <ResultScreen
       aiError={aiError}
-      aiMealPlanResponse={resultAiMealPlanResponse}
+      aiResponse={resultAiResponse}
       favoriteFoods={favoriteFoods}
       goal={resultGoal}
       isAiLoading={isAiLoading}

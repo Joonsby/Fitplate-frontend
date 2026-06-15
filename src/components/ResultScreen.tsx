@@ -31,8 +31,8 @@ interface ResultScreenProps {
   isSavedView: boolean;
   isAiLoading: boolean;
   aiError: string | null;
-  aiMealPlanResponse: AIMealPlanResponse | null;
-  savedAt?: string;  
+  aiResponse: AIMealPlanResponse | null;
+  savedAt?: string;
   onLoginRequired: () => void;
   onSaveMealPlan?: () => void;
   onFavoriteFoodToggle: (food: MealFood) => void;
@@ -45,7 +45,7 @@ interface ResultScreenProps {
 // 규칙 기반 식단과 AI 응답을 함께 보여줍니다.
 export function ResultScreen({
   aiError,
-  aiMealPlanResponse,
+  aiResponse,
   favoriteFoods,
   goal,
   isAiLoading,
@@ -60,6 +60,7 @@ export function ResultScreen({
   onBack,
   onRestart,  
 }: ResultScreenProps) {
+  console.log("mealPlan", mealPlan);
   const shoppingList = aggregateShoppingList(mealPlan);
   const favoriteFoodNames = new Set(
     favoriteFoods.map((favoriteFood) => favoriteFood.name),
@@ -71,7 +72,7 @@ export function ResultScreen({
           dateStyle: "medium",
           timeStyle: "short",
         });
-  const shouldShowFallbackFailure = !isAiLoading && aiError != null && aiMealPlanResponse == null;  
+  const shouldShowFallbackFailure = !isAiLoading && aiError != null && aiResponse == null;
 
   return (
     <section className="screen">      
@@ -86,14 +87,14 @@ export function ResultScreen({
       {!shouldShowFallbackFailure && (isAiLoading || aiError != null) ? (
         <AiMealPlanPanel
           aiError={aiError}
-          aiMealPlanResponse={aiMealPlanResponse}
+          aiResponse={aiResponse}
           isAiLoading={isAiLoading}
           target={target}
           mealPlan={mealPlan}
           onRetryAiGenerate={onRetryAiGenerate}
         />
       ) : null}
-      {!isAiLoading && aiMealPlanResponse != null ? (
+      {!isAiLoading && aiResponse != null ? (
         <>         
           <ScreenSectionHeader
             description={`${profile.heightCm}cm, ${profile.weightKg}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
@@ -128,7 +129,7 @@ export function ResultScreen({
 
               <AiMealPlanPanel
                 aiError={aiError}
-                aiMealPlanResponse={aiMealPlanResponse}
+                aiResponse={aiResponse}
                 isAiLoading={isAiLoading}
                 target={target}
                 mealPlan={mealPlan}
@@ -188,7 +189,7 @@ export function ResultScreen({
 interface AiMealPlanPanelProps {
   isAiLoading: boolean;
   aiError: string | null;
-  aiMealPlanResponse: AIMealPlanResponse | null;
+  aiResponse: AIMealPlanResponse | null;
   target: NutritionTarget;
   mealPlan: MealPlan;
   onRetryAiGenerate: () => void;
@@ -252,7 +253,7 @@ function AiMealPlanFailureScreen({
 function AiMealPlanPanel({
   isAiLoading,
   aiError,
-  aiMealPlanResponse,
+  aiResponse,
   target,
   mealPlan,
   onRetryAiGenerate,
@@ -283,7 +284,7 @@ if (isAiLoading) {
     );
   }
 
-  if (aiMealPlanResponse == null) {
+  if (aiResponse == null) {
     return (
       <section className="aiPanel">
         <h3>AI 응답 대기</h3>
@@ -314,7 +315,7 @@ if (isAiLoading) {
       </div>
 
     <div className="aiDayList">
-      {aiMealPlanResponse.days.map((day) => (
+      {aiResponse.days.map((day) => (
         <AiDayCard day={day} key={day.dayNumber} />
       ))}
     </div>

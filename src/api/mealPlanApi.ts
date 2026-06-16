@@ -13,7 +13,7 @@ interface BackendMealPlanGenerateResponse {
   age: number;
   gender: string;
   goal: string;
-  periodDays: PlanDuration;
+  durationDays: PlanDuration;
   targetCalories: number;
   bmr: number;
   tdee: number;
@@ -63,7 +63,7 @@ const TEMPORARY_MEAL_PLAN_RESPONSE: BackendMealPlanGenerateResponse = {
   gender: "MALE",
   goal: "MAINTAIN",
   height: 170,
-  periodDays: 3,
+  durationDays: 3,
   proteinGram: 109,
   targetCalories: 2157,
   tdee: 2157,
@@ -172,7 +172,7 @@ export async function generateMealPlanFromApi({
     age: profile.age,
     bodyFatRate: profile.bodyFatPercentage ?? null,
     goal: mapGoalToBackend(goal),
-    periodDays: durationDays,
+    durationDays: durationDays,
   };  
 
   if (USE_TEMPORARY_MEAL_PLAN_DATA) {    
@@ -215,6 +215,7 @@ if (!response.ok) {
   );
 }
 
-  const data = (await response.json()) as BackendMealPlanGenerateResponse;  
+  const data = (await response.json()) as BackendMealPlanGenerateResponse;
+  console.log(JSON.stringify(data, null, 2));
   return data;
 }

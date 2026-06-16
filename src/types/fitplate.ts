@@ -141,7 +141,7 @@ export interface MealPlanGenerateResponse {
   proteinGram: number;
   carbsGram: number;
   fatGram: number;
-  periodDays: PlanDuration;
+  durationDays: PlanDuration;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 
@@ -160,7 +160,7 @@ export interface SavedMealPlan {
 // 식단 저장 요청 타입입니다. SavedMealPlan과 거의 비슷하지만, id나 savedAt 같은 필드는 제외하고, AI 응답은 선택값으로 둡니다.
 export interface SaveMealPlanRequest {
   goal: GoalType;
-  periodDays: number;
+  durationDays: number;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 

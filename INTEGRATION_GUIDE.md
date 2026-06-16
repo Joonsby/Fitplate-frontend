@@ -91,7 +91,7 @@ export const getMealPlanFavoriteUrl = (mealPlanId: string): string =>
   "gender": "MALE",
   "bodyFatRate": 15.5,
   "goal": "WEIGHT_LOSS",
-  "periodDays": 7
+  "durationDays": 7
 }
 ```
 

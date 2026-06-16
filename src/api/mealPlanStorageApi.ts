@@ -23,7 +23,7 @@ export interface CreateSavedMealPlanInput {
 
 export interface SaveMealPlanRequest {
   goal: GoalType;
-  periodDays: number;
+  durationDays: number;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 
@@ -79,7 +79,7 @@ export async function createSavedMealPlan(
   const accessToken = getAccessToken();
   const requestBody = {
     goal: input.goal,
-    periodDays: input.planDuration,
+    durationDays: input.planDuration,
     aiMealPlanResponse: input.aiMealPlanResponse,
   };
   console.log("[식단 저장] request body:", JSON.stringify(requestBody, null, 2));

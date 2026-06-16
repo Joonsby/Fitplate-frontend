@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { GoalSelector } from "../components/GoalSelector";
 import type {
-  AIMealPlanResponse,
   GoalType,
   MealPlan,
   NutritionTarget,
@@ -17,9 +16,7 @@ interface GoalPageProps {
   onDurationChange: (duration: PlanDuration) => void;
   onBack: () => void;
   onGeneratedStart: () => void;
-  generateAiMealPlan: (
-    mealPlan: MealPlan,
-  ) => Promise<AIMealPlanResponse | null>;
+  generateAiMealPlan: (mealPlan: MealPlan) => Promise<MealPlan | null>;
 }
 
 export function GoalPage({

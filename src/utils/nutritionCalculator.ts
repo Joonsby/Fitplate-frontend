@@ -61,7 +61,7 @@ export function calculateNutritionTarget(
   const calories = Math.max(0, tdee + GOAL_CALORIE_OFFSET[goal]);
 
   // 단백질은 체중 1kg당 1.6g 기준입니다.
-  const proteinGram = Math.round(safeProfile.weightKg * 1.6);
+  const proteinGram = Math.round(safeProfile.weight * 1.6);
 
   // 지방은 전체 칼로리의 25%이며, 지방 1g은 9kcal로 계산합니다.
   const fatGram = Math.round((calories * 0.25) / 9);

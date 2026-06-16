@@ -62,12 +62,10 @@ function App() {
 
   const {
     resultSnapshot,
-    aiMealPlanResponse,
     isAiLoading,
     aiError,
     generateAiMealPlan,
     resetAiMealPlan,
-    restoreAiMealPlan,
   } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
 
   if (loginStatus === "loading") {
@@ -104,13 +102,13 @@ function App() {
       console.error("저장된 식단 목록 조회 실패:", error);
     }
 
-    navigate("/saved-plans");
+    navigate("/saved-plans", { replace: location.pathname === "/saved-plans" });
   };
 
   const goToFavoriteFoods = () => {
     clearViewingSavedMealPlan();
     resetAiMealPlan();
-    navigate("/favorite-foods");
+    navigate("/favorite-foods", { replace: location.pathname === "/favorite-foods" });
   };
 
   const onBack = () => {
@@ -158,7 +156,6 @@ function App() {
               setFavoriteFoods={setFavoriteFoods}
               setSavedMealPlans={setSavedMealPlans}
               resultSnapshot={resultSnapshot}
-              aiMealPlanResponse={aiMealPlanResponse}
               aiError={aiError}
               isAiLoading={isAiLoading}
               generateAiMealPlan={generateAiMealPlan}
@@ -173,7 +170,6 @@ function App() {
               savedMealPlans={savedMealPlans}
               setSavedMealPlans={setSavedMealPlans}
               setViewingSavedMealPlan={setViewingSavedMealPlan}
-              restoreAiMealPlan={restoreAiMealPlan}
               onBack={onBack}
             />
           }

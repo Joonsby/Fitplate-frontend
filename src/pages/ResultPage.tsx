@@ -8,7 +8,6 @@ import {
   deleteMealPlanFavorite,
 } from "../api/mealPlanStorageApi";
 import type {
-  AIMealPlanResponse,
   FavoriteFood,
   GoalType,
   MealFood,
@@ -31,12 +30,9 @@ interface ResultPageProps {
   setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
   setSavedMealPlans: React.Dispatch<React.SetStateAction<SavedMealPlan[]>>;
   resultSnapshot: ResultSnapshot | null;
-  aiMealPlanResponse: AIMealPlanResponse | null;
   aiError: string | null;
   isAiLoading: boolean;
-  generateAiMealPlan: (
-    mealPlan: MealPlan,
-  ) => Promise<AIMealPlanResponse | null>;
+  generateAiMealPlan: (mealPlan: MealPlan) => Promise<MealPlan | null>;
   onBack: () => void;
 }
 
@@ -51,7 +47,6 @@ export function ResultPage({
   setFavoriteFoods,
   setSavedMealPlans,
   resultSnapshot,
-  aiMealPlanResponse,
   aiError,
   isAiLoading,
   generateAiMealPlan,
@@ -68,13 +63,11 @@ export function ResultPage({
     setToastOpen(true);
   };
 
-  // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → sessionStorage 스냅샷 우선, 최후 fallback → React 상태
+  // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → 스냅샷 우선, 최후 fallback → React 상태
   const resultProfile = viewingSavedMealPlan?.profile ?? resultSnapshot?.profile ?? profile;
   const resultGoal = viewingSavedMealPlan?.goal ?? resultSnapshot?.goal ?? goal;
   const resultTarget = viewingSavedMealPlan?.target ?? resultSnapshot?.nutritionTarget ?? nutritionTarget;
   const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? resultSnapshot?.mealPlan ?? selectedMealPlan;
-  const resultAiMealPlanResponse =
-    viewingSavedMealPlan?.aiMealPlanResponse ?? aiMealPlanResponse;
 
   const handleSaveMealPlan = async () => {
     if (viewingSavedMealPlan != null) {
@@ -89,7 +82,6 @@ export function ResultPage({
         target: resultTarget,
         planDuration,
         mealPlan: resultMealPlan,
-        aiMealPlanResponse: resultAiMealPlanResponse ?? undefined,
       });
 
       setSavedMealPlans((currentSavedMealPlans) => [
@@ -165,7 +157,6 @@ export function ResultPage({
       />
       <ResultScreen
       aiError={aiError}
-      aiMealPlanResponse={resultAiMealPlanResponse}
       favoriteFoods={favoriteFoods}
       goal={resultGoal}
       isAiLoading={isAiLoading}

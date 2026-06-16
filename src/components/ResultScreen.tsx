@@ -1,16 +1,14 @@
-﻿import { Button, Post, Loader } from "@toss/tds-mobile";
+import { Button, Post, Loader } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../types/fitplate";
 import { SHOPPING_LINKS } from "../data/shoppingLinks";
 import { ScreenSectionHeader } from "./ScreenSectionHeader";
 import type {
-  AIDayMealPlan,
-  AIMealPlanResponse,
   DayMeal,
   FavoriteFood,
   GoalType,
   MealFood,
   MealPlan,
-  NutritionTarget,  
+  NutritionTarget,
   ShoppingListItem,
   UserProfile,
 } from "../types/fitplate";
@@ -19,46 +17,42 @@ import { aggregateShoppingList } from "../utils/shoppingListAggregator";
 const CAUTIONS = [
   "의학적 진단이나 치료 목적의 식단이 아닙니다.",
   "알레르기와 개인 질환이 있다면 전문가와 상담하세요.",
-]
-
+];
 
 interface ResultScreenProps {
   profile: UserProfile;
   goal: GoalType;
   target: NutritionTarget;
-  mealPlan: MealPlan;  
+  mealPlan: MealPlan;
   favoriteFoods: FavoriteFood[];
   isSavedView: boolean;
   isAiLoading: boolean;
   aiError: string | null;
-  aiMealPlanResponse: AIMealPlanResponse | null;
-  savedAt?: string;  
+  savedAt?: string;
   onLoginRequired: () => void;
   onSaveMealPlan?: () => void;
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
   onBack: () => void;
-  onRestart: () => void;  
+  onRestart: () => void;
 }
 
 // 결과 화면 컴포넌트입니다.
-// 규칙 기반 식단과 AI 응답을 함께 보여줍니다.
 export function ResultScreen({
   aiError,
-  aiMealPlanResponse,
   favoriteFoods,
   goal,
   isAiLoading,
   isSavedView,
-  mealPlan,  
+  mealPlan,
   profile,
-  savedAt,  
+  savedAt,
   target,
   onFavoriteFoodToggle,
   onRetryAiGenerate,
   onSaveMealPlan,
   onBack,
-  onRestart,  
+  onRestart,
 }: ResultScreenProps) {
   const shoppingList = aggregateShoppingList(mealPlan);
   const favoriteFoodNames = new Set(
@@ -71,10 +65,13 @@ export function ResultScreen({
           dateStyle: "medium",
           timeStyle: "short",
         });
-  const shouldShowFallbackFailure = !isAiLoading && aiError != null && aiMealPlanResponse == null;  
+
+  // meal.name 존재 여부로 AI 병합 완료 여부 판단
+  const hasAiData = mealPlan.days.length > 0 && mealPlan.days[0].meals[0]?.name != null;
+  const shouldShowFallbackFailure = !isAiLoading && aiError != null && !hasAiData;
 
   return (
-    <section className="screen">      
+    <section className="screen">
       {shouldShowFallbackFailure ? (
         <AiMealPlanFailureScreen
           aiError={aiError}
@@ -83,18 +80,16 @@ export function ResultScreen({
         />
       ) : null}
 
-      {!shouldShowFallbackFailure && (isAiLoading || aiError != null) ? (
+      {!shouldShowFallbackFailure && isAiLoading ? (
         <AiMealPlanPanel
-          aiError={aiError}
-          aiMealPlanResponse={aiMealPlanResponse}
           isAiLoading={isAiLoading}
-          target={target}
-          mealPlan={mealPlan}
+          aiError={aiError}
           onRetryAiGenerate={onRetryAiGenerate}
         />
       ) : null}
-      {!isAiLoading && aiMealPlanResponse != null ? (
-        <>         
+
+      {!isAiLoading && hasAiData ? (
+        <>
           <ScreenSectionHeader
             description={`${profile.height}cm, ${profile.weight}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
             step={isSavedView ? "저장된 식단" : "3단계"}
@@ -103,10 +98,11 @@ export function ResultScreen({
             {savedDate ? (
               <Post.H3 color="#3182f6" typography="t7" className="savedAtText">저장 날짜: {savedDate}</Post.H3>
             ) : null}
-          </ScreenSectionHeader>          
+          </ScreenSectionHeader>
+
           <section className="mealPlanSummary">
             <div className="mealPlanSummaryInner">
-              <div className="nutritionSummary">                
+              <div className="nutritionSummary">
                 <div className="caloriePanel">
                   <span>목표 칼로리</span>
                   <strong>{target.calories.toLocaleString()} kcal</strong>
@@ -121,19 +117,10 @@ export function ResultScreen({
                   <MacroItem label="단백질" value={target.proteinGram} />
                   <MacroItem label="탄수화물" value={target.carbsGram} />
                   <MacroItem label="지방" value={target.fatGram} />
-                </div>     
-               <Button onClick={onSaveMealPlan}>식단 저장하기</Button>
+                </div>
 
+                <Button onClick={onSaveMealPlan}>식단 저장하기</Button>
               </div>
-
-              <AiMealPlanPanel
-                aiError={aiError}
-                aiMealPlanResponse={aiMealPlanResponse}
-                isAiLoading={isAiLoading}
-                target={target}
-                mealPlan={mealPlan}
-                onRetryAiGenerate={onRetryAiGenerate}
-              />
 
               <div className="mealList">
                 <div className="mealListHeader">
@@ -148,9 +135,9 @@ export function ResultScreen({
                     key={dayMeal.id}
                     onFavoriteFoodToggle={onFavoriteFoodToggle}
                   />
-                    ))}
-              </div>             
-              
+                ))}
+              </div>
+
               <div className="shoppingList">
                 <div className="mealListHeader">
                   <h3>장보기 리스트</h3>
@@ -166,11 +153,17 @@ export function ResultScreen({
                   />
                 ))}
               </div>
+
+              <ul className="aiCautionList">
+                {CAUTIONS.map((caution) => (
+                  <li key={caution}>{caution}</li>
+                ))}
+              </ul>
             </div>
           </section>
         </>
       ) : null}
-      
+
       {!isAiLoading ? (
         <div className="buttonRow">
           <Button variant="weak" onClick={onBack}>
@@ -188,14 +181,9 @@ export function ResultScreen({
 interface AiMealPlanPanelProps {
   isAiLoading: boolean;
   aiError: string | null;
-  aiMealPlanResponse: AIMealPlanResponse | null;
-  target: NutritionTarget;
-  mealPlan: MealPlan;
   onRetryAiGenerate: () => void;
 }
 
-// AI 응답을 보여주는 패널입니다.
-// 아직 실제 API를 호출하지 않고, Promise 기반 mock JSON만 렌더링합니다.
 interface AiMealPlanFailureScreenProps {
   aiError: string;
   target: NutritionTarget;
@@ -249,23 +237,17 @@ function AiMealPlanFailureScreen({
   );
 }
 
-function AiMealPlanPanel({
-  isAiLoading,
-  aiError,
-  aiMealPlanResponse,
-  target,
-  mealPlan,
-  onRetryAiGenerate,
-}: AiMealPlanPanelProps) {
-if (isAiLoading) {
-  return (
-    <main className="appShell" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "16px" }}>
-        <Loader size="large"/>
+// 로딩·에러 상태만 담당하는 패널입니다. AI 완료 후엔 렌더링되지 않습니다.
+function AiMealPlanPanel({ isAiLoading, aiError, onRetryAiGenerate }: AiMealPlanPanelProps) {
+  if (isAiLoading) {
+    return (
+      <main className="appShell" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "16px" }}>
+        <Loader size="large" />
         <h3>AI가 식단을 생성하고 있어요</h3>
         <p>신체정보와 목표를 바탕으로 맞춤 식단을 구성하는 중입니다.</p>
       </main>
-  );
-}
+    );
+  }
 
   if (aiError != null) {
     return (
@@ -283,72 +265,7 @@ if (isAiLoading) {
     );
   }
 
-  if (aiMealPlanResponse == null) {
-    return (
-      <section className="aiPanel">
-        <h3>AI 응답 대기</h3>
-        <p>결과 보기 버튼을 누르면 AI 응답이 여기에 표시됩니다.</p>
-      </section>
-    );
-  }
-
-  return (
-    <section className="aiPanel">
-      <div className="aiPanelHeader">        
-        <h3>AI 식단 결과</h3>
-        <p>
-            {target.calories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한{" "}
-            {mealPlan.durationDays}일 식단입니다.
-        </p>
-      </div>
-
-      <div className="aiMetaGrid">        
-        <div>
-          <span>기간</span>
-          <strong>{mealPlan.durationDays}일</strong>
-        </div>
-        <div>
-          <span>목표</span>
-          <strong>{target.calories.toLocaleString()} kcal</strong>
-        </div>
-      </div>
-
-    <div className="aiDayList">
-      {aiMealPlanResponse.days.map((day) => (
-        <AiDayCard day={day} key={day.dayNumber} />
-      ))}
-    </div>
-
-      <ul className="aiCautionList">
-        {CAUTIONS.map((caution) => (
-          <li key={caution}>{caution}</li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-interface AiDayCardProps {
-  day: AIDayMealPlan;
-}
-
-// AI JSON 응답 중 하루 식단을 간단히 보여주는 카드입니다.
-function AiDayCard({ day }: AiDayCardProps) {
-  const totalCalories =
-    day.breakfast.calories + day.lunch.calories + day.dinner.calories;
-
-  return (
-    <article className="aiDayCard">
-      <div className="dayMealHeader">
-        <strong>{day.dayNumber}일차</strong>
-        <span>{totalCalories.toLocaleString()} kcal</span>
-      </div>
-
-      <p>아침: {day.breakfast.name}</p>
-      <p>점심: {day.lunch.name}</p>
-      <p>저녁: {day.dinner.name}</p>
-    </article>
-  );
+  return null;
 }
 
 interface DayMealCardProps {
@@ -358,11 +275,7 @@ interface DayMealCardProps {
 }
 
 // 하루치 식단을 카드로 보여주는 컴포넌트입니다.
-function DayMealCard({
-  dayMeal,
-  favoriteFoodNames,
-  onFavoriteFoodToggle,
-}: DayMealCardProps) {
+function DayMealCard({ dayMeal, favoriteFoodNames, onFavoriteFoodToggle }: DayMealCardProps) {
   return (
     <article className="dayMealCard">
       <div className="dayMealHeader">
@@ -376,6 +289,18 @@ function DayMealCard({
             <strong>{meal.title}</strong>
             <span>{meal.calories} kcal</span>
           </div>
+
+          {meal.name != null && (
+            <p className="aiMealName">{meal.name}</p>
+          )}
+
+          {(meal.protein != null || meal.carbs != null || meal.fat != null) && (
+            <div className="mealMacros">
+              {meal.protein != null && <span>단백질 {meal.protein}g</span>}
+              {meal.carbs != null && <span>탄수화물 {meal.carbs}g</span>}
+              {meal.fat != null && <span>지방 {meal.fat}g</span>}
+            </div>
+          )}
 
           <div className="foodList">
             {meal.foods.map((food) => (
@@ -412,9 +337,7 @@ function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
       <div className="foodRowActions">
         <button
           aria-label={`${food.name} 즐겨찾기`}
-          className={
-            isFavorite ? "favoriteFoodButton selected" : "favoriteFoodButton"
-          }
+          className={isFavorite ? "favoriteFoodButton selected" : "favoriteFoodButton"}
           type="button"
           onClick={() => onFavoriteFoodToggle(food)}
         >
@@ -440,11 +363,7 @@ interface ShoppingListRowProps {
 }
 
 // 중복 재료를 합친 장보기 리스트 한 줄입니다.
-function ShoppingListRow({
-  isFavorite,
-  item,
-  onFavoriteFoodToggle,
-}: ShoppingListRowProps) {
+function ShoppingListRow({ isFavorite, item, onFavoriteFoodToggle }: ShoppingListRowProps) {
   const favoriteFood: MealFood = {
     id: item.id,
     name: item.name,
@@ -465,9 +384,7 @@ function ShoppingListRow({
       <div className="foodRowActions">
         <button
           aria-label={`${item.name} 즐겨찾기`}
-          className={
-            isFavorite ? "favoriteFoodButton selected" : "favoriteFoodButton"
-          }
+          className={isFavorite ? "favoriteFoodButton selected" : "favoriteFoodButton"}
           type="button"
           onClick={() => onFavoriteFoodToggle(favoriteFood)}
         >

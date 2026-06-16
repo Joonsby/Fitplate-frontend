@@ -196,4 +196,4 @@ npm run dev
 - `API_BASE_URL`은 현재 `http://localhost:8080`입니다. 배포 시 실제 서버 URL로 변경해야 합니다.
 - 저장 식단(`savedMealPlans`)과 즐겨찾기(`favoriteFoods`)는 앱 시작 시 서버에서 불러오는 초기 로드 API가 아직 없습니다. 현재는 해당 세션에서 생성한 항목만 상태에 반영됩니다.
 - `AIMealPlanResponse.source`는 임시 데이터/실제 API 호출 모두 `"mock"`으로 고정되어 있습니다. 실제 AI 연동 시 구분이 필요하면 값을 변경해야 합니다.
-- 사용자 프로필은 `useMealPlanSelection` 내부에 하드코딩되어 있습니다(`heightCm: 170, weightKg: 68, age: 30, gender: "male"`). `UserProfileForm` 컴포넌트가 존재하지만 아직 이 훅과 연결되지 않았습니다.
+- 사용자 프로필은 `useMealPlanSelection` 내부에 하드코딩되어 있습니다(`height: 170, weight: 68, age: 30, gender: "male"`). `UserProfileForm` 컴포넌트가 존재하지만 아직 이 훅과 연결되지 않았습니다.

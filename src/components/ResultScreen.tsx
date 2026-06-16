@@ -207,7 +207,7 @@ function AiMealPlanFailureScreen({
   target,
   onRetryAiGenerate,
 }: AiMealPlanFailureScreenProps) {
-  return (    
+  return (
     <section className="aiFailureSection">
       <div className="aiFailureScreen" role="alert">
         <div>

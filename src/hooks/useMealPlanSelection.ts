@@ -4,9 +4,9 @@ import { calculateNutritionTarget } from "../utils/nutritionCalculator";
 import { selectClosestMealPlan } from "../utils/mealPlanSelector";
 
 export function useMealPlanSelection() {
-  const [profile] = useState<UserProfile>({
-    heightCm: 170,
-    weightKg: 68,
+  const [profile, setProfile] = useState<UserProfile>({
+    height: 170,
+    weight: 68,
     age: 30,
     gender: "male",
   });
@@ -23,6 +23,7 @@ export function useMealPlanSelection() {
 
   return {
     profile,
+    setProfile,
     goal,
     setGoal,
     planDuration,

@@ -26,8 +26,8 @@ function ensurePositiveNumber(value: number, fallback: number): number {
 function sanitizeProfile(profile: UserProfile): UserProfile {
   return {
     ...profile,
-    heightCm: ensurePositiveNumber(profile.heightCm, 170),
-    weightKg: ensurePositiveNumber(profile.weightKg, 60),
+    height: ensurePositiveNumber(profile.height, 170),
+    weight: ensurePositiveNumber(profile.weight, 60),
     age: ensurePositiveNumber(profile.age, 30),
     bodyFatPercentage:
       profile.bodyFatPercentage == null
@@ -40,7 +40,7 @@ function sanitizeProfile(profile: UserProfile): UserProfile {
 // Mifflin-St Jeor 공식은 성별에 따라 마지막 보정값만 달라집니다.
 function calculateBmr(profile: UserProfile): number {
   const common =
-    10 * profile.weightKg + 6.25 * profile.heightCm - 5 * profile.age;
+    10 * profile.weight + 6.25 * profile.height - 5 * profile.age;
 
   if (profile.gender === "male") {
     return common + 5;

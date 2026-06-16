@@ -41,6 +41,7 @@ function App() {
 
   const {
     profile,
+    setProfile,
     goal,
     setGoal,
     planDuration,
@@ -126,7 +127,7 @@ function App() {
       />
 
       <Routes>
-        <Route path="/" element={<HomePage profile={profile} />} />
+        <Route path="/" element={<HomePage profile={profile} onProfileSave={setProfile} />} />
         <Route
           path="/goal"
           element={

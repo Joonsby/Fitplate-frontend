@@ -1,5 +1,19 @@
 // AI 응답과 규칙 기반 식단을 통합 구조로 병합하고 역추출하는 유틸입니다.
-import type { AIMeal, AIMealPlanResponse, Meal, MealPlan } from "../types/fitplate";
+import type { AIFood, AIMealPlanResponse, MealFood, MealPlan } from "../types/fitplate";
+
+function aifoodToMealFood(food: AIFood, mealId: string, index: number): MealFood {
+  return {
+    id: `${mealId}-food${index}`,
+    name: food.name,
+    amount: food.amount,
+    calories: food.calories,
+    shoppingCategory: "vegetable",
+    shoppingKeyword: food.shoppingKeyword,
+    protein: food.protein,
+    carbohydrate: food.carbohydrate,
+    fat: food.fat,
+  };
+}
 
 export function mergeMealPlanWithAi(mealPlan: MealPlan, aiResponse: AIMealPlanResponse): MealPlan {
   const mergedDays = mealPlan.days.map((day, index) => {
@@ -7,18 +21,25 @@ export function mergeMealPlanWithAi(mealPlan: MealPlan, aiResponse: AIMealPlanRe
     if (aiDay == null) return day;
 
     const mergedMeals = day.meals.map((meal) => {
-      const aiMeal: AIMeal =
-        meal.mealType === "breakfast" ? aiDay.breakfast :
-        meal.mealType === "lunch" ? aiDay.lunch :
-        aiDay.dinner;
+      const aiMeal = aiDay.meals.find((m) => m.mealType === meal.mealType);
+      if (aiMeal == null) return meal;
+
+      const foods = aiMeal.foods.map((f, i) =>
+        aifoodToMealFood(f, `day${aiDay.dayNumber}-${aiMeal.mealType}`, i),
+      );
+      const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0);
+      const totalProtein = aiMeal.foods.reduce((sum, f) => sum + f.protein, 0);
+      const totalCarbs = aiMeal.foods.reduce((sum, f) => sum + f.carbohydrate, 0);
+      const totalFat = aiMeal.foods.reduce((sum, f) => sum + f.fat, 0);
 
       return {
         ...meal,
-        name: aiMeal.name,
-        calories: aiMeal.calories,
-        protein: aiMeal.protein,
-        carbs: aiMeal.carbohydrate,
-        fat: aiMeal.fat,
+        name: aiMeal.foods.map((f) => f.name).join(", "),
+        calories: totalCalories,
+        protein: totalProtein,
+        carbs: totalCarbs,
+        fat: totalFat,
+        foods,
       };
     });
 
@@ -34,26 +55,22 @@ export function mergeMealPlanWithAi(mealPlan: MealPlan, aiResponse: AIMealPlanRe
 
 // 백엔드 저장 시 aiMealPlanResponse 형식이 필요한 경우 역추출합니다.
 export function extractAiResponseFromMealPlan(mealPlan: MealPlan): AIMealPlanResponse {
-  const toAiMeal = (meal: Meal): AIMeal => ({
-    name: meal.name ?? "",
-    calories: meal.calories,
-    protein: meal.protein ?? 0,
-    carbohydrate: meal.carbs ?? 0,
-    fat: meal.fat ?? 0,
-  });
-
   return {
-    days: mealPlan.days.map((day, index) => {
-      const breakfast = day.meals.find((m) => m.mealType === "breakfast")!;
-      const lunch = day.meals.find((m) => m.mealType === "lunch")!;
-      const dinner = day.meals.find((m) => m.mealType === "dinner")!;
-
-      return {
-        dayNumber: index + 1,
-        breakfast: toAiMeal(breakfast),
-        lunch: toAiMeal(lunch),
-        dinner: toAiMeal(dinner),
-      };
-    }),
+    days: mealPlan.days.map((day, index) => ({
+      dayNumber: index + 1,
+      meals: day.meals.map((meal) => ({
+        mealType: meal.mealType,
+        title: meal.title,
+        foods: meal.foods.map((food) => ({
+          name: food.name,
+          amount: food.amount,
+          calories: food.calories,
+          protein: food.protein ?? 0,
+          carbohydrate: food.carbohydrate ?? 0,
+          fat: food.fat ?? 0,
+          shoppingKeyword: food.shoppingKeyword ?? food.name,
+        })),
+      })),
+    })),
   };
 }

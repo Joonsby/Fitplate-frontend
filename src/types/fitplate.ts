@@ -53,6 +53,10 @@ export interface MealFood {
   amount: string;
   calories: number;
   shoppingCategory: ShoppingCategory;
+  shoppingKeyword?: string;
+  protein?: number;
+  carbohydrate?: number;
+  fat?: number;
 }
 
 // 즐겨찾기 음식 타입입니다.
@@ -108,27 +112,34 @@ export interface ShoppingListItem {
   totalCalories: number;
   servingCount: number;
   shoppingCategory: ShoppingCategory;
+  shoppingKeyword?: string;
+}
+
+// AI 응답 안의 음식 한 개 타입입니다.
+export interface AIFood {
+  name: string;
+  amount: string;
+  calories: number;
+  protein: number;
+  carbohydrate: number;
+  fat: number;
+  shoppingKeyword: string;
 }
 
 // AI 응답 안의 한 끼 식사 타입입니다.
 export interface AIMeal {
-  name: string;
-  calories: number;
-  carbohydrate: number;
-  protein: number;
-  fat: number;
+  mealType: "breakfast" | "lunch" | "dinner";
+  title: string;
+  foods: AIFood[];
 }
 
 // AI 응답 안의 하루 식단 타입입니다.
 export interface AIDayMealPlan {
   dayNumber: number;
-  breakfast: AIMeal;
-  lunch: AIMeal;
-  dinner: AIMeal;
+  meals: AIMeal[];
 }
 
-// mock AI 식단 응답 전체 타입입니다.
-// schemaVersion은 나중에 JSON 구조를 바꿀 때 버전을 구분하기 위해 둡니다.
+// AI 식단 응답 전체 타입입니다.
 export interface AIMealPlanResponse {
   days: AIDayMealPlan[];
 }

@@ -399,6 +399,10 @@ interface FoodRowProps {
 
 // 식단 안의 음식 한 줄을 보여주는 컴포넌트입니다.
 function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
+  const shoppingHref = food.shoppingKeyword != null
+    ? `https://www.coupang.com/np/search?q=${encodeURIComponent(food.shoppingKeyword)}`
+    : SHOPPING_LINKS[food.shoppingCategory];
+  console.log(food);
   return (
     <div className="foodRow">
       <div>
@@ -420,7 +424,7 @@ function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
         </button>
         <a
           className="buyFoodButton"
-          href={SHOPPING_LINKS[food.shoppingCategory]}
+          href={shoppingHref}
           rel="noopener noreferrer"
           target="_blank"
         >
@@ -473,7 +477,11 @@ function ShoppingListRow({
         </button>
         <a
           className="buyFoodButton"
-          href={SHOPPING_LINKS[item.shoppingCategory]}
+          href={
+            item.shoppingKeyword != null
+              ? `https://www.coupang.com/np/search?q=${encodeURIComponent(item.shoppingKeyword)}`
+              : SHOPPING_LINKS[item.shoppingCategory]
+          }
           rel="noopener noreferrer"
           target="_blank"
         >

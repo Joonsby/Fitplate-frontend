@@ -565,6 +565,10 @@ button:focus{
   min-width: 0;
 }
 
+.foodRow div:first-child{
+  flex-direction: column;  
+}
+
 .foodRow .foodRowActions{
   flex-direction: row;
   gap: 10px;
@@ -633,6 +637,11 @@ button:focus{
   display: flex;  
   gap: 10px;
   align-items: center;
+}
+
+.shoppingListRow div:first-child{
+  flex-direction: column;
+  align-items:baseline;
 }
 
 .shoppingListRow strong {

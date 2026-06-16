@@ -1,5 +1,5 @@
 // ResultPage 복원에 필요한 AI 식단 스냅샷을 메모리에서 관리하는 훅입니다.
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateMealPlanFromApi } from "../api/mealPlanApi";
 import { mergeMealPlanWithAi } from "../utils/mealPlanMerger";
 import type {
@@ -11,6 +11,29 @@ import type {
   UserProfile,
 } from "../types/fitplate";
 
+const SESSION_KEY = "fitplate_result_snapshot";
+
+function loadSnapshot(): ResultSnapshot | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw != null ? (JSON.parse(raw) as ResultSnapshot) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSnapshot(snapshot: ResultSnapshot | null): void {
+  try {
+    if (snapshot == null) {
+      sessionStorage.removeItem(SESSION_KEY);
+    } else {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(snapshot));
+    }
+  } catch {
+    // sessionStorage 용량 초과 등 예외 무시
+  }
+}
+
 interface UseAiMealPlanParams {
   profile: UserProfile;
   goal: GoalType;
@@ -19,9 +42,15 @@ interface UseAiMealPlanParams {
 }
 
 export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: UseAiMealPlanParams) {
-  const [resultSnapshot, setResultSnapshot] = useState<ResultSnapshot | null>(null);
+  const [resultSnapshot, setResultSnapshot] = useState<ResultSnapshot | null>(
+    () => loadSnapshot(),
+  );
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+
+  useEffect(() => {
+    saveSnapshot(resultSnapshot);
+  }, [resultSnapshot]);
 
   const generateAiMealPlan = async (mealPlan: MealPlan) => {
     setIsAiLoading(true);

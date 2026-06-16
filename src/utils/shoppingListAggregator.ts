@@ -58,6 +58,7 @@ export function aggregateShoppingList(mealPlan: MealPlan): ShoppingListItem[] {
             totalCalories: food.calories,
             servingCount: 1,
             shoppingCategory: food.shoppingCategory,
+            shoppingKeyword: food.shoppingKeyword,
           });
           return;
         }
@@ -76,5 +77,6 @@ export function aggregateShoppingList(mealPlan: MealPlan): ShoppingListItem[] {
     totalCalories: item.totalCalories,
     servingCount: item.servingCount,
     shoppingCategory: item.shoppingCategory,
+    shoppingKeyword: item.shoppingKeyword,
   }));
 }

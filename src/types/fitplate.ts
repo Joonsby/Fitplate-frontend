@@ -13,8 +13,8 @@ export type PlanDuration = 3 | 7 | 14;
 // 신체정보 입력 폼에서 관리할 사용자 프로필 타입입니다.
 // bodyFatPercentage 뒤의 ?는 입력하지 않아도 되는 선택값이라는 뜻입니다.
 export interface UserProfile {
-  heightCm: number;
-  weightKg: number;
+  height: number;
+  weight: number;
   age: number;
   gender: Gender;
   bodyFatPercentage?: number;
@@ -67,11 +67,16 @@ export interface FavoriteFood {
 }
 
 // 아침/점심/저녁 한 끼를 표현하는 타입입니다.
+// name, protein, carbs, fat은 AI 병합 후 채워집니다.
 export interface Meal {
   id: string;
   mealType: "breakfast" | "lunch" | "dinner";
   title: string;
+  name?: string;
   calories: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
   foods: MealFood[];
 }
 
@@ -141,7 +146,7 @@ export interface MealPlanGenerateResponse {
   proteinGram: number;
   carbsGram: number;
   fatGram: number;
-  periodDays: PlanDuration;
+  durationDays: PlanDuration;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 
@@ -154,24 +159,23 @@ export interface SavedMealPlan {
   target: NutritionTarget;
   planDuration: PlanDuration;
   mealPlan: MealPlan;
-  aiMealPlanResponse?: AIMealPlanResponse;
 }
 
 // 식단 저장 요청 타입입니다. SavedMealPlan과 거의 비슷하지만, id나 savedAt 같은 필드는 제외하고, AI 응답은 선택값으로 둡니다.
 export interface SaveMealPlanRequest {
   goal: GoalType;
-  periodDays: number;
+  durationDays: number;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 
-// ResultPage 복원에 필요한 전체 데이터를 sessionStorage에 보관하는 스냅샷 타입입니다.
+// ResultPage 복원에 필요한 전체 데이터를 메모리에 보관하는 스냅샷 타입입니다.
+// mealPlan.days[i].meals[j].name 등에 AI 병합 데이터가 포함됩니다.
 export interface ResultSnapshot {
   profile: UserProfile;
   goal: GoalType;
   nutritionTarget: NutritionTarget;
   planDuration: PlanDuration;
   mealPlan: MealPlan;
-  aiMealPlanResponse: AIMealPlanResponse;
 }
 
 export const GOAL_LABELS: Record<GoalType, string> = {

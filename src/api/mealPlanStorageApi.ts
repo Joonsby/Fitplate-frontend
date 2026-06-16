@@ -11,6 +11,8 @@ import type {
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl, getMealPlanFavoriteUrl } from "./apiConfig";
 import { getAccessToken } from "./authToken";
+import { selectClosestMealPlan } from "../utils/mealPlanSelector";
+import { mergeMealPlanWithAi, extractAiResponseFromMealPlan } from "../utils/mealPlanMerger";
 
 export interface CreateSavedMealPlanInput {
   profile: UserProfile;
@@ -18,12 +20,11 @@ export interface CreateSavedMealPlanInput {
   target: NutritionTarget;
   planDuration: PlanDuration;
   mealPlan: MealPlan;
-  aiMealPlanResponse?: AIMealPlanResponse;
 }
 
 export interface SaveMealPlanRequest {
   goal: GoalType;
-  periodDays: number;
+  durationDays: number;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 
@@ -58,8 +59,6 @@ function toSavedMealPlan(
     target: responseRecord.target ?? input.target,
     planDuration: responseRecord.planDuration ?? input.planDuration,
     mealPlan: responseRecord.mealPlan ?? input.mealPlan,
-    aiMealPlanResponse:
-      responseRecord.aiMealPlanResponse ?? input.aiMealPlanResponse,
   };
 }
 
@@ -79,8 +78,8 @@ export async function createSavedMealPlan(
   const accessToken = getAccessToken();
   const requestBody = {
     goal: input.goal,
-    periodDays: input.planDuration,
-    aiMealPlanResponse: input.aiMealPlanResponse,
+    durationDays: input.planDuration,
+    aiMealPlanResponse: extractAiResponseFromMealPlan(input.mealPlan),
   };
   console.log("[식단 저장] request body:", JSON.stringify(requestBody, null, 2));
   const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
@@ -113,11 +112,11 @@ export async function createSavedMealPlan(
 
 // GET /api/meal-plan 응답 항목의 형태입니다. SavedMealPlan과 키 구조가 달라 별도로 변환합니다.
 interface ApiSavedMealPlan {
-  mealPlanId: number;
+  id: number;
   goal: GoalType;
   durationDays: PlanDuration;
-  heightCm: number;
-  weightKg: number;
+  height: number;
+  weight: number;
   age: number;
   gender: "MALE" | "FEMALE";
   targetCalories: number;
@@ -126,43 +125,21 @@ interface ApiSavedMealPlan {
   proteinGram: number;
   carbsGram: number;
   fatGram: number;
-  aiResponseJson: string;
+  aiMealPlanResponse: AIMealPlanResponse;
   createdAt: string;
 }
 
-function parseAiResponseJson(aiResponseJson: string): AIMealPlanResponse | undefined {
-  try {
-    return JSON.parse(aiResponseJson) as AIMealPlanResponse;
-  } catch {
-    return undefined;
-  }
-}
-
-function computeAverageCalories(
-  aiMealPlanResponse: AIMealPlanResponse | undefined,
-  fallback: number,
-): number {
-  if (aiMealPlanResponse == null || aiMealPlanResponse.days.length === 0) {
-    return fallback;
-  }
-
-  const total = aiMealPlanResponse.days.reduce(
-    (sum, day) => sum + day.breakfast.calories + day.lunch.calories + day.dinner.calories,
-    0,
-  );
-
-  return Math.round(total / aiMealPlanResponse.days.length);
-}
 
 function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
-  const aiMealPlanResponse = parseAiResponseJson(item.aiResponseJson);
+  const baseMealPlan = selectClosestMealPlan(item.targetCalories, item.durationDays);
+  const mealPlan = mergeMealPlanWithAi(baseMealPlan, item.aiMealPlanResponse);
 
   return {
-    id: String(item.mealPlanId),
+    id: String(item.id),
     savedAt: item.createdAt,
     profile: {
-      heightCm: item.heightCm,
-      weightKg: item.weightKg,
+      height: item.height,
+      weight: item.weight,
       age: item.age,
       gender: item.gender === "FEMALE" ? "female" : "male",
     },
@@ -176,14 +153,7 @@ function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
       fatGram: item.fatGram,
     },
     planDuration: item.durationDays,
-    mealPlan: {
-      id: String(item.mealPlanId),
-      targetCalories: item.targetCalories,
-      durationDays: item.durationDays,
-      averageCalories: computeAverageCalories(aiMealPlanResponse, item.targetCalories),
-      days: [],
-    },
-    aiMealPlanResponse,
+    mealPlan,
   };
 }
 
@@ -201,7 +171,7 @@ export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
   }
 
   const responseBody = await readOptionalJson(response);
-
+  console.log(JSON.stringify(responseBody,null,2))
   return Array.isArray(responseBody)
     ? (responseBody as ApiSavedMealPlan[]).map(toSavedMealPlanFromApi)
     : [];

@@ -13,7 +13,7 @@ interface BackendMealPlanGenerateResponse {
   age: number;
   gender: string;
   goal: string;
-  periodDays: PlanDuration;
+  durationDays: PlanDuration;
   targetCalories: number;
   bmr: number;
   tdee: number;
@@ -56,18 +56,18 @@ const USE_TEMPORARY_MEAL_PLAN_DATA = true;
  * 사용하면 안 됩니다.
  */
 const TEMPORARY_MEAL_PLAN_RESPONSE: BackendMealPlanGenerateResponse = {
+  height: 170,
+  weight: 68,
   age: 30,
-  bmr: 1598,
-  carbsGram: 295,
-  fatGram: 60,
   gender: "MALE",
   goal: "MAINTAIN",
-  height: 170,
-  periodDays: 3,
-  proteinGram: 109,
+  durationDays: 3,
   targetCalories: 2157,
+  bmr: 1598,
   tdee: 2157,
-  weight: 68,
+  proteinGram: 109,
+  carbsGram: 295,
+  fatGram: 60,
   aiMealPlanResponse: {
     days: [
       {
@@ -166,13 +166,13 @@ export async function generateMealPlanFromApi({
   durationDays: PlanDuration;  
 }): Promise<BackendMealPlanGenerateResponse> {
   const requestBody = {
-    height: profile.heightCm,
-    weight: profile.weightKg,
+    height: profile.height,
+    weight: profile.weight,
     gender: mapGenderToBackend(profile.gender),
     age: profile.age,
     bodyFatRate: profile.bodyFatPercentage ?? null,
     goal: mapGoalToBackend(goal),
-    periodDays: durationDays,
+    durationDays: durationDays,
   };  
 
   if (USE_TEMPORARY_MEAL_PLAN_DATA) {    
@@ -180,6 +180,8 @@ export async function generateMealPlanFromApi({
   }
   
   let response: Response;
+
+  console.log(profile);
 
   try {
     const accessToken = getAccessToken();
@@ -215,6 +217,7 @@ if (!response.ok) {
   );
 }
 
-  const data = (await response.json()) as BackendMealPlanGenerateResponse;  
+  const data = (await response.json()) as BackendMealPlanGenerateResponse;
+  console.log(JSON.stringify(data, null, 2));
   return data;
 }

@@ -631,7 +631,8 @@ button:focus{
 
 .shoppingListRow div {
   display: flex;  
-  gap: 10px;  
+  gap: 10px;
+  align-items: center;
 }
 
 .shoppingListRow strong {

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { SavedMealPlansScreen } from "../components/SavedMealPlansScreen";
 import { deleteSavedMealPlanById } from "../api/mealPlanStorageApi";
-import type { AIMealPlanResponse, SavedMealPlan } from "../types/fitplate";
+import type { SavedMealPlan } from "../types/fitplate";
 
 interface SavedMealPlansPageProps {
   savedMealPlans: SavedMealPlan[];
@@ -9,7 +9,6 @@ interface SavedMealPlansPageProps {
   setViewingSavedMealPlan: React.Dispatch<
     React.SetStateAction<SavedMealPlan | null>
   >;
-  restoreAiMealPlan: (response: AIMealPlanResponse | null) => void;
   onBack: () => void;
 }
 
@@ -17,7 +16,6 @@ export function SavedMealPlansPage({
   savedMealPlans,
   setSavedMealPlans,
   setViewingSavedMealPlan,
-  restoreAiMealPlan,
   onBack,
 }: SavedMealPlansPageProps) {
   const navigate = useNavigate();
@@ -42,7 +40,6 @@ export function SavedMealPlansPage({
 
   const handleViewSavedMealPlan = (savedMealPlan: SavedMealPlan) => {
     setViewingSavedMealPlan(savedMealPlan);
-    restoreAiMealPlan(savedMealPlan.aiMealPlanResponse ?? null);
     navigate("/result");
   };
 

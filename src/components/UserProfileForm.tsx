@@ -6,10 +6,11 @@ import type { Gender, UserProfile } from "../types/fitplate";
 
 interface UserProfileFormProps {
   profile: UserProfile;
+  onProfileSave: (profile: UserProfile) => void;
   onNext: () => void;
 }
 
-type ProfileFieldName = "heightCm" | "weightKg" | "age" | "bodyFatPercentage";
+type ProfileFieldName = "height" | "weight" | "age" | "bodyFatPercentage";
 
 type ProfileFieldValues = Record<ProfileFieldName, string>;
 type ProfileFieldErrors = Partial<Record<ProfileFieldName, string>>;
@@ -35,14 +36,14 @@ function validateNumberField(value: string): string | null {
   return null;
 }
 
-export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
+export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileFormProps) {
   const [selectedGender, setSelectedGender] = useState<Gender>(profile.gender);
   const [focusedField, setFocusedField] = useState<ProfileFieldName | null>(
     null,
   );
   const [fieldValues, setFieldValues] = useState<ProfileFieldValues>({
-    heightCm: String(profile.heightCm),
-    weightKg: String(profile.weightKg),
+    height: String(profile.height),
+    weight: String(profile.weight),
     age: String(profile.age),
     bodyFatPercentage:
       profile.bodyFatPercentage == null ? "" : String(profile.bodyFatPercentage),
@@ -82,10 +83,24 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
 
   const hasFieldError = Object.values(fieldErrors).some(Boolean);
   const hasRequiredEmptyField =
-    fieldValues.heightCm.trim() === "" ||
-    fieldValues.weightKg.trim() === "" ||
+    fieldValues.height.trim() === "" ||
+    fieldValues.weight.trim() === "" ||
     fieldValues.age.trim() === "";
   const isProfileValid = !hasFieldError && !hasRequiredEmptyField;
+
+  const handleNext = () => {
+    onProfileSave({
+      height: Number(fieldValues.height),
+      weight: Number(fieldValues.weight),
+      age: Number(fieldValues.age),
+      gender: selectedGender,
+      bodyFatPercentage:
+        fieldValues.bodyFatPercentage.trim() === ""
+          ? undefined
+          : Number(fieldValues.bodyFatPercentage),
+    });
+    onNext();
+  };
 
   return (
     <section className="screen">
@@ -97,32 +112,32 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
 
       <div className="fieldGroup">
         <TextField
-          containerProps={{ className: getTextFieldClassName("heightCm") }}
-          hasError={fieldErrors.heightCm != null}
-          help={fieldErrors.heightCm}
+          containerProps={{ className: getTextFieldClassName("height") }}
+          hasError={fieldErrors.height != null}
+          help={fieldErrors.height}
           label="키"
           labelOption="sustain"
           placeholder="키를 입력하세요"
           suffix="cm"
-          value={fieldValues.heightCm}
+          value={fieldValues.height}
           variant="box"
           onBlur={blurNumberField}
-          onChange={updateNumberField("heightCm")}
-          onFocus={focusNumberField("heightCm")}
+          onChange={updateNumberField("height")}
+          onFocus={focusNumberField("height")}
         />
         <TextField
-          containerProps={{ className: getTextFieldClassName("weightKg") }}
-          hasError={fieldErrors.weightKg != null}
-          help={fieldErrors.weightKg}
+          containerProps={{ className: getTextFieldClassName("weight") }}
+          hasError={fieldErrors.weight != null}
+          help={fieldErrors.weight}
           label="몸무게"
           labelOption="sustain"
           placeholder="몸무게를 입력하세요"
           suffix="kg"
-          value={fieldValues.weightKg}
+          value={fieldValues.weight}
           variant="box"
           onBlur={blurNumberField}
-          onChange={updateNumberField("weightKg")}
-          onFocus={focusNumberField("weightKg")}
+          onChange={updateNumberField("weight")}
+          onFocus={focusNumberField("weight")}
         />
         <TextField
           containerProps={{ className: getTextFieldClassName("age") }}
@@ -172,7 +187,7 @@ export function UserProfileForm({ profile, onNext }: UserProfileFormProps) {
       </div>
 
       <div className="selectGroup">
-        <Button disabled={!isProfileValid} onClick={onNext}>
+        <Button disabled={!isProfileValid} onClick={handleNext}>
           목표 선택하기
         </Button>
       </div>

@@ -26,8 +26,8 @@ function ensurePositiveNumber(value: number, fallback: number): number {
 function sanitizeProfile(profile: UserProfile): UserProfile {
   return {
     ...profile,
-    heightCm: ensurePositiveNumber(profile.heightCm, 170),
-    weightKg: ensurePositiveNumber(profile.weightKg, 60),
+    height: ensurePositiveNumber(profile.height, 170),
+    weight: ensurePositiveNumber(profile.weight, 60),
     age: ensurePositiveNumber(profile.age, 30),
     bodyFatPercentage:
       profile.bodyFatPercentage == null
@@ -40,7 +40,7 @@ function sanitizeProfile(profile: UserProfile): UserProfile {
 // Mifflin-St Jeor 공식은 성별에 따라 마지막 보정값만 달라집니다.
 function calculateBmr(profile: UserProfile): number {
   const common =
-    10 * profile.weightKg + 6.25 * profile.heightCm - 5 * profile.age;
+    10 * profile.weight + 6.25 * profile.height - 5 * profile.age;
 
   if (profile.gender === "male") {
     return common + 5;
@@ -61,7 +61,7 @@ export function calculateNutritionTarget(
   const calories = Math.max(0, tdee + GOAL_CALORIE_OFFSET[goal]);
 
   // 단백질은 체중 1kg당 1.6g 기준입니다.
-  const proteinGram = Math.round(safeProfile.weightKg * 1.6);
+  const proteinGram = Math.round(safeProfile.weight * 1.6);
 
   // 지방은 전체 칼로리의 25%이며, 지방 1g은 9kcal로 계산합니다.
   const fatGram = Math.round((calories * 0.25) / 9);

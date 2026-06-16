@@ -166,8 +166,8 @@ export async function generateMealPlanFromApi({
   durationDays: PlanDuration;  
 }): Promise<BackendMealPlanGenerateResponse> {
   const requestBody = {
-    height: profile.heightCm,
-    weight: profile.weightKg,
+    height: profile.height,
+    weight: profile.weight,
     gender: mapGenderToBackend(profile.gender),
     age: profile.age,
     bodyFatRate: profile.bodyFatPercentage ?? null,

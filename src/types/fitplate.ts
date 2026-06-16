@@ -13,8 +13,8 @@ export type PlanDuration = 3 | 7 | 14;
 // 신체정보 입력 폼에서 관리할 사용자 프로필 타입입니다.
 // bodyFatPercentage 뒤의 ?는 입력하지 않아도 되는 선택값이라는 뜻입니다.
 export interface UserProfile {
-  heightCm: number;
-  weightKg: number;
+  height: number;
+  weight: number;
   age: number;
   gender: Gender;
   bodyFatPercentage?: number;

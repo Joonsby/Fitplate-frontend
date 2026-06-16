@@ -116,8 +116,8 @@ interface ApiSavedMealPlan {
   mealPlanId: number;
   goal: GoalType;
   durationDays: PlanDuration;
-  heightCm: number;
-  weightKg: number;
+  height: number;
+  weight: number;
   age: number;
   gender: "MALE" | "FEMALE";
   targetCalories: number;
@@ -161,8 +161,8 @@ function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
     id: String(item.mealPlanId),
     savedAt: item.createdAt,
     profile: {
-      heightCm: item.heightCm,
-      weightKg: item.weightKg,
+      height: item.height,
+      weight: item.weight,
       age: item.age,
       gender: item.gender === "FEMALE" ? "female" : "male",
     },

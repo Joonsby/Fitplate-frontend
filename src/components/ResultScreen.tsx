@@ -96,7 +96,7 @@ export function ResultScreen({
       {!isAiLoading && aiMealPlanResponse != null ? (
         <>         
           <ScreenSectionHeader
-            description={`${profile.heightCm}cm, ${profile.weightKg}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
+            description={`${profile.height}cm, ${profile.weight}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
             step={isSavedView ? "저장된 식단" : "3단계"}
             title={`${GOAL_LABELS[goal]} 결과`}
           >

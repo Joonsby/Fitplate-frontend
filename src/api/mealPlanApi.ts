@@ -1,4 +1,4 @@
-﻿import type {  
+import type {
   AIMealPlanResponse,
   GoalType,
   PlanDuration,
@@ -6,6 +6,7 @@
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
 import { getAccessToken } from "./authToken";
+import { apiFetch } from "./httpClient";
 
 interface BackendMealPlanGenerateResponse {
   height: number;
@@ -19,7 +20,7 @@ interface BackendMealPlanGenerateResponse {
   tdee: number;
   proteinGram: number;
   carbsGram: number;
-  fatGram: number;  
+  fatGram: number;
   aiMealPlanResponse: AIMealPlanResponse;
 }
 
@@ -191,11 +192,11 @@ function mapGenderToBackend(gender: UserProfile["gender"]): string {
 export async function generateMealPlanFromApi({
   profile,
   goal,
-  durationDays,  
+  durationDays,
 }: {
   profile: UserProfile;
   goal: GoalType;
-  durationDays: PlanDuration;  
+  durationDays: PlanDuration;
 }): Promise<BackendMealPlanGenerateResponse> {
   const requestBody = {
     height: profile.height,
@@ -205,51 +206,29 @@ export async function generateMealPlanFromApi({
     bodyFatRate: profile.bodyFatPercentage ?? null,
     goal: mapGoalToBackend(goal),
     durationDays: durationDays,
-  };  
+  };
 
-  if (USE_TEMPORARY_MEAL_PLAN_DATA) {    
+  if (USE_TEMPORARY_MEAL_PLAN_DATA) {
     return TEMPORARY_MEAL_PLAN_RESPONSE;
   }
-  
-  let response: Response;
+
+  const accessToken = getAccessToken();
+  if (!accessToken) {
+    throw new Error("인증 토큰이 없습니다. 로그인 상태를 확인해주세요.");
+  }
 
   console.log(profile);
 
-  try {
-    const accessToken = getAccessToken();
-    if (!accessToken) {
-      throw new Error("인증 토큰이 없습니다. 로그인 상태를 확인해주세요.");
-    }
-    response = await fetch(`${getApiUrl(API_ENDPOINTS.MEAL_PLAN)}`, {
+  const data = await apiFetch<BackendMealPlanGenerateResponse>(
+    getApiUrl(API_ENDPOINTS.MEAL_PLAN),
+    {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(requestBody),
-    });
-  } catch (error) {
-    console.error("식단 생성 API 네트워크 오류:", error);
-    throw new Error(
-      `AI 식단 생성 서버에 연결하지 못했습니다.\n 서버 상태를 확인한 뒤 다시 시도해주세요.`
-    );
-  }
-
-if (!response.ok) {
-  const errorText = await response.text();
-
-  console.error("식단 생성 API 호출 실패:", {
-    status: response.status,
-    statusText: response.statusText,
-    body: errorText,
-  });
-
-  throw new Error(
-    "AI 식단 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      body: requestBody,
+      networkErrorMessage: "AI 식단 생성 서버에 연결하지 못했습니다.\n 서버 상태를 확인한 뒤 다시 시도해주세요.",
+      httpErrorMessage: "AI 식단 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    }
   );
-}
 
-  const data = (await response.json()) as BackendMealPlanGenerateResponse;
   console.log(JSON.stringify(data, null, 2));
   return data;
 }

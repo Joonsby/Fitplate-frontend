@@ -1,11 +1,8 @@
 import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { ResultScreen } from "../components/ResultScreen";
-import {
-  addMealPlanFavorite,
-  createSavedMealPlan,
-  deleteMealPlanFavorite,
-} from "../api/mealPlanStorageApi";
+import { createSavedMealPlan } from "../api/mealPlanStorageApi";
+import { toggleFavoriteFood } from "../api/favoriteFoodsApi";
 import type {
   FavoriteFood,
   GoalType,
@@ -93,33 +90,27 @@ export function ResultPage({
   };
 
   const handleToggleFavoriteFood = async (food: MealFood) => {
-    const mealPlanId = viewingSavedMealPlan?.id ?? resultMealPlan.id;
-
-    const existingFavoriteFood = favoriteFoods.find(
-      (favoriteFood) => favoriteFood.name === food.name,
-    );
-
     try {
-      if (existingFavoriteFood != null) {
-        await deleteMealPlanFavorite(mealPlanId);
+      const result = await toggleFavoriteFood(food);
 
-        setFavoriteFoods((currentFavoriteFoods) =>
-          currentFavoriteFoods.filter(
-            (favoriteFood) => favoriteFood.name !== food.name,
-          ),
+      if (result.action === "ADDED") {
+        const now = new Date().toISOString();
+        setFavoriteFoods((current) => [
+          {
+            id: String(result.favoriteFoodId),
+            name: food.name,
+            shoppingCategory: food.shoppingCategory,
+            useCount: 1,
+            createdAt: now,
+            updatedAt: now,
+          },
+          ...current.filter((f) => f.name !== food.name),
+        ]);
+      } else {
+        setFavoriteFoods((current) =>
+          current.filter((f) => f.name !== food.name),
         );
-
-        return;
       }
-
-      const favoriteFood = await addMealPlanFavorite({ mealPlanId, food });
-
-      setFavoriteFoods((currentFavoriteFoods) => [
-        favoriteFood,
-        ...currentFavoriteFoods.filter(
-          (currentFavoriteFood) => currentFavoriteFood.name !== food.name,
-        ),
-      ]);
     } catch (error) {
       console.error("즐겨찾기 변경 실패:", error);
       showToast(

@@ -1,5 +1,7 @@
 import { appLogin } from "@apps-in-toss/web-framework";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
+import { getAccessToken } from "./authToken";
+import type { UserProfile } from "../types/fitplate";
 
 async function tossLogin(
     authorizationCode: string,
@@ -33,6 +35,34 @@ async function devLogin() {
     }
 
     return response.json();
+}
+
+export async function getMyUserProfile(): Promise<UserProfile | null> {
+  const accessToken = getAccessToken();
+  const response = await fetch(getApiUrl(API_ENDPOINTS.USER_PROFILE_ME), {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+    },
+  });
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  if (!response.ok) {
+    console.error("[UserProfile] 조회 실패:", response.status);
+    return null;
+  }
+
+  const data = await response.json();
+  return {
+    height: data.height,
+    weight: data.weight,
+    age: data.age,
+    gender: data.gender === "FEMALE" ? "female" : "male",
+    bodyFatPercentage: data.bodyFatPercentage,
+  };
 }
 
 export async function login() {

@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
   MEAL_PLAN_SAVE: "/api/meal-plan/save",
   AUTH_DEV_LOGIN: "/api/auth/dev-login",
   AUTH_TOSS_LOGIN: "/api/auth/toss-login",
+  USER_PROFILE_ME: "/api/user-profile/me",
 } as const;
 
 // endpoint를 받아 전체 API URL을 만드는 헬퍼 함수입니다.

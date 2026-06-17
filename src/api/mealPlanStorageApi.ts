@@ -10,9 +10,9 @@ import type {
   UserProfile,
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl, getMealPlanFavoriteUrl } from "./apiConfig";
-import { getAccessToken } from "./authToken";
 import { selectClosestMealPlan } from "../utils/mealPlanSelector";
 import { mergeMealPlanWithAi, extractAiResponseFromMealPlan } from "../utils/mealPlanMerger";
+import { apiFetch, apiFetchRaw, apiFetchVoid } from "./httpClient";
 
 export interface CreateSavedMealPlanInput {
   profile: UserProfile;
@@ -75,20 +75,17 @@ async function readOptionalJson(response: Response): Promise<unknown> {
 export async function createSavedMealPlan(
   input: CreateSavedMealPlanInput,
 ): Promise<SavedMealPlan> {
-  const accessToken = getAccessToken();
   const requestBody = {
     goal: input.goal,
     durationDays: input.planDuration,
     aiMealPlanResponse: extractAiResponseFromMealPlan(input.mealPlan),
   };
   console.log("[식단 저장] request body:", JSON.stringify(requestBody, null, 2));
-  const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
+
+  const response = await apiFetchRaw(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(requestBody),
+    body: requestBody,
+    networkErrorMessage: "식단 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
   });
 
   if (!response.ok) {
@@ -129,7 +126,6 @@ interface ApiSavedMealPlan {
   createdAt: string;
 }
 
-
 function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
   const baseMealPlan = selectClosestMealPlan(item.targetCalories, item.durationDays);
   const mealPlan = mergeMealPlanWithAi(baseMealPlan, item.aiMealPlanResponse);
@@ -158,58 +154,20 @@ function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
 }
 
 export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
-  const accessToken = getAccessToken();
-  const response = await fetch(getApiUrl(API_ENDPOINTS.MEAL_PLAN), {
-    method: "GET",
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-    },
+  const items = await apiFetch<ApiSavedMealPlan[]>(getApiUrl(API_ENDPOINTS.MEAL_PLAN), {
+    httpErrorMessage: "저장된 식단 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+    networkErrorMessage: "저장된 식단 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
   });
-
-  if (!response.ok) {
-    throw new Error("저장된 식단 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
-  }
-
-  const responseBody = await readOptionalJson(response);
-  console.log(JSON.stringify(responseBody,null,2))
-  return Array.isArray(responseBody)
-    ? (responseBody as ApiSavedMealPlan[]).map(toSavedMealPlanFromApi)
-    : [];
+  console.log(JSON.stringify(items, null, 2));
+  return Array.isArray(items) ? items.map(toSavedMealPlanFromApi) : [];
 }
 
-export async function deleteSavedMealPlanById(
-  mealPlanId: string,
-): Promise<void> {
-  let response : Response;
-
-  try{
-  const accessToken = getAccessToken();  
-  response = await fetch(getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}`), {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
-      },
-    },
-  );  
-  } catch(error){
-    console.log("식단 삭제 API 네트워크 오류:", error);
-    throw new Error("식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
-  } 
-
-  if (!response.ok) {
-    const errorText = await response.text();
-
-    console.error("식단 삭제 API 호출 실패:", {
-      status: response.status,
-      statusText: response.statusText,
-      body: errorText,
-    });
-
-    throw new Error(
-      "AI 식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
-    );
-  }
+export async function deleteSavedMealPlanById(mealPlanId: string): Promise<void> {
+  return apiFetchVoid(getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}`), {
+    method: "DELETE",
+    networkErrorMessage: "식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    httpErrorMessage: "AI 식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+  });
 }
 
 export async function addMealPlanFavorite({
@@ -219,12 +177,10 @@ export async function addMealPlanFavorite({
   mealPlanId: string;
   food: MealFood;
 }): Promise<FavoriteFood> {
-  const response = await fetch(getMealPlanFavoriteUrl(mealPlanId), {
+  const response = await apiFetchRaw(getMealPlanFavoriteUrl(mealPlanId), {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ food }),
+    body: { food },
+    networkErrorMessage: "즐겨찾기 추가에 실패했습니다. 잠시 후 다시 시도해주세요.",
   });
 
   if (!response.ok) {
@@ -251,14 +207,10 @@ export async function addMealPlanFavorite({
   };
 }
 
-export async function deleteMealPlanFavorite(
-  mealPlanId: string,
-): Promise<void> {
-  const response = await fetch(getMealPlanFavoriteUrl(mealPlanId), {
+export async function deleteMealPlanFavorite(mealPlanId: string): Promise<void> {
+  return apiFetchVoid(getMealPlanFavoriteUrl(mealPlanId), {
     method: "DELETE",
+    networkErrorMessage: "즐겨찾기 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    httpErrorMessage: "즐겨찾기 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
   });
-
-  if (!response.ok) {
-    throw new Error("즐겨찾기 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
-  }
 }

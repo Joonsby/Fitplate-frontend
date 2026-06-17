@@ -426,8 +426,7 @@ interface FoodRowProps {
 function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
   const shoppingHref = food.shoppingKeyword != null
     ? `https://www.coupang.com/np/search?q=${encodeURIComponent(food.shoppingKeyword)}`
-    : SHOPPING_LINKS[food.shoppingCategory];
-  console.log(food);
+    : SHOPPING_LINKS[food.shoppingCategory];  
   return (
     <div className="foodRow">
       <div>

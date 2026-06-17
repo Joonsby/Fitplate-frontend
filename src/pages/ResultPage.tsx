@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Toast } from "@toss/tds-mobile";
+import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { ResultScreen } from "../components/ResultScreen";
 import {
@@ -53,15 +52,7 @@ export function ResultPage({
   onBack,
 }: ResultPageProps) {
   const navigate = useNavigate();
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastText, setToastText] = useState("");
-  const [toastType, setToastType] = useState<"success" | "error" | "info">("info");
-
-  const showToast = (text: string, type: "success" | "error" | "info" = "info") => {
-    setToastText(text);
-    setToastType(type);
-    setToastOpen(true);
-  };
+  const { showToast, toastElement } = useToast();
 
   // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → 스냅샷 우선, 최후 fallback → React 상태
   const resultProfile = viewingSavedMealPlan?.profile ?? resultSnapshot?.profile ?? profile;
@@ -131,30 +122,18 @@ export function ResultPage({
       ]);
     } catch (error) {
       console.error("즐겨찾기 변경 실패:", error);
-      alert(
+      showToast(
         error instanceof Error
           ? error.message
           : "즐겨찾기 변경 중 알 수 없는 오류가 발생했습니다.",
+        "error",
       );
     }
   };
 
   return (
     <>
-      <Toast
-        position="top"
-        open={toastOpen}
-        text={toastText}
-        leftAddon={
-          toastType === "success"
-            ? <Toast.Lottie src="https://static.toss.im/lotties-common/check-green-spot.json" />
-            : toastType === "error"
-            ? <Toast.Icon name="icon-dynamicIntelli-X-red" />
-            : undefined
-        }
-        duration={3000}
-        onClose={() => setToastOpen(false)}
-      />
+      {toastElement}
       <ResultScreen
       aiError={aiError}
       favoriteFoods={favoriteFoods}

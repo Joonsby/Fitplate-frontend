@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { login, getMyUserProfile } from "./api/authApi";
 import { saveAccessToken } from "./api/authToken";
 import { getSavedMealPlans } from "./api/mealPlanStorageApi";
+import { getFavoriteFoods } from "./api/favoriteFoodsApi";
 import "./App.css";
 import { AppTopTitle } from "./components/AppTopTitle";
 import { HomePage } from "./pages/HomePage";
@@ -34,6 +35,16 @@ function App() {
     selectedMealPlan,
   } = useMealPlanSelection();
 
+  const {
+    savedMealPlans,
+    setSavedMealPlans,
+    viewingSavedMealPlan,
+    setViewingSavedMealPlan,
+    clearViewingSavedMealPlan,
+  } = useSavedMealPlans();
+
+  const { favoriteFoods, setFavoriteFoods } = useFavoriteFoods();
+
   const checkLogin = useCallback(async () => {
     setLoginStatus("loading");
 
@@ -46,25 +57,19 @@ function App() {
       if (userProfile !== null) {
         setProfile(userProfile);
       }
+
+      getFavoriteFoods()
+        .then(setFavoriteFoods)
+        .catch((err) => console.error("즐겨찾기 목록 조회 실패:", err));
     } catch (error) {
       console.error("[Login] 실패", error);
       setLoginStatus("error");
     }
-  }, [setProfile]);
+  }, [setProfile, setFavoriteFoods]);
 
   useEffect(() => {
     checkLogin();
   }, [checkLogin]);
-
-  const {
-    savedMealPlans,
-    setSavedMealPlans,
-    viewingSavedMealPlan,
-    setViewingSavedMealPlan,
-    clearViewingSavedMealPlan,
-  } = useSavedMealPlans();
-
-  const { favoriteFoods, setFavoriteFoods } = useFavoriteFoods();
 
   const {
     resultSnapshot,

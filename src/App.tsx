@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { login } from "./api/authApi";
+import { login, getMyUserProfile } from "./api/authApi";
+import { saveAccessToken } from "./api/authToken";
 import { getSavedMealPlans } from "./api/mealPlanStorageApi";
 import "./App.css";
 import { AppTopTitle } from "./components/AppTopTitle";
@@ -22,23 +23,6 @@ function App() {
   const location = useLocation();
   const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");  
 
-  const checkLogin = useCallback(async () => {
-    setLoginStatus("loading");
-
-    try{
-      const data = await login();
-      sessionStorage.setItem("fitplate_access_token", data.accessToken);
-      setLoginStatus("success");
-    } catch (error) {
-      console.error("[Login] 실패", error);
-      setLoginStatus("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    checkLogin();
-  }, [checkLogin]);
-
   const {
     profile,
     setProfile,
@@ -49,6 +33,28 @@ function App() {
     nutritionTarget,
     selectedMealPlan,
   } = useMealPlanSelection();
+
+  const checkLogin = useCallback(async () => {
+    setLoginStatus("loading");
+
+    try{
+      const data = await login();
+      saveAccessToken(data.accessToken);
+      setLoginStatus("success");
+
+      const userProfile = await getMyUserProfile();
+      if (userProfile !== null) {
+        setProfile(userProfile);
+      }
+    } catch (error) {
+      console.error("[Login] 실패", error);
+      setLoginStatus("error");
+    }
+  }, [setProfile]);
+
+  useEffect(() => {
+    checkLogin();
+  }, [checkLogin]);
 
   const {
     savedMealPlans,

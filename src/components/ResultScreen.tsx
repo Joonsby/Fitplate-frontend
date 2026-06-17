@@ -81,7 +81,7 @@ export function ResultScreen({
         />
       ) : null}
 
-      {!shouldShowFallbackFailure && (isAiLoading || aiError != null) ? (
+      {!shouldShowFallbackFailure && isAiLoading ? (
         <AiMealPlanPanel
           aiError={aiError}
           isAiLoading={isAiLoading}
@@ -93,37 +93,41 @@ export function ResultScreen({
 
       {!isAiLoading && hasAiData ? (
         <>
-          <ScreenSectionHeader
-            description={`${profile.height}cm, ${profile.weight}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
-            step={isSavedView ? "저장된 식단" : "3단계"}
-            title={`${GOAL_LABELS[goal]} 결과`}
-          >
-            {savedDate ? (
-              <Post.H3 color="#3182f6" typography="t7" className="savedAtText">저장 날짜: {savedDate}</Post.H3>
-            ) : null}
-          </ScreenSectionHeader>
+          {aiError == null ? (
+            <ScreenSectionHeader
+              description={`${profile.height}cm, ${profile.weight}kg 기준 목표와 가장 가까운 ${mealPlan.targetCalories.toLocaleString()}kcal 식단입니다.`}
+              step={isSavedView ? "저장된 식단" : "3단계"}
+              title={`${GOAL_LABELS[goal]} 결과`}
+            >
+              {savedDate ? (
+                <Post.H3 color="#3182f6" typography="t7" className="savedAtText">저장 날짜: {savedDate}</Post.H3>
+              ) : null}
+            </ScreenSectionHeader>
+          ) : null}
 
           <section className="mealPlanSummary">
             <div className="mealPlanSummaryInner">
-              <div className="nutritionSummary">
-                <div className="caloriePanel">
-                  <span>목표 칼로리</span>
-                  <strong>{target.calories.toLocaleString()} kcal</strong>
-                </div>
+              {aiError == null ? (
+                <div className="nutritionSummary">
+                  <div className="caloriePanel">
+                    <span>목표 칼로리</span>
+                    <strong>{target.calories.toLocaleString()} kcal</strong>
+                  </div>
 
-                <div className="metricGrid">
-                  <MetricItem label="BMR" value={target.bmr} unit="kcal" />
-                  <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
-                </div>
+                  <div className="metricGrid">
+                    <MetricItem label="BMR" value={target.bmr} unit="kcal" />
+                    <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
+                  </div>
 
-                <div className="macroGrid">
-                  <MacroItem label="단백질" value={target.proteinGram} />
-                  <MacroItem label="탄수화물" value={target.carbsGram} />
-                  <MacroItem label="지방" value={target.fatGram} />
-                </div>
+                  <div className="macroGrid">
+                    <MacroItem label="단백질" value={target.proteinGram} />
+                    <MacroItem label="탄수화물" value={target.carbsGram} />
+                    <MacroItem label="지방" value={target.fatGram} />
+                  </div>
 
-                <Button onClick={onSaveMealPlan}>식단 저장하기</Button>
-              </div>
+                  <Button onClick={onSaveMealPlan}>식단 저장하기</Button>
+                </div>
+              ) : null}
 
               <AiMealPlanPanel
                 aiError={aiError}
@@ -133,37 +137,41 @@ export function ResultScreen({
                 onRetryAiGenerate={onRetryAiGenerate}
               />
 
-              <div className="mealList">
-                <div className="mealListHeader">
-                  <h3>날짜별 식단</h3>
-                  <span>평균 {mealPlan.averageCalories.toLocaleString()} kcal</span>
-                </div>
+              {aiError == null ? (
+                <>
+                  <div className="mealList">
+                    <div className="mealListHeader">
+                      <h3>날짜별 식단</h3>
+                      <span>평균 {mealPlan.averageCalories.toLocaleString()} kcal</span>
+                    </div>
 
-                {mealPlan.days.map((dayMeal) => (
-                  <DayMealCard
-                    dayMeal={dayMeal}
-                    favoriteFoodNames={favoriteFoodNames}
-                    key={dayMeal.id}
-                    onFavoriteFoodToggle={onFavoriteFoodToggle}
-                  />
-                ))}
-              </div>
+                    {mealPlan.days.map((dayMeal) => (
+                      <DayMealCard
+                        dayMeal={dayMeal}
+                        favoriteFoodNames={favoriteFoodNames}
+                        key={dayMeal.id}
+                        onFavoriteFoodToggle={onFavoriteFoodToggle}
+                      />
+                    ))}
+                  </div>
 
-              <div className="shoppingList">
-                <div className="mealListHeader">
-                  <h3>장보기 리스트</h3>
-                  <span>{shoppingList.length}개 재료</span>
-                </div>
+                  <div className="shoppingList">
+                    <div className="mealListHeader">
+                      <h3>장보기 리스트</h3>
+                      <span>{shoppingList.length}개 재료</span>
+                    </div>
 
-                {shoppingList.map((item) => (
-                  <ShoppingListRow
-                    isFavorite={favoriteFoodNames.has(item.name)}
-                    item={item}
-                    key={item.id}
-                    onFavoriteFoodToggle={onFavoriteFoodToggle}
-                  />
-                ))}
-              </div>
+                    {shoppingList.map((item) => (
+                      <ShoppingListRow
+                        isFavorite={favoriteFoodNames.has(item.name)}
+                        item={item}
+                        key={item.id}
+                        onFavoriteFoodToggle={onFavoriteFoodToggle}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : null}
             </div>
           </section>
         </>
@@ -266,6 +274,23 @@ function AiMealPlanPanel({
     return (
       <section className="aiPanel error">
         <h3>AI 응답 오류</h3>
+
+        <div className="caloriePanel">
+          <span>목표 칼로리</span>
+          <strong>{target.calories.toLocaleString()} kcal</strong>
+        </div>
+
+        <div className="metricGrid">
+          <MetricItem label="BMR" value={target.bmr} unit="kcal" />
+          <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
+        </div>
+
+        <div className="macroGrid">
+          <MacroItem label="단백질" value={target.proteinGram} />
+          <MacroItem label="탄수화물" value={target.carbsGram} />
+          <MacroItem label="지방" value={target.fatGram} />
+        </div>
+
         <p>
           {aiError.split("\n").map((line, i) => (
             <span key={i}>{line}<br /></span>

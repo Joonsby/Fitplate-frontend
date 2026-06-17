@@ -180,17 +180,35 @@ export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
 export async function deleteSavedMealPlanById(
   mealPlanId: string,
 ): Promise<void> {
-  console.log("[식단 삭제] mealPlanId:", mealPlanId);
-  const response = await fetch(
-    getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}`),
-    {
+  let response : Response;
+
+  try{
+  const accessToken = getAccessToken();  
+  response = await fetch(getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}`), {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+      },
     },
-  );
-  
+  );  
+  } catch(error){
+    console.log("식단 삭제 API 네트워크 오류:", error);
+    throw new Error("식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+  } 
 
   if (!response.ok) {
-    throw new Error("식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    const errorText = await response.text();
+
+    console.error("식단 삭제 API 호출 실패:", {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+    });
+
+    throw new Error(
+      "AI 식단 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    );
   }
 }
 

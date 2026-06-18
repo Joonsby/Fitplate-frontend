@@ -102,6 +102,9 @@ function App() {
 
   const isResultPage = location.pathname === "/result";
 
+  // 두 페이지 간 이동은 스택 교체 — 돌아가기가 이 둘 사이 이력을 밟지 않도록
+  const isMainMenuPage = ["/saved-plans", "/favorite-foods"].includes(location.pathname);
+
   const goToSavedPlans = async () => {
     clearViewingSavedMealPlan();
     resetAiMealPlan();
@@ -113,13 +116,13 @@ function App() {
       console.error("저장된 식단 목록 조회 실패:", error);
     }
 
-    navigate("/saved-plans", { replace: location.pathname === "/saved-plans" });
+    navigate("/saved-plans", { replace: isMainMenuPage });
   };
 
   const goToFavoriteFoods = () => {
     clearViewingSavedMealPlan();
     resetAiMealPlan();
-    navigate("/favorite-foods", { replace: location.pathname === "/favorite-foods" });
+    navigate("/favorite-foods", { replace: isMainMenuPage });
   };
 
   const onBack = () => {

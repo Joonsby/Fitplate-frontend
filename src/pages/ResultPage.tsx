@@ -147,6 +147,7 @@ export function ResultPage({
         void generateAiMealPlan(resultMealPlan)
       }
       onBack={onBack}
+      onGoalReselect={() => navigate("/goal")}
       onRestart={() => navigate("/")}
     />
     </>

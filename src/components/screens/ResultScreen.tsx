@@ -32,6 +32,7 @@ export interface ResultScreenProps {
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
   onBack: () => void;
+  onGoalReselect: () => void;
   onRestart: () => void;
 }
 
@@ -49,6 +50,7 @@ export function ResultScreen({
   onRetryAiGenerate,
   onSaveMealPlan,
   onBack,
+  onGoalReselect,
   onRestart,
 }: ResultScreenProps) {
   const shoppingList = aggregateShoppingList(mealPlan);
@@ -161,7 +163,7 @@ export function ResultScreen({
 
       {!isAiLoading ? (
         <div className="buttonRow">
-          <Button variant="weak" onClick={onBack}>
+          <Button variant="weak" onClick={isSavedView ? onBack : onGoalReselect}>
             {isSavedView ? "목록으로" : "목표 다시 선택"}
           </Button>
           <Button variant="weak" onClick={onRestart}>

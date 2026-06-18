@@ -551,11 +551,10 @@ button:focus{
 .foodRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 44px;
-  padding: 10px 0;
-  border-top: 1px solid #f2f4f6;
+  justify-content: space-between;    
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
 }
 
 .foodRow div {
@@ -600,7 +599,7 @@ button:focus{
   color: #b0b8c1;
   cursor: pointer;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 800;  
 }
 
 .favoriteFoodButton.selected {
@@ -874,4 +873,134 @@ button:focus{
     max-width: 480px;
     margin: 0 auto;
   }
+}
+
+/* DayMealSwiper 전용 스타일 */
+.dayMealSwiper,
+.dayMealSwiperContainer,
+.dayMealSwiperContainer .swiper-wrapper,
+.dayMealSwiperContainer .swiper-slide {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.dayMealSwiper {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.dayMealSwiperContainer {
+  overflow: hidden;
+}
+
+.dayMealSwiperContainer .swiper-slide {
+  min-width: 0;
+}
+
+/* 일차 단위 세로 컨테이너 */
+.dayMealSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.dayMealSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dayMealSectionHeader strong {
+  font-size: 17px;
+}
+
+.dayMealSectionHeader span {
+  color: #6b7684;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* MealSwiper — 끼니 단위 Swiper */
+.mealSwiperRoot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.mealSwiperHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mealSwiperLabel {
+  font-size: 15px;
+  font-weight: 700;
+  color: #191f28;
+}
+
+.mealSwiperNav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.mealSwiperHint {
+  color: #3182f6;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.mealSwiperPos {
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mealSwiperContainer,
+.mealSwiperContainer .swiper-wrapper,
+.mealSwiperContainer .swiper-slide {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.mealSwiperContainer {
+  overflow: hidden;
+}
+
+.mealSwiperContainer .swiper-slide {
+  min-width: 0;
+}
+
+.mealSwiperDots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+}
+
+.mealSwiperDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e5e8eb;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.mealSwiperDot.active {
+  background: #3182f6;
+  transform: scale(1.3);
 }

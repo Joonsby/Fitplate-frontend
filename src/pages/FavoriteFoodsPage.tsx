@@ -1,28 +1,24 @@
 import { useToast } from "../hooks/useToast";
-import { FavoriteFoodsScreen } from "../components/FavoriteFoodsScreen";
-import { deleteMealPlanFavorite } from "../api/mealPlanStorageApi";
+import { FavoriteFoodsScreen } from "../components/screens/FavoriteFoodsScreen";
+import { deleteFavoriteFood } from "../api/favoriteFoodsApi";
 import type { FavoriteFood } from "../types/fitplate";
 
 interface FavoriteFoodsPageProps {
   favoriteFoods: FavoriteFood[];
   setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
-  fallbackMealPlanId: string;
   onBack: () => void;
 }
 
 export function FavoriteFoodsPage({
   favoriteFoods,
   setFavoriteFoods,
-  fallbackMealPlanId,
   onBack,
 }: FavoriteFoodsPageProps) {
   const { showToast, toastElement } = useToast();
 
-  const handleDeleteFavoriteFood = async (id: string) => {
-    const mealPlanId = id.includes(":") ? id.split(":")[0] : fallbackMealPlanId;
-
+  const handleDeleteFavoriteFood = async (favoriteFoodId: number) => {
     try {
-      await deleteMealPlanFavorite(mealPlanId);
+      await deleteFavoriteFood(favoriteFoodId);
     } catch (error) {
       console.error("즐겨찾기 삭제 실패:", error);
       showToast(
@@ -35,7 +31,7 @@ export function FavoriteFoodsPage({
     }
 
     setFavoriteFoods((currentFavoriteFoods) =>
-      currentFavoriteFoods.filter((favoriteFood) => favoriteFood.id !== id),
+      currentFavoriteFoods.filter((favoriteFood) => favoriteFood.favoriteFoodId !== favoriteFoodId),
     );
   };
 

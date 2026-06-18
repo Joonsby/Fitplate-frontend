@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ConfirmDialog } from "@toss/tds-mobile";
 import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
-import { SavedMealPlansScreen } from "../components/SavedMealPlansScreen";
+import { SavedMealPlansScreen } from "../components/screens/SavedMealPlansScreen";
 import { deleteSavedMealPlanById } from "../api/mealPlanStorageApi";
 import type { SavedMealPlan } from "../types/fitplate";
 

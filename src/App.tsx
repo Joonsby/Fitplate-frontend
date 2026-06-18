@@ -5,7 +5,7 @@ import { saveAccessToken } from "./api/authToken";
 import { getSavedMealPlans } from "./api/mealPlanStorageApi";
 import { getFavoriteFoods } from "./api/favoriteFoodsApi";
 import "./App.css";
-import { AppTopTitle } from "./components/AppTopTitle";
+import { AppTopTitle } from "./components/common/AppTopTitle";
 import { HomePage } from "./pages/HomePage";
 import { GoalPage } from "./pages/GoalPage";
 import { ResultPage } from "./pages/ResultPage";
@@ -79,6 +79,25 @@ function App() {
     resetAiMealPlan,
   } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
 
+  const [isMealPlanSaved, setIsMealPlanSaved] = useState(false);
+
+  // AI 생성 성공 시 미저장 상태로 전환
+  const wrappedGenerateAiMealPlan: typeof generateAiMealPlan = async (mealPlan) => {
+    const result = await generateAiMealPlan(mealPlan);
+    if (result !== null) {
+      setIsMealPlanSaved(false);
+    }
+    return result;
+  };
+
+  // 저장된 식단 상세 진입 시 저장됨 상태로 전환
+  const handleSetViewingSavedMealPlan: typeof setViewingSavedMealPlan = (planOrUpdater) => {
+    setViewingSavedMealPlan(planOrUpdater);
+    if (typeof planOrUpdater !== "function" && planOrUpdater !== null) {
+      setIsMealPlanSaved(true);
+    }
+  };
+
   if (loginStatus === "loading") {
     return (
       <main className="appShell" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>        
@@ -102,6 +121,9 @@ function App() {
 
   const isResultPage = location.pathname === "/result";
 
+  // 두 페이지 간 이동은 스택 교체 — 돌아가기가 이 둘 사이 이력을 밟지 않도록
+  const isMainMenuPage = ["/saved-plans", "/favorite-foods"].includes(location.pathname);
+
   const goToSavedPlans = async () => {
     clearViewingSavedMealPlan();
     resetAiMealPlan();
@@ -113,13 +135,13 @@ function App() {
       console.error("저장된 식단 목록 조회 실패:", error);
     }
 
-    navigate("/saved-plans", { replace: location.pathname === "/saved-plans" });
+    navigate("/saved-plans", { replace: isMainMenuPage });
   };
 
   const goToFavoriteFoods = () => {
     clearViewingSavedMealPlan();
     resetAiMealPlan();
-    navigate("/favorite-foods", { replace: location.pathname === "/favorite-foods" });
+    navigate("/favorite-foods", { replace: isMainMenuPage });
   };
 
   const onBack = () => {
@@ -149,7 +171,8 @@ function App() {
               onDurationChange={setPlanDuration}
               onBack={onBack}
               onGeneratedStart={clearViewingSavedMealPlan}
-              generateAiMealPlan={generateAiMealPlan}
+              isMealPlanSaved={isMealPlanSaved}
+              generateAiMealPlan={wrappedGenerateAiMealPlan}
             />
           }
         />
@@ -169,7 +192,9 @@ function App() {
               resultSnapshot={resultSnapshot}
               aiError={aiError}
               isAiLoading={isAiLoading}
-              generateAiMealPlan={generateAiMealPlan}
+              isMealPlanSaved={isMealPlanSaved}
+              setIsMealPlanSaved={setIsMealPlanSaved}
+              generateAiMealPlan={wrappedGenerateAiMealPlan}
               onBack={onBack}
             />
           }
@@ -180,7 +205,7 @@ function App() {
             <SavedMealPlansPage
               savedMealPlans={savedMealPlans}
               setSavedMealPlans={setSavedMealPlans}
-              setViewingSavedMealPlan={setViewingSavedMealPlan}
+              setViewingSavedMealPlan={handleSetViewingSavedMealPlan}
               onBack={onBack}
             />
           }
@@ -191,7 +216,6 @@ function App() {
             <FavoriteFoodsPage
               favoriteFoods={favoriteFoods}
               setFavoriteFoods={setFavoriteFoods}
-              fallbackMealPlanId={selectedMealPlan.id}
               onBack={onBack}
             />
           }

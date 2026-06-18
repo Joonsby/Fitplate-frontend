@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
-import { ResultScreen } from "../components/ResultScreen";
+import { ConfirmDialog } from "@toss/tds-mobile";
+import { ResultScreen } from "../components/screens/ResultScreen";
 import { createSavedMealPlan } from "../api/mealPlanStorageApi";
 import { toggleFavoriteFood } from "../api/favoriteFoodsApi";
 import type {
@@ -28,6 +30,8 @@ interface ResultPageProps {
   resultSnapshot: ResultSnapshot | null;
   aiError: string | null;
   isAiLoading: boolean;
+  isMealPlanSaved: boolean;
+  setIsMealPlanSaved: React.Dispatch<React.SetStateAction<boolean>>;
   generateAiMealPlan: (mealPlan: MealPlan) => Promise<MealPlan | null>;
   onBack: () => void;
 }
@@ -45,11 +49,14 @@ export function ResultPage({
   resultSnapshot,
   aiError,
   isAiLoading,
+  isMealPlanSaved,
+  setIsMealPlanSaved,
   generateAiMealPlan,
   onBack,
 }: ResultPageProps) {
   const navigate = useNavigate();
   const { showToast, toastElement } = useToast();
+  const [confirmRestartOpen, setConfirmRestartOpen] = useState(false);
 
   // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → 스냅샷 우선, 최후 fallback → React 상태
   const resultProfile = viewingSavedMealPlan?.profile ?? resultSnapshot?.profile ?? profile;
@@ -77,6 +84,7 @@ export function ResultPage({
         ...currentSavedMealPlans.filter((plan) => plan.id !== savedMealPlan.id),
       ]);
 
+      setIsMealPlanSaved(true);
       showToast("식단을 저장했습니다.", "success");
     } catch (error) {
       console.error("식단 저장 실패:", error);
@@ -97,19 +105,26 @@ export function ResultPage({
         const now = new Date().toISOString();
         setFavoriteFoods((current) => [
           {
-            id: String(result.favoriteFoodId),
+            favoriteFoodId: result.favoriteFoodId,
             name: food.name,
+            amount: food.amount,
+            calories: food.calories,
+            carbohydrate: food.carbohydrate ?? 0,
+            protein: food.protein ?? 0,
+            fat: food.fat ?? 0,
             shoppingCategory: food.shoppingCategory,
-            useCount: 1,
+            shoppingKeyword: food.shoppingKeyword ?? "",
+            sourceFoodId: food.id,
             createdAt: now,
-            updatedAt: now,
           },
           ...current.filter((f) => f.name !== food.name),
         ]);
+        showToast(`${food.name}을 즐겨찾는 음식에 추가하였습니다.`, "success");
       } else {
         setFavoriteFoods((current) =>
           current.filter((f) => f.name !== food.name),
         );
+        showToast(`${food.name}을 즐겨찾는 음식에서 삭제하였습니다.`, "error");
       }
     } catch (error) {
       console.error("즐겨찾기 변경 실패:", error);
@@ -125,6 +140,28 @@ export function ResultPage({
   return (
     <>
       {toastElement}
+      <ConfirmDialog
+        open={confirmRestartOpen}
+        title="처음부터 시작"
+        description="처음부터 다시 시작하면 저장하지 않은 현재 식단 결과는 복구할 수 없습니다. 계속하시겠습니까?"
+        confirmButton={
+          <ConfirmDialog.ConfirmButton
+            onClick={() => {
+              setConfirmRestartOpen(false);
+              setIsMealPlanSaved(false);
+              navigate("/");
+            }}
+          >
+            확인
+          </ConfirmDialog.ConfirmButton>
+        }
+        cancelButton={
+          <ConfirmDialog.CancelButton onClick={() => setConfirmRestartOpen(false)}>
+            취소
+          </ConfirmDialog.CancelButton>
+        }
+        onClose={() => setConfirmRestartOpen(false)}
+      />
       <ResultScreen
       aiError={aiError}
       favoriteFoods={favoriteFoods}
@@ -142,7 +179,15 @@ export function ResultPage({
         void generateAiMealPlan(resultMealPlan)
       }
       onBack={onBack}
-      onRestart={() => navigate("/")}
+      onGoalReselect={() => navigate("/goal", { state: { from: "/result" } })}
+      onRestart={() => {
+        if (isMealPlanSaved) {
+          setIsMealPlanSaved(false);
+          navigate("/");
+        } else {
+          setConfirmRestartOpen(true);
+        }
+      }}
     />
     </>
   );

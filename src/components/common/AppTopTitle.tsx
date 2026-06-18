@@ -1,5 +1,5 @@
 import { Top,Button } from "@toss/tds-mobile";
-import logoImage from "../assets/images/logo.png";
+import logoImage from "../../assets/images/logo.png";
 
 interface AppTopTitleProps {
   isResultPage: boolean;

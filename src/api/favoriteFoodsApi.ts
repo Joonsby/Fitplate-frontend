@@ -1,7 +1,7 @@
 // 즐겨찾기 음식 관련 API 함수 모음
 import type { FavoriteFood, MealFood } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
-import { apiFetch } from "./httpClient";
+import { apiFetch, apiFetchVoid } from "./httpClient";
 
 export async function getFavoriteFoods(): Promise<FavoriteFood[]> {
   return apiFetch<FavoriteFood[]>(getApiUrl(API_ENDPOINTS.FAVORITE_FOODS), {
@@ -14,6 +14,14 @@ export interface ToggleFavoriteFoodResult {
   favorited: boolean;
   action: "ADDED" | "REMOVED";
   favoriteFoodId: number;
+}
+
+export async function deleteFavoriteFood(favoriteFoodId: number): Promise<void> {
+  return apiFetchVoid(getApiUrl(`${API_ENDPOINTS.FAVORITE_FOODS}/${favoriteFoodId}`), {
+    method: "DELETE",
+    networkErrorMessage: "즐겨찾기 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    httpErrorMessage: "즐겨찾기 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
+  });
 }
 
 export async function toggleFavoriteFood(food: MealFood): Promise<ToggleFavoriteFoodResult> {

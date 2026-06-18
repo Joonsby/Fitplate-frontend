@@ -195,15 +195,20 @@ export async function addMealPlanFavorite({
   const now = new Date().toISOString();
 
   return {
-    id:
-      typeof responseRecord.id === "string"
-        ? responseRecord.id
-        : `${mealPlanId}:${food.name}`,
+    favoriteFoodId:
+      typeof responseRecord.favoriteFoodId === "number"
+        ? responseRecord.favoriteFoodId
+        : 0,
     name: responseRecord.name ?? food.name,
+    amount: responseRecord.amount ?? food.amount,
+    calories: responseRecord.calories ?? food.calories,
+    carbohydrate: responseRecord.carbohydrate ?? food.carbohydrate ?? 0,
+    protein: responseRecord.protein ?? food.protein ?? 0,
+    fat: responseRecord.fat ?? food.fat ?? 0,
     shoppingCategory: responseRecord.shoppingCategory ?? food.shoppingCategory,
-    useCount: responseRecord.useCount ?? 1,
+    shoppingKeyword: responseRecord.shoppingKeyword ?? food.shoppingKeyword ?? "",
+    sourceFoodId: responseRecord.sourceFoodId ?? food.id,
     createdAt: responseRecord.createdAt ?? now,
-    updatedAt: responseRecord.updatedAt ?? now,
   };
 }
 

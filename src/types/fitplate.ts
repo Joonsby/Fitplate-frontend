@@ -59,15 +59,19 @@ export interface MealFood {
   fat?: number;
 }
 
-// 즐겨찾기 음식 타입입니다.
-// useCount는 자주 사용하는 음식을 위에 보여주기 위한 숫자입니다.
+// 즐겨찾기 음식 타입입니다. 백엔드 /api/favorite-foods 응답 구조와 일치합니다.
 export interface FavoriteFood {
-  id: string;
+  favoriteFoodId: number;
   name: string;
+  amount: string;
+  calories: number;
+  carbohydrate: number;
+  protein: number;
+  fat: number;
   shoppingCategory: ShoppingCategory;
-  useCount: number;
+  shoppingKeyword: string;
+  sourceFoodId: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 // 아침/점심/저녁 한 끼를 표현하는 타입입니다.

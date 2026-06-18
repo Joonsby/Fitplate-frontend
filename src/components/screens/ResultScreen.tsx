@@ -5,7 +5,7 @@ import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { AiMealPlanPanel } from "../result/AiMealPlanPanel";
 import { AiMealPlanFailureScreen } from "../result/AiMealPlanFailureScreen";
-import { DayMealCard } from "../result/DayMealCard";
+import { DayMealSwiper } from "../result/DayMealSwiper";
 import { ShoppingListRow } from "../result/ShoppingListRow";
 import { aggregateShoppingList } from "../../utils/shoppingListAggregator";
 import type {
@@ -121,21 +121,11 @@ export function ResultScreen({
 
               {aiError == null ? (
                 <>
-                  <div className="mealList">
-                    <div className="mealListHeader">
-                      <h3>날짜별 식단</h3>
-                      <span>평균 {mealPlan.averageCalories.toLocaleString()} kcal</span>
-                    </div>
-
-                    {mealPlan.days.map((dayMeal) => (
-                      <DayMealCard
-                        dayMeal={dayMeal}
-                        favoriteFoodNames={favoriteFoodNames}
-                        key={dayMeal.id}
-                        onFavoriteFoodToggle={onFavoriteFoodToggle}
-                      />
-                    ))}
-                  </div>
+                  <DayMealSwiper
+                    days={mealPlan.days}
+                    favoriteFoodNames={favoriteFoodNames}
+                    onFavoriteFoodToggle={onFavoriteFoodToggle}
+                  />
 
                   <div className="shoppingList">
                     <div className="mealCard">

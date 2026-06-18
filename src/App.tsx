@@ -191,7 +191,6 @@ function App() {
             <FavoriteFoodsPage
               favoriteFoods={favoriteFoods}
               setFavoriteFoods={setFavoriteFoods}
-              fallbackMealPlanId={selectedMealPlan.id}
               onBack={onBack}
             />
           }

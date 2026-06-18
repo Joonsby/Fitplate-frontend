@@ -551,11 +551,10 @@ button:focus{
 .foodRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 44px;
-  padding: 10px 0;
-  border-top: 1px solid #f2f4f6;
+  justify-content: space-between;    
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
 }
 
 .foodRow div {
@@ -600,7 +599,7 @@ button:focus{
   color: #b0b8c1;
   cursor: pointer;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 800;  
 }
 
 .favoriteFoodButton.selected {

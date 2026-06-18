@@ -156,19 +156,21 @@ export function ResultScreen({
                   </div>
 
                   <div className="shoppingList">
-                    <div className="mealListHeader">
-                      <h3>장보기 리스트</h3>
-                      <span>{shoppingList.length}개 재료</span>
-                    </div>
+                    <div className="mealCard">
+                      <div className="mealListHeader">
+                        <h3>장보기 리스트</h3>
+                        <span>{shoppingList.length}개 재료</span>
+                      </div>
 
-                    {shoppingList.map((item) => (
-                      <ShoppingListRow
-                        isFavorite={favoriteFoodNames.has(item.name)}
-                        item={item}
-                        key={item.id}
-                        onFavoriteFoodToggle={onFavoriteFoodToggle}
-                      />
-                    ))}
+                      {shoppingList.map((item) => (
+                        <ShoppingListRow
+                          isFavorite={favoriteFoodNames.has(item.name)}
+                          item={item}
+                          key={item.id}
+                          onFavoriteFoodToggle={onFavoriteFoodToggle}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </>
               ) : null}
@@ -437,23 +439,22 @@ function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps) {
       </div>
       <div className="foodRowActions">
         <button
+          type='button'          
           aria-label={`${food.name} 즐겨찾기`}
           className={
             isFavorite ? "favoriteFoodButton selected" : "favoriteFoodButton"
-          }
-          type="button"
+          }          
           onClick={() => onFavoriteFoodToggle(food)}
         >
           ★
         </button>
-        <a
-          className="buyFoodButton"
-          href={shoppingHref}
-          rel="noopener noreferrer"
-          target="_blank"
+        <Button
+          size="medium"
+          variant="weak"
+          onClick={() => window.open(shoppingHref, "_blank", "noopener,noreferrer")}
         >
           구매하기
-        </a>
+        </Button>
       </div>
     </div>
   );
@@ -499,18 +500,19 @@ function ShoppingListRow({
         >
           ★
         </button>
-        <a
-          className="buyFoodButton"
-          href={
+        <Button
+          size="medium"
+          variant="weak"
+          onClick={() => window.open(
             item.shoppingKeyword != null
               ? `https://www.coupang.com/np/search?q=${encodeURIComponent(item.shoppingKeyword)}`
-              : SHOPPING_LINKS[item.shoppingCategory]
-          }
-          rel="noopener noreferrer"
-          target="_blank"
+              : SHOPPING_LINKS[item.shoppingCategory],
+            "_blank",
+            "noopener,noreferrer"
+          )}
         >
           구매하기
-        </a>
+        </Button>
       </div>
     </div>
   );

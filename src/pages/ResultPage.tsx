@@ -97,12 +97,17 @@ export function ResultPage({
         const now = new Date().toISOString();
         setFavoriteFoods((current) => [
           {
-            id: String(result.favoriteFoodId),
+            favoriteFoodId: result.favoriteFoodId,
             name: food.name,
+            amount: food.amount,
+            calories: food.calories,
+            carbohydrate: food.carbohydrate ?? 0,
+            protein: food.protein ?? 0,
+            fat: food.fat ?? 0,
             shoppingCategory: food.shoppingCategory,
-            useCount: 1,
+            shoppingKeyword: food.shoppingKeyword ?? "",
+            sourceFoodId: food.id,
             createdAt: now,
-            updatedAt: now,
           },
           ...current.filter((f) => f.name !== food.name),
         ]);

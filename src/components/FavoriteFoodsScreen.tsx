@@ -6,7 +6,7 @@ import type { FavoriteFood } from "../types/fitplate";
 interface FavoriteFoodsScreenProps {
   favoriteFoods: FavoriteFood[];
   onBack: () => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
 }
 
 export function FavoriteFoodsScreen({
@@ -14,6 +14,7 @@ export function FavoriteFoodsScreen({
   onBack,
   onDelete,
 }: FavoriteFoodsScreenProps) {
+  console.log(JSON.stringify(favoriteFoods,null,2));
   return (
     <section className="screen">
       <ScreenSectionHeader
@@ -30,26 +31,29 @@ export function FavoriteFoodsScreen({
           </div>
         ) : (
           <div className="favoriteFoodList">
-            {favoriteFoods.map((favoriteFood) => (
-              <article className="favoriteFoodCard" key={favoriteFood.id}>
+            {favoriteFoods.map((food) => (
+              <div className="foodRow" key={food.favoriteFoodId}>
                 <div>
-                  <strong>{favoriteFood.name}</strong>
-                  <p>사용 {favoriteFood.useCount}회</p>
+                  <strong>{food.name}</strong>
+                  <span>
+                    {food.amount} · {food.calories} kcal
+                  </span>
                 </div>
-
-                <div className="favoriteFoodActions">
-                  <a
-                    href={SHOPPING_LINKS[favoriteFood.shoppingCategory]}
-                    rel="noopener noreferrer"
-                    target="_blank"
+                <div className="foodRowActions">
+                  <Button
+                    size="medium"
+                    onClick={() => window.open(SHOPPING_LINKS[food.shoppingCategory], "_blank", "noopener,noreferrer")}
                   >
                     구매하기
-                  </a>
-                  <button type="button" onClick={() => onDelete(favoriteFood.id)}>
+                  </Button>
+                  <Button
+                    size="medium"
+                    variant="weak"
+                    onClick={() => onDelete(food.favoriteFoodId)}>
                     삭제
-                  </button>
+                  </Button>
                 </div>
-              </article>
+              </div>
             ))}
           </div>
         )}

@@ -1,6 +1,6 @@
 import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
-import { ResultScreen } from "../components/ResultScreen";
+import { ResultScreen } from "../components/screens/ResultScreen";
 import { createSavedMealPlan } from "../api/mealPlanStorageApi";
 import { toggleFavoriteFood } from "../api/favoriteFoodsApi";
 import type {

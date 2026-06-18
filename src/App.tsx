@@ -5,7 +5,7 @@ import { saveAccessToken } from "./api/authToken";
 import { getSavedMealPlans } from "./api/mealPlanStorageApi";
 import { getFavoriteFoods } from "./api/favoriteFoodsApi";
 import "./App.css";
-import { AppTopTitle } from "./components/AppTopTitle";
+import { AppTopTitle } from "./components/common/AppTopTitle";
 import { HomePage } from "./pages/HomePage";
 import { GoalPage } from "./pages/GoalPage";
 import { ResultPage } from "./pages/ResultPage";

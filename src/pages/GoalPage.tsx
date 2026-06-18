@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { GoalSelector } from "../components/GoalSelector";
+import { GoalSelector } from "../components/forms/GoalSelector";
 import type {
   GoalType,
   MealPlan,

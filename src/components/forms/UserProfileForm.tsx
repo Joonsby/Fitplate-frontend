@@ -1,8 +1,8 @@
 import { Button, TextField } from "@toss/tds-mobile";
 import { useState } from "react";
 import type { ChangeEvent } from "react";
-import { ScreenSectionHeader } from "./ScreenSectionHeader";
-import type { Gender, UserProfile } from "../types/fitplate";
+import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import type { Gender, UserProfile } from "../../types/fitplate";
 
 interface UserProfileFormProps {
   profile: UserProfile;

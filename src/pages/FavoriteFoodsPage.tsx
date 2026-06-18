@@ -1,5 +1,5 @@
 import { useToast } from "../hooks/useToast";
-import { FavoriteFoodsScreen } from "../components/FavoriteFoodsScreen";
+import { FavoriteFoodsScreen } from "../components/screens/FavoriteFoodsScreen";
 import { deleteFavoriteFood } from "../api/favoriteFoodsApi";
 import type { FavoriteFood } from "../types/fitplate";
 

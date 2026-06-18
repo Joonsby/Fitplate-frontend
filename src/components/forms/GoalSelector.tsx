@@ -1,7 +1,7 @@
 import { Button } from "@toss/tds-mobile";
-import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../types/fitplate";
-import { ScreenSectionHeader } from "./ScreenSectionHeader";
-import type { GoalType, PlanDuration } from "../types/fitplate";
+import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../../types/fitplate";
+import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import type { GoalType, PlanDuration } from "../../types/fitplate";
 
 interface GoalSelectorProps {
   selectedGoal: GoalType;

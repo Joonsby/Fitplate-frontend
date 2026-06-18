@@ -1,7 +1,7 @@
 import { Button } from "@toss/tds-mobile";
-import { GOAL_LABELS } from "../types/fitplate";
-import { ScreenSectionHeader } from "./ScreenSectionHeader";
-import type { SavedMealPlan } from "../types/fitplate";
+import { GOAL_LABELS } from "../../types/fitplate";
+import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import type { SavedMealPlan } from "../../types/fitplate";
 
 interface SavedMealPlansScreenProps {
   savedMealPlans: SavedMealPlan[];

@@ -1,7 +1,7 @@
 import { Button } from "@toss/tds-mobile";
-import { SHOPPING_LINKS } from "../data/shoppingLinks";
-import { ScreenSectionHeader } from "./ScreenSectionHeader";
-import type { FavoriteFood } from "../types/fitplate";
+import { SHOPPING_LINKS } from "../../data/shoppingLinks";
+import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import type { FavoriteFood } from "../../types/fitplate";
 
 interface FavoriteFoodsScreenProps {
   favoriteFoods: FavoriteFood[];

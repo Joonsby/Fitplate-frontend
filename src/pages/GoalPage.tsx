@@ -15,6 +15,7 @@ interface GoalPageProps {
   planDuration: PlanDuration;
   selectedMealPlan: MealPlan;
   nutritionTarget: NutritionTarget;
+  isMealPlanSaved: boolean;
   onGoalChange: (goal: GoalType) => void;
   onDurationChange: (duration: PlanDuration) => void;
   onBack: () => void;
@@ -26,6 +27,7 @@ export function GoalPage({
   goal,
   planDuration,
   selectedMealPlan,
+  isMealPlanSaved,
   onGoalChange,
   onDurationChange,
   onBack,
@@ -44,7 +46,7 @@ export function GoalPage({
   };
 
   const handleNextClick = () => {
-    if (isFromResult) {
+    if (isFromResult && !isMealPlanSaved) {
       setConfirmOpen(true);
     } else {
       void goToGeneratedResult();
@@ -56,7 +58,7 @@ export function GoalPage({
       <ConfirmDialog
         open={confirmOpen}
         title="새 식단 생성"
-        description="새 식단을 생성하면 현재 저장되지 않은 식단 결과는 복구할 수 없습니다. 계속하시겠습니까?"
+        description="새 식단을 생성하면 저장하지 않은 현재 식단 결과는 복구할 수 없습니다. 계속하시겠습니까?"
         confirmButton={
           <ConfirmDialog.ConfirmButton
             onClick={() => {

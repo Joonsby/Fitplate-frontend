@@ -79,6 +79,25 @@ function App() {
     resetAiMealPlan,
   } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
 
+  const [isMealPlanSaved, setIsMealPlanSaved] = useState(false);
+
+  // AI 생성 성공 시 미저장 상태로 전환
+  const wrappedGenerateAiMealPlan: typeof generateAiMealPlan = async (mealPlan) => {
+    const result = await generateAiMealPlan(mealPlan);
+    if (result !== null) {
+      setIsMealPlanSaved(false);
+    }
+    return result;
+  };
+
+  // 저장된 식단 상세 진입 시 저장됨 상태로 전환
+  const handleSetViewingSavedMealPlan: typeof setViewingSavedMealPlan = (planOrUpdater) => {
+    setViewingSavedMealPlan(planOrUpdater);
+    if (typeof planOrUpdater !== "function" && planOrUpdater !== null) {
+      setIsMealPlanSaved(true);
+    }
+  };
+
   if (loginStatus === "loading") {
     return (
       <main className="appShell" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>        
@@ -152,7 +171,8 @@ function App() {
               onDurationChange={setPlanDuration}
               onBack={onBack}
               onGeneratedStart={clearViewingSavedMealPlan}
-              generateAiMealPlan={generateAiMealPlan}
+              isMealPlanSaved={isMealPlanSaved}
+              generateAiMealPlan={wrappedGenerateAiMealPlan}
             />
           }
         />
@@ -172,7 +192,9 @@ function App() {
               resultSnapshot={resultSnapshot}
               aiError={aiError}
               isAiLoading={isAiLoading}
-              generateAiMealPlan={generateAiMealPlan}
+              isMealPlanSaved={isMealPlanSaved}
+              setIsMealPlanSaved={setIsMealPlanSaved}
+              generateAiMealPlan={wrappedGenerateAiMealPlan}
               onBack={onBack}
             />
           }
@@ -183,7 +205,7 @@ function App() {
             <SavedMealPlansPage
               savedMealPlans={savedMealPlans}
               setSavedMealPlans={setSavedMealPlans}
-              setViewingSavedMealPlan={setViewingSavedMealPlan}
+              setViewingSavedMealPlan={handleSetViewingSavedMealPlan}
               onBack={onBack}
             />
           }

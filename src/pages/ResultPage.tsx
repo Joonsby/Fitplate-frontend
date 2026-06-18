@@ -30,6 +30,8 @@ interface ResultPageProps {
   resultSnapshot: ResultSnapshot | null;
   aiError: string | null;
   isAiLoading: boolean;
+  isMealPlanSaved: boolean;
+  setIsMealPlanSaved: React.Dispatch<React.SetStateAction<boolean>>;
   generateAiMealPlan: (mealPlan: MealPlan) => Promise<MealPlan | null>;
   onBack: () => void;
 }
@@ -47,6 +49,8 @@ export function ResultPage({
   resultSnapshot,
   aiError,
   isAiLoading,
+  isMealPlanSaved,
+  setIsMealPlanSaved,
   generateAiMealPlan,
   onBack,
 }: ResultPageProps) {
@@ -80,6 +84,7 @@ export function ResultPage({
         ...currentSavedMealPlans.filter((plan) => plan.id !== savedMealPlan.id),
       ]);
 
+      setIsMealPlanSaved(true);
       showToast("식단을 저장했습니다.", "success");
     } catch (error) {
       console.error("식단 저장 실패:", error);
@@ -136,11 +141,12 @@ export function ResultPage({
       <ConfirmDialog
         open={confirmRestartOpen}
         title="처음부터 시작"
-        description="처음부터 다시 시작하면 현재 저장되지 않은 식단 결과는 모두 사라지며 복구할 수 없습니다. 계속하시겠습니까?"
+        description="처음부터 다시 시작하면 저장하지 않은 현재 식단 결과는 복구할 수 없습니다. 계속하시겠습니까?"
         confirmButton={
           <ConfirmDialog.ConfirmButton
             onClick={() => {
               setConfirmRestartOpen(false);
+              setIsMealPlanSaved(false);
               navigate("/");
             }}
           >
@@ -172,7 +178,14 @@ export function ResultPage({
       }
       onBack={onBack}
       onGoalReselect={() => navigate("/goal", { state: { from: "/result" } })}
-      onRestart={() => setConfirmRestartOpen(true)}
+      onRestart={() => {
+        if (isMealPlanSaved) {
+          setIsMealPlanSaved(false);
+          navigate("/");
+        } else {
+          setConfirmRestartOpen(true);
+        }
+      }}
     />
     </>
   );

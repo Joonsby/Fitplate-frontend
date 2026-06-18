@@ -67,7 +67,7 @@ export function AiMealPlanPanel({
   return (
     <section className="aiPanel">
       <div className="aiPanelHeader">
-        <h3>AI 식단 결과</h3>
+        <h3>AI 식단 결과 요약</h3>
         <p>
           {target.calories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한{" "}
           {mealPlan.durationDays}일 식단입니다.

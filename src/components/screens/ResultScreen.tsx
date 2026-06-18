@@ -6,7 +6,7 @@ import { NutritionPanel } from "../common/NutritionPanel";
 import { AiMealPlanPanel } from "../result/AiMealPlanPanel";
 import { AiMealPlanFailureScreen } from "../result/AiMealPlanFailureScreen";
 import { DayMealSwiper } from "../result/DayMealSwiper";
-import { ShoppingListRow } from "../result/ShoppingListRow";
+import { ShoppingListSection } from "../result/ShoppingListSection";
 import { aggregateShoppingList } from "../../utils/shoppingListAggregator";
 import type {
   FavoriteFood,
@@ -127,23 +127,11 @@ export function ResultScreen({
                     onFavoriteFoodToggle={onFavoriteFoodToggle}
                   />
 
-                  <div className="shoppingList">
-                    <div className="mealCard">
-                      <div className="mealListHeader">
-                        <h3>장보기 리스트</h3>
-                        <span>{shoppingList.length}개 재료</span>
-                      </div>
-
-                      {shoppingList.map((item) => (
-                        <ShoppingListRow
-                          isFavorite={favoriteFoodNames.has(item.name)}
-                          item={item}
-                          key={item.id}
-                          onFavoriteFoodToggle={onFavoriteFoodToggle}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <ShoppingListSection
+                    shoppingList={shoppingList}
+                    favoriteFoodNames={favoriteFoodNames}
+                    onFavoriteFoodToggle={onFavoriteFoodToggle}
+                  />
                 </>
               ) : null}
             </div>

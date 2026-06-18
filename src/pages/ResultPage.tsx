@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
+import { ConfirmDialog } from "@toss/tds-mobile";
 import { ResultScreen } from "../components/screens/ResultScreen";
 import { createSavedMealPlan } from "../api/mealPlanStorageApi";
 import { toggleFavoriteFood } from "../api/favoriteFoodsApi";
@@ -50,6 +52,7 @@ export function ResultPage({
 }: ResultPageProps) {
   const navigate = useNavigate();
   const { showToast, toastElement } = useToast();
+  const [confirmRestartOpen, setConfirmRestartOpen] = useState(false);
 
   // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → 스냅샷 우선, 최후 fallback → React 상태
   const resultProfile = viewingSavedMealPlan?.profile ?? resultSnapshot?.profile ?? profile;
@@ -130,6 +133,27 @@ export function ResultPage({
   return (
     <>
       {toastElement}
+      <ConfirmDialog
+        open={confirmRestartOpen}
+        title="처음부터 시작"
+        description="처음부터 다시 시작하면 현재 저장되지 않은 식단 결과는 모두 사라지며 복구할 수 없습니다. 계속하시겠습니까?"
+        confirmButton={
+          <ConfirmDialog.ConfirmButton
+            onClick={() => {
+              setConfirmRestartOpen(false);
+              navigate("/");
+            }}
+          >
+            확인
+          </ConfirmDialog.ConfirmButton>
+        }
+        cancelButton={
+          <ConfirmDialog.CancelButton onClick={() => setConfirmRestartOpen(false)}>
+            취소
+          </ConfirmDialog.CancelButton>
+        }
+        onClose={() => setConfirmRestartOpen(false)}
+      />
       <ResultScreen
       aiError={aiError}
       favoriteFoods={favoriteFoods}
@@ -147,8 +171,8 @@ export function ResultPage({
         void generateAiMealPlan(resultMealPlan)
       }
       onBack={onBack}
-      onGoalReselect={() => navigate("/goal")}
-      onRestart={() => navigate("/")}
+      onGoalReselect={() => navigate("/goal", { state: { from: "/result" } })}
+      onRestart={() => setConfirmRestartOpen(true)}
     />
     </>
   );

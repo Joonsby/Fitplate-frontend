@@ -119,10 +119,12 @@ export function ResultPage({
           },
           ...current.filter((f) => f.name !== food.name),
         ]);
+        showToast(`${food.name}을 즐겨찾는 음식에 추가하였습니다.`, "success");
       } else {
         setFavoriteFoods((current) =>
           current.filter((f) => f.name !== food.name),
         );
+        showToast(`${food.name}을 즐겨찾는 음식에서 삭제하였습니다.`, "error");
       }
     } catch (error) {
       console.error("즐겨찾기 변경 실패:", error);

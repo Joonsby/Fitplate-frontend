@@ -1,6 +1,7 @@
 import { Button } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import { EmptyState } from "../common/EmptyState";
 import type { SavedMealPlan } from "../../types/fitplate";
 
 interface SavedMealPlansScreenProps {
@@ -26,10 +27,10 @@ export function SavedMealPlansScreen({
 
       <div className="savedMealPlansContent">
         {savedMealPlans.length === 0 ? (
-          <div className="emptySavedList">
-            <strong>아직 저장된 식단이 없어요</strong>
-            <p>결과 화면에서 식단을 저장하면 여기에 표시됩니다.</p>
-          </div>
+          <EmptyState
+            title="아직 저장된 식단이 없어요"
+            description="결과 화면에서 식단을 저장하면 여기에 표시됩니다."
+          />
         ) : (
           <div className="savedPlanList">
             {savedMealPlans.map((savedMealPlan) => (

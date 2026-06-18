@@ -1,6 +1,7 @@
 import { Button } from "@toss/tds-mobile";
-import { SHOPPING_LINKS } from "../../data/shoppingLinks";
+import { getShoppingHref } from "../../utils/shoppingHref";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import { EmptyState } from "../common/EmptyState";
 import type { FavoriteFood } from "../../types/fitplate";
 
 interface FavoriteFoodsScreenProps {
@@ -25,10 +26,10 @@ export function FavoriteFoodsScreen({
 
       <div className="favoriteFoodsContent">
         {favoriteFoods.length === 0 ? (
-          <div className="emptySavedList">
-            <strong>아직 즐겨찾기한 음식이 없어요</strong>
-            <p>결과 화면에서 음식 옆의 별 버튼을 눌러 추가할 수 있습니다.</p>
-          </div>
+          <EmptyState
+            title="아직 즐겨찾기한 음식이 없어요"
+            description="결과 화면에서 음식 옆의 별 버튼을 눌러 추가할 수 있습니다."
+          />
         ) : (
           <div className="favoriteFoodList">
             {favoriteFoods.map((food) => (
@@ -42,7 +43,7 @@ export function FavoriteFoodsScreen({
                 <div className="foodRowActions">
                   <Button
                     size="medium"
-                    onClick={() => window.open(SHOPPING_LINKS[food.shoppingCategory], "_blank", "noopener,noreferrer")}
+                    onClick={() => window.open(getShoppingHref(food.shoppingCategory, food.shoppingKeyword), "_blank", "noopener,noreferrer")}
                   >
                     구매하기
                   </Button>

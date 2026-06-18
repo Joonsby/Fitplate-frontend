@@ -1,4 +1,4 @@
-import { Button } from "@toss/tds-mobile";
+import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import type { GoalType, PlanDuration } from "../../types/fitplate";
@@ -45,7 +45,7 @@ export function GoalSelector({
           </button>
         ))}
       </div>      
-
+      <Post.Paragraph color="#4a5568" typography="t7">*TDEE : 현재 활동량을 기준으로 하루에 소비하는 총 칼로리입니다.</Post.Paragraph>
       <div className="durationPanel">
         <h3>식단 기간</h3>
 

@@ -1,6 +1,7 @@
 // 토스트 상태를 관리하는 공통 커스텀 훅
 import { useState } from "react";
 import { Toast } from "@toss/tds-mobile";
+import failedIconLottie from "../assets/images/x-red-spot.json";
 
 type ToastType = "success" | "error" | "info";
 
@@ -24,7 +25,7 @@ export function useToast() {
         type === "success"
           ? <Toast.Lottie src="https://static.toss.im/lotties-common/check-green-spot.json" />
           : type === "error"
-          ? <Toast.Icon name="icon-dynamicIntelli-X-red" />
+          ? <Toast.Lottie src={failedIconLottie} />
           : undefined
       }
       duration={3000}

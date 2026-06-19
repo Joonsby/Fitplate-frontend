@@ -621,6 +621,27 @@ button:focus{
   text-decoration: none;
 }
 
+.shoppingListExpand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease, margin 0.35s ease;
+  margin-top: -7px;
+  margin-bottom: -7px;
+}
+
+.shoppingListExpand--expanded {
+  grid-template-rows: 1fr;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.shoppingListExpand > div {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .shoppingListRow {
   display: flex;
   align-items: center;
@@ -896,6 +917,7 @@ button:focus{
 
 .dayMealSwiperContainer .swiper-slide {
   min-width: 0;
+  height: auto !important;
 }
 
 /* 일차 단위 세로 컨테이너 */
@@ -983,6 +1005,7 @@ button:focus{
 
 .mealSwiperContainer .swiper-slide {
   min-width: 0;
+  height: auto !important;
 }
 
 .mealSwiperDots {

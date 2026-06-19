@@ -15,7 +15,8 @@ interface ShoppingListSectionProps {
 export function ShoppingListSection({ shoppingList, favoriteFoodNames, onFavoriteFoodToggle }: ShoppingListSectionProps) {
   const [expanded, setExpanded] = useState(false);
   const hasMore = shoppingList.length > INITIAL_COUNT;
-  const visibleItems = expanded ? shoppingList : shoppingList.slice(0, INITIAL_COUNT);
+  const visibleItems = shoppingList.slice(0, INITIAL_COUNT);
+  const hiddenItems = shoppingList.slice(INITIAL_COUNT);
   const hiddenCount = shoppingList.length - INITIAL_COUNT;
 
   return (
@@ -34,6 +35,21 @@ export function ShoppingListSection({ shoppingList, favoriteFoodNames, onFavorit
             onFavoriteFoodToggle={onFavoriteFoodToggle}
           />
         ))}
+
+        {hasMore && (
+          <div className={`shoppingListExpand${expanded ? ' shoppingListExpand--expanded' : ''}`}>
+            <div>
+              {hiddenItems.map((item) => (
+                <ShoppingListRow
+                  isFavorite={favoriteFoodNames.has(item.name)}
+                  item={item}
+                  key={item.id}
+                  onFavoriteFoodToggle={onFavoriteFoodToggle}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {hasMore && (
           <Button

@@ -5,12 +5,6 @@ import "swiper/css";
 import { FoodRow } from "./FoodRow";
 import type { Meal, MealFood } from "../../types/fitplate";
 
-const MEAL_LABELS: Record<string, string> = {
-  breakfast: "아침",
-  lunch: "점심",
-  dinner: "저녁",
-};
-
 interface MealSwiperProps {
   meals: Meal[];
   favoriteFoodNames: Set<string>;
@@ -18,8 +12,7 @@ interface MealSwiperProps {
 }
 
 export function MealSwiper({ meals, favoriteFoodNames, onFavoriteFoodToggle }: MealSwiperProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeMeal = meals[activeIndex];
+  const [activeIndex, setActiveIndex] = useState(0);  
 
   return (
     <div className="mealSwiperRoot">
@@ -36,6 +29,7 @@ export function MealSwiper({ meals, favoriteFoodNames, onFavoriteFoodToggle }: M
         className="mealSwiperContainer"
         spaceBetween={12}
         slidesPerView={1}
+        autoHeight={true}
         onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
       >
         {meals.map((meal) => (

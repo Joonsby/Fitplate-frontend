@@ -2,6 +2,7 @@ import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import type { GoalType, PlanDuration } from "../../types/fitplate";
+import { useFullScreenAd } from "../../ads/useFullScreenAd"
 
 interface GoalSelectorProps {
   selectedGoal: GoalType;
@@ -22,6 +23,14 @@ export function GoalSelector({
   onBack,
   onNext,
 }: GoalSelectorProps) {
+  const { showAd } = useFullScreenAd();
+
+  const handleClickResult = () => {
+    showAd(() => {
+      onNext();
+    });
+  };  
+
   return (
     <section className="screen goalSelectorScreen">
       <ScreenSectionHeader
@@ -71,7 +80,7 @@ export function GoalSelector({
         <Button variant="weak" onClick={onBack}>
           이전
         </Button>
-        <Button color="primary" variant="fill" onClick={onNext}>
+        <Button color="primary" variant="fill" onClick={handleClickResult}>
           결과 보기
         </Button>
       </div>

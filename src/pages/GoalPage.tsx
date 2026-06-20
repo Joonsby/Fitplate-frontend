@@ -39,10 +39,7 @@ export function GoalPage({
   const handleNext = async () => {
     onGeneratedStart();
     navigate("/result");
-    const result = await generateAiMealPlan(selectedMealPlan);
-    if (result !== null) {
-      navigate("/result", { replace: true });
-    }
+    await generateAiMealPlan(selectedMealPlan);
   };
 
   return (

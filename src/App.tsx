@@ -15,7 +15,9 @@ import { useAiMealPlan } from "./hooks/useAiMealPlan";
 import { useMealPlanSelection } from "./hooks/useMealPlanSelection";
 import { useSavedMealPlans } from "./hooks/useSavedMealPlans";
 import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
+import { useToast } from "./hooks/useToast";
 import { Loader, Result, Asset } from "@toss/tds-mobile";
+import type { MealPlan } from "./types/fitplate";
 
 type LoginStatus = "loading" | "success" | "error";
 
@@ -44,6 +46,8 @@ function App() {
   } = useSavedMealPlans();
 
   const { favoriteFoods, setFavoriteFoods } = useFavoriteFoods();
+
+  const { showToast, toastElement } = useToast();
 
   const checkLogin = useCallback(async () => {
     setLoginStatus("loading");
@@ -80,6 +84,24 @@ function App() {
     generateAiMealPlan,
     resetAiMealPlan,
   } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
+
+  const handleGenerationSuccess = () => {
+    showToast("식단 생성이 완료되었습니다. 저장된 식단 메뉴에서 확인해 주세요.", "success");
+  };
+
+  const handleGenerationError = () => {
+    showToast("식단 생성에 실패했습니다. 광고 없이 다시 생성할 수 있습니다.", "error");
+  };
+
+  const generateAiMealPlanWithEvents = async (mealPlan: MealPlan) => {
+    const result = await generateAiMealPlan(mealPlan);
+    if (result !== null) {
+      handleGenerationSuccess();
+    } else {
+      handleGenerationError();
+    }
+    return result;
+  };
 
 
   if (loginStatus === "loading") {
@@ -136,6 +158,7 @@ function App() {
 
   return (
     <main className="appShell">
+      {toastElement}
       <AppTopTitle
         isResultPage={isResultPage}
         isAiLoading={isAiLoading}
@@ -157,7 +180,7 @@ function App() {
               onDurationChange={setPlanDuration}
               onBack={onBack}
               onGeneratedStart={clearViewingSavedMealPlan}
-              generateAiMealPlan={generateAiMealPlan}
+              generateAiMealPlan={generateAiMealPlanWithEvents}
               isGenerating={isGenerating}
               markGenerating={markGenerating}
             />
@@ -177,7 +200,7 @@ function App() {
               resultSnapshot={resultSnapshot}
               aiError={aiError}
               isAiLoading={isAiLoading}
-              generateAiMealPlan={generateAiMealPlan}
+              generateAiMealPlan={generateAiMealPlanWithEvents}
               onBack={onBack}
             />
           }

@@ -30,8 +30,19 @@ export function GoalSelector({
   const { isAdLoaded, showAd } = useFullScreenAd();
 
   const handleClickResult = () => {
+    if (isGenerating) return;
+
+    if (sessionStorage.getItem("adRewardAvailable") === "true") {
+      onStartGenerating();
+      onNext();
+      return;
+    }
+
     onStartGenerating();
-    showAd(() => {
+    showAd((wasWatched) => {
+      if (wasWatched) {
+        sessionStorage.setItem("adRewardAvailable", "true");
+      }
       onNext();
     });
   };
@@ -91,7 +102,11 @@ export function GoalSelector({
           onClick={handleClickResult}
           disabled={isGenerating}
         >
-          {isGenerating ? "식단 생성 중..." : isAdLoaded ? "결과보기 (AD)" : "결과보기"}
+          {isGenerating
+            ? "식단 생성 중..."
+            : isAdLoaded && sessionStorage.getItem("adRewardAvailable") !== "true"
+            ? "결과보기 (AD)"
+            : "결과보기"}
         </Button>
       </div>
     </section>

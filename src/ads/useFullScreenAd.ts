@@ -38,9 +38,9 @@ export function useFullScreenAd() {
   }, [loadAd]);
 
   const showAd = useCallback(
-    (onComplete?: () => void) => {
+    (onComplete?: (wasWatched: boolean) => void) => {
       if (!isAdLoaded) {
-        onComplete?.();
+        onComplete?.(false);
         return;
       }
 
@@ -50,20 +50,20 @@ export function useFullScreenAd() {
           if (event.type === "dismissed") {
             setIsAdLoaded(false);
             loadAd();
-            onComplete?.();
+            onComplete?.(true);
           }
           if (event.type === "failedToShow") {
             console.error("광고 표시 실패");
             setIsAdLoaded(false);
             loadAd();
-            onComplete?.();
+            onComplete?.(false);
           }
         },
         onError: (error) => {
           console.error("광고 표시 오류:", error);
           setIsAdLoaded(false);
           loadAd();
-          onComplete?.();
+          onComplete?.(false);
         },
       });
     },

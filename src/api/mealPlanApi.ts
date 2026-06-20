@@ -215,9 +215,7 @@ export async function generateMealPlanFromApi({
   const accessToken = getAccessToken();
   if (!accessToken) {
     throw new Error("인증 토큰이 없습니다. 로그인 상태를 확인해주세요.");
-  }
-
-  console.log(profile);
+  }  
 
   const data = await apiFetch<BackendMealPlanGenerateResponse>(
     getApiUrl(API_ENDPOINTS.MEAL_PLAN),

@@ -79,24 +79,6 @@ function App() {
     resetAiMealPlan,
   } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
 
-  const [isMealPlanSaved, setIsMealPlanSaved] = useState(false);
-
-  // AI 생성 성공 시 미저장 상태로 전환
-  const wrappedGenerateAiMealPlan: typeof generateAiMealPlan = async (mealPlan) => {
-    const result = await generateAiMealPlan(mealPlan);
-    if (result !== null) {
-      setIsMealPlanSaved(false);
-    }
-    return result;
-  };
-
-  // 저장된 식단 상세 진입 시 저장됨 상태로 전환
-  const handleSetViewingSavedMealPlan: typeof setViewingSavedMealPlan = (planOrUpdater) => {
-    setViewingSavedMealPlan(planOrUpdater);
-    if (typeof planOrUpdater !== "function" && planOrUpdater !== null) {
-      setIsMealPlanSaved(true);
-    }
-  };
 
   if (loginStatus === "loading") {
     return (
@@ -171,8 +153,7 @@ function App() {
               onDurationChange={setPlanDuration}
               onBack={onBack}
               onGeneratedStart={clearViewingSavedMealPlan}
-              isMealPlanSaved={isMealPlanSaved}
-              generateAiMealPlan={wrappedGenerateAiMealPlan}
+              generateAiMealPlan={generateAiMealPlan}
             />
           }
         />
@@ -188,13 +169,10 @@ function App() {
               viewingSavedMealPlan={viewingSavedMealPlan}
               favoriteFoods={favoriteFoods}
               setFavoriteFoods={setFavoriteFoods}
-              setSavedMealPlans={setSavedMealPlans}
               resultSnapshot={resultSnapshot}
               aiError={aiError}
               isAiLoading={isAiLoading}
-              isMealPlanSaved={isMealPlanSaved}
-              setIsMealPlanSaved={setIsMealPlanSaved}
-              generateAiMealPlan={wrappedGenerateAiMealPlan}
+              generateAiMealPlan={generateAiMealPlan}
               onBack={onBack}
             />
           }
@@ -205,7 +183,7 @@ function App() {
             <SavedMealPlansPage
               savedMealPlans={savedMealPlans}
               setSavedMealPlans={setSavedMealPlans}
-              setViewingSavedMealPlan={handleSetViewingSavedMealPlan}
+              setViewingSavedMealPlan={setViewingSavedMealPlan}
               onBack={onBack}
             />
           }

@@ -14,14 +14,6 @@ import { selectClosestMealPlan } from "../utils/mealPlanSelector";
 import { mergeMealPlanWithAi, extractAiResponseFromMealPlan } from "../utils/mealPlanMerger";
 import { apiFetch, apiFetchRaw, apiFetchVoid } from "./httpClient";
 
-export interface CreateSavedMealPlanInput {
-  profile: UserProfile;
-  goal: GoalType;
-  target: NutritionTarget;
-  planDuration: PlanDuration;
-  mealPlan: MealPlan;
-}
-
 export interface SaveMealPlanRequest {
   goal: GoalType;
   durationDays: number;
@@ -36,31 +28,6 @@ function createClientId(prefix: string): string {
   return `${prefix}-${Date.now()}`;
 }
 
-function toSavedMealPlan(
-  input: CreateSavedMealPlanInput,
-  responseBody: unknown,
-): SavedMealPlan {
-  const responseRecord =
-    responseBody != null && typeof responseBody === "object"
-      ? (responseBody as Partial<SavedMealPlan>)
-      : {};
-
-  return {
-    id:
-      typeof responseRecord.id === "string"
-        ? responseRecord.id
-        : createClientId("meal-plan"),
-    savedAt:
-      typeof responseRecord.savedAt === "string"
-        ? responseRecord.savedAt
-        : new Date().toISOString(),
-    profile: responseRecord.profile ?? input.profile,
-    goal: responseRecord.goal ?? input.goal,
-    target: responseRecord.target ?? input.target,
-    planDuration: responseRecord.planDuration ?? input.planDuration,
-    mealPlan: responseRecord.mealPlan ?? input.mealPlan,
-  };
-}
 
 async function readOptionalJson(response: Response): Promise<unknown> {
   const text = await response.text();
@@ -70,41 +37,6 @@ async function readOptionalJson(response: Response): Promise<unknown> {
   }
 
   return JSON.parse(text);
-}
-
-export async function createSavedMealPlan(
-  input: CreateSavedMealPlanInput,
-): Promise<SavedMealPlan> {
-  const requestBody = {
-    goal: input.goal,
-    durationDays: input.planDuration,
-    aiMealPlanResponse: extractAiResponseFromMealPlan(input.mealPlan),
-  };
-  console.log("[식단 저장] request body:", JSON.stringify(requestBody, null, 2));
-
-  const response = await apiFetchRaw(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
-    method: "POST",
-    body: requestBody,
-    networkErrorMessage: "식단 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
-  });
-
-  if (!response.ok) {
-    const errorBody = await readOptionalJson(response);
-
-    const message =
-      errorBody != null &&
-      typeof errorBody === "object" &&
-      "message" in errorBody &&
-      typeof errorBody.message === "string"
-        ? errorBody.message
-        : "식단 저장에 실패했습니다. 잠시 후 다시 시도해주세요.";
-
-    throw new Error(message);
-  }
-
-  const responseBody = await readOptionalJson(response);
-
-  return toSavedMealPlan(input, responseBody);
 }
 
 // GET /api/meal-plan 응답 항목의 형태입니다. SavedMealPlan과 키 구조가 달라 별도로 변환합니다.

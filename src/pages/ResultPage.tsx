@@ -1,5 +1,5 @@
 import { useToast } from "../hooks/useToast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ResultScreen } from "../components/screens/ResultScreen";
 import { toggleFavoriteFood } from "../api/favoriteFoodsApi";
 import type {
@@ -28,6 +28,8 @@ interface ResultPageProps {
   onBack: () => void;
 }
 
+type ResultSource = "savedMealPlan" | "favoriteFood";
+
 export function ResultPage({
   profile,
   goal,
@@ -43,13 +45,19 @@ export function ResultPage({
   onBack,
 }: ResultPageProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast, toastElement } = useToast();
 
-  // 저장된 식단 보기 → viewingSavedMealPlan 우선, 신선한 결과 → 스냅샷 우선, 최후 fallback → React 상태
-  const resultProfile = viewingSavedMealPlan?.profile ?? resultSnapshot?.profile ?? profile;
-  const resultGoal = viewingSavedMealPlan?.goal ?? resultSnapshot?.goal ?? goal;
-  const resultTarget = viewingSavedMealPlan?.target ?? resultSnapshot?.nutritionTarget ?? nutritionTarget;
-  const resultMealPlan = viewingSavedMealPlan?.mealPlan ?? resultSnapshot?.mealPlan ?? selectedMealPlan;  
+  // source는 navigate() 호출 시 state로 주입되며, 히스토리 엔트리별로 독립적으로 관리됨.
+  // 뒤로가기로 진입하면 해당 엔트리의 state를 읽으므로 source가 없어 session으로 분기됨.
+  const source = (location.state as { source?: ResultSource } | null)?.source;
+  const isSavedView = source === "savedMealPlan" || source === "favoriteFood";
+  const dbData = isSavedView ? viewingSavedMealPlan : null;
+
+  const resultProfile = dbData?.profile ?? resultSnapshot?.profile ?? profile;
+  const resultGoal = dbData?.goal ?? resultSnapshot?.goal ?? goal;
+  const resultTarget = dbData?.target ?? resultSnapshot?.nutritionTarget ?? nutritionTarget;
+  const resultMealPlan = dbData?.mealPlan ?? resultSnapshot?.mealPlan ?? selectedMealPlan;  
 
   const handleToggleFavoriteFood = async (food: MealFood) => {
     try {
@@ -91,27 +99,29 @@ export function ResultPage({
     }
   };
 
+  const hasSessionData = resultSnapshot != null;
+  const showEmptyState = !isSavedView && !hasSessionData && !isAiLoading;
+
   return (
     <>
       {toastElement}
       <ResultScreen
-      aiError={aiError}
-      favoriteFoods={favoriteFoods}
-      goal={resultGoal}
-      isAiLoading={isAiLoading}
-      isSavedView={viewingSavedMealPlan != null}
-      mealPlan={resultMealPlan}
-      profile={resultProfile}
-      savedAt={viewingSavedMealPlan?.savedAt}
-      target={resultTarget}      
-      onFavoriteFoodToggle={handleToggleFavoriteFood}
-      onRetryAiGenerate={() =>
-        void generateAiMealPlan(resultMealPlan)
-      }
-      onBack={onBack}
-      onGoalReselect={() => navigate("/goal", { state: { from: "/result" } })}
-      onRestart={() => navigate("/")}
-    />
+        aiError={aiError}
+        favoriteFoods={favoriteFoods}
+        goal={resultGoal}
+        isAiLoading={isAiLoading}
+        isSavedView={isSavedView}
+        mealPlan={resultMealPlan}
+        profile={resultProfile}
+        savedAt={dbData?.savedAt}
+        target={resultTarget}
+        showEmptyState={showEmptyState}
+        onFavoriteFoodToggle={handleToggleFavoriteFood}
+        onRetryAiGenerate={() => void generateAiMealPlan(resultMealPlan)}
+        onBack={onBack}
+        onGoalReselect={() => navigate("/goal", { state: { from: "/result" } })}
+        onRestart={() => navigate("/")}
+      />
     </>
   );
 }

@@ -1,7 +1,8 @@
-// 결과 화면 컴포넌트입니다. 규칙 기반 식단과 AI 응답을 함께 보여줍니다.
+import { useNavigate } from "react-router-dom";
 import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import { EmptyState } from "../common/EmptyState";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { AiMealPlanPanel } from "../result/AiMealPlanPanel";
 import { AiMealPlanFailureScreen } from "../result/AiMealPlanFailureScreen";
@@ -26,7 +27,8 @@ export interface ResultScreenProps {
   isSavedView: boolean;
   isAiLoading: boolean;
   aiError: string | null;
-  savedAt?: string;    
+  savedAt?: string;
+  showEmptyState: boolean;
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
   onBack: () => void;
@@ -44,12 +46,14 @@ export function ResultScreen({
   profile,
   savedAt,
   target,
+  showEmptyState,
   onFavoriteFoodToggle,
-  onRetryAiGenerate,  
+  onRetryAiGenerate,
   onBack,
   onGoalReselect,
   onRestart,
 }: ResultScreenProps) {
+  const navigate = useNavigate();
   const shoppingList = aggregateShoppingList(mealPlan);
   const favoriteFoodNames = new Set(
     favoriteFoods.map((favoriteFood) => favoriteFood.name),
@@ -64,6 +68,27 @@ export function ResultScreen({
 
   const hasAiData = mealPlan.days.length > 0 && mealPlan.days[0].meals[0]?.name != null;
   const shouldShowFallbackFailure = !isAiLoading && aiError != null && !hasAiData;
+
+  if (showEmptyState) {
+    return (
+      <section className="screen">
+        <ScreenSectionHeader
+          title="생성된 식단"
+          description="AI 식단 결과를 확인할 수 있어요."
+          step="3단계"
+        />
+        <div className="savedMealPlansContent">
+          <EmptyState
+            title="아직 생성된 식단이 없어요"
+            description="프로필 정보를 입력하면 목표에 맞는 AI 식단을 만들어 드릴게요."
+          />
+          <Button variant="weak" onClick={() => navigate('/')}>
+            식단 생성하기
+          </Button>
+        </div>        
+      </section>
+    );
+  }
 
   return (
     <section className="screen">

@@ -63,7 +63,7 @@ export function SavedMealPlansPage({
 
   const handleViewSavedMealPlan = (savedMealPlan: SavedMealPlan) => {
     setViewingSavedMealPlan(savedMealPlan);
-    navigate("/result");
+    navigate("/result", { state: { source: "savedMealPlan" } });
   };
 
   return (

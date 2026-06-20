@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
@@ -17,6 +18,8 @@ export function SavedMealPlansScreen({
   onDelete,
   onView,
 }: SavedMealPlansScreenProps) {
+  const navigate = useNavigate();
+  
   return (
     <section className="screen">
       <ScreenSectionHeader
@@ -29,7 +32,7 @@ export function SavedMealPlansScreen({
         {savedMealPlans.length === 0 ? (
           <EmptyState
             title="아직 저장된 식단이 없어요"
-            description="결과 화면에서 식단을 저장하면 여기에 표시됩니다."
+            description="식단을 생성하면 식단이 자동으로 저장됩니다."
           />
         ) : (
           <div className="savedPlanList">
@@ -44,7 +47,9 @@ export function SavedMealPlansScreen({
           </div>
         )}
 
-        <Button variant="weak" onClick={onBack}>돌아가기</Button>
+        <Button variant="weak" onClick={() => navigate('/')}>
+            식단 생성하기
+          </Button>
       </div>
     </section>
   );

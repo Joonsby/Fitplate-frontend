@@ -21,7 +21,14 @@ export function useFullScreenAd() {
   }, []);
 
   useEffect(() => {
-    if (!loadFullScreenAd.isSupported()) {
+    let supported = false;
+    try {
+      supported = loadFullScreenAd.isSupported();
+    } catch {
+      // 앱인토스 환경이 아닌 경우 isSupported() 자체가 실패할 수 있음
+    }
+
+    if (!supported) {
       console.log("광고 미지원 환경입니다.");
       return;
     }

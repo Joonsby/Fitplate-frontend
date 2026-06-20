@@ -18,6 +18,8 @@ interface GoalPageProps {
   onBack: () => void;
   onGeneratedStart: () => void;
   generateAiMealPlan: (mealPlan: MealPlan) => Promise<MealPlan | null>;
+  isGenerating: boolean;
+  markGenerating: () => void;
 }
 
 export function GoalPage({
@@ -29,13 +31,18 @@ export function GoalPage({
   onBack,
   onGeneratedStart,
   generateAiMealPlan,
+  isGenerating,
+  markGenerating,
 }: GoalPageProps) {
   const navigate = useNavigate();
 
   const handleNext = async () => {
     onGeneratedStart();
     navigate("/result");
-    await generateAiMealPlan(selectedMealPlan);
+    const result = await generateAiMealPlan(selectedMealPlan);
+    if (result !== null) {
+      navigate("/result", { replace: true });
+    }
   };
 
   return (
@@ -46,6 +53,8 @@ export function GoalPage({
       onGoalChange={onGoalChange}
       onDurationChange={onDurationChange}
       onNext={() => void handleNext()}
+      isGenerating={isGenerating}
+      onStartGenerating={markGenerating}
     />
   );
 }

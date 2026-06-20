@@ -11,6 +11,8 @@ interface GoalSelectorProps {
   onDurationChange: (duration: PlanDuration) => void;
   onBack: () => void;
   onNext: () => void;
+  isGenerating: boolean;
+  onStartGenerating: () => void;
 }
 const PLAN_DURATIONS: PlanDuration[] = [3, 7, 14];
 const GOALS: GoalType[] = ["lose", "maintain", "gain"];
@@ -22,10 +24,13 @@ export function GoalSelector({
   onDurationChange,
   onBack,
   onNext,
+  isGenerating,
+  onStartGenerating,
 }: GoalSelectorProps) {
   const { isAdLoaded, showAd } = useFullScreenAd();
 
   const handleClickResult = () => {
+    onStartGenerating();
     showAd(() => {
       onNext();
     });
@@ -80,8 +85,13 @@ export function GoalSelector({
         <Button variant="weak" onClick={onBack}>
           이전
         </Button>
-        <Button color="primary" variant="fill" onClick={handleClickResult}>
-          {isAdLoaded ? "결과보기 (AD)" : "결과보기"}
+        <Button
+          color="primary"
+          variant="fill"
+          onClick={handleClickResult}
+          disabled={isGenerating}
+        >
+          {isGenerating ? "식단 생성 중..." : isAdLoaded ? "결과보기 (AD)" : "결과보기"}
         </Button>
       </div>
     </section>

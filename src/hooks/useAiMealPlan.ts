@@ -46,13 +46,17 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     () => loadSnapshot(),
   );
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+
+  const markGenerating = () => setIsGenerating(true);
 
   useEffect(() => {
     saveSnapshot(resultSnapshot);
   }, [resultSnapshot]);
 
   const generateAiMealPlan = async (mealPlan: MealPlan) => {
+    setIsGenerating(true);
     setIsAiLoading(true);
     setAiError(null);
 
@@ -82,6 +86,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
           ? error.message
           : "AI 식단 생성 중 알 수 없는 오류가 발생했습니다.",
       );
+      setIsGenerating(false);
 
       return null;
     } finally {
@@ -92,11 +97,14 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
   const resetAiMealPlan = () => {
     setAiError(null);
     setIsAiLoading(false);
+    setIsGenerating(false);
   };
 
   return {
     resultSnapshot,
     isAiLoading,
+    isGenerating,
+    markGenerating,
     aiError,
     generateAiMealPlan,
     resetAiMealPlan,

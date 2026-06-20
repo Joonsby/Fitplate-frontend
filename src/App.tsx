@@ -78,7 +78,7 @@ function App() {
   const {
     resultSnapshot,
     isAiLoading,
-    isGenerating,
+    generationStatus,
     markGenerating,
     aiError,
     generateAiMealPlan,
@@ -181,7 +181,7 @@ function App() {
               onBack={onBack}
               onGeneratedStart={clearViewingSavedMealPlan}
               generateAiMealPlan={generateAiMealPlanWithEvents}
-              isGenerating={isGenerating}
+              generationStatus={generationStatus}
               markGenerating={markGenerating}
             />
           }

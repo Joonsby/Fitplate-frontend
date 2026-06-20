@@ -6,6 +6,9 @@ export type Gender = "male" | "female";
 // 정해진 값만 허용하면 오타로 생기는 버그를 줄일 수 있습니다.
 export type GoalType = "lose" | "maintain" | "gain";
 
+// 식단 생성 진행 상태입니다. sessionStorage에 지속되어 페이지 이동 후에도 유지됩니다.
+export type GenerationStatus = "idle" | "generating" | "failed";
+
 // 기간별 식단에서 선택할 수 있는 일수입니다.
 // 3, 7, 14 외의 숫자는 TypeScript가 막아줍니다.
 export type PlanDuration = 3 | 7 | 14;

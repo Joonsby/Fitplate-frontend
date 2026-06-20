@@ -14,6 +14,28 @@ import type {
 
 const SESSION_KEY = "fitplate_result_snapshot";
 const GENERATION_STATUS_KEY = "mealPlanGenerationStatus";
+const SESSION_AI_REQUEST_KEY = "fitplate_ai_request_params";
+
+function saveAiRequestParams(profile: UserProfile, goal: GoalType): void {
+  try {
+    sessionStorage.setItem(SESSION_AI_REQUEST_KEY, JSON.stringify({ profile, goal }));
+  } catch {
+    // ignore
+  }
+}
+
+function loadAiRequestParams(): { profile: UserProfile; goal: GoalType } | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_AI_REQUEST_KEY);
+    return raw != null ? (JSON.parse(raw) as { profile: UserProfile; goal: GoalType }) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearAiRequestParams(): void {
+  sessionStorage.removeItem(SESSION_AI_REQUEST_KEY);
+}
 
 function loadGenerationStatus(): GenerationStatus {
   const raw = sessionStorage.getItem(GENERATION_STATUS_KEY);
@@ -79,18 +101,26 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     setIsAiLoading(true);
     setAiError(null);
 
+    // 세션에 저장된 요청 파라미터가 있으면 사용(재시도), 없으면 현재 값 저장(최초 요청)
+    const savedParams = loadAiRequestParams();
+    const requestProfile = savedParams?.profile ?? profile;
+    const requestGoal = savedParams?.goal ?? goal;
+    if (savedParams == null) {
+      saveAiRequestParams(profile, goal);
+    }
+
     try {
       const response = await generateMealPlanFromApi({
-        profile,
-        goal,
+        profile: requestProfile,
+        goal: requestGoal,
         durationDays: mealPlan.durationDays,
       });
 
       const mergedMealPlan = mergeMealPlanWithAi(mealPlan, response.aiMealPlanResponse);
 
       const snapshot: ResultSnapshot = {
-        profile,
-        goal,
+        profile: requestProfile,
+        goal: requestGoal,
         nutritionTarget,
         planDuration,
         mealPlan: mergedMealPlan,
@@ -99,6 +129,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
       saveGenerationStatus("idle");
       setGenerationStatus("idle");
       sessionStorage.removeItem("adRewardAvailable");
+      clearAiRequestParams();
 
       return mergedMealPlan;
     } catch (error) {

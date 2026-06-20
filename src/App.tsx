@@ -11,7 +11,7 @@ import { GoalPage } from "./pages/GoalPage";
 import { ResultPage } from "./pages/ResultPage";
 import { SavedMealPlansPage } from "./pages/SavedMealPlansPage";
 import { FavoriteFoodsPage } from "./pages/FavoriteFoodsPage";
-import { useAiMealPlan } from "./hooks/useAiMealPlan";
+import { useAiMealPlan, clearAiRequestParams } from "./hooks/useAiMealPlan";
 import { useMealPlanSelection } from "./hooks/useMealPlanSelection";
 import { useSavedMealPlans } from "./hooks/useSavedMealPlans";
 import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
@@ -86,6 +86,7 @@ function App() {
   } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
 
   const handleGenerationSuccess = () => {
+    clearAiRequestParams();
     showToast("식단 생성이 완료되었습니다. 저장된 식단 메뉴에서 확인해 주세요.", "success");
   };
 

@@ -1,17 +1,15 @@
 import type {
   AIMealPlanResponse,
+  DayMeal,
   FavoriteFood,
   GoalType,
+  Meal,
   MealFood,
   MealPlan,
-  NutritionTarget,
   PlanDuration,
   SavedMealPlan,
-  UserProfile,
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl, getMealPlanFavoriteUrl } from "./apiConfig";
-import { selectClosestMealPlan } from "../utils/mealPlanSelector";
-import { mergeMealPlanWithAi, extractAiResponseFromMealPlan } from "../utils/mealPlanMerger";
 import { apiFetch, apiFetchRaw, apiFetchVoid } from "./httpClient";
 
 export interface SaveMealPlanRequest {
@@ -19,15 +17,6 @@ export interface SaveMealPlanRequest {
   durationDays: number;
   aiMealPlanResponse: AIMealPlanResponse;
 }
-
-function createClientId(prefix: string): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-
-  return `${prefix}-${Date.now()}`;
-}
-
 
 async function readOptionalJson(response: Response): Promise<unknown> {
   const text = await response.text();
@@ -42,8 +31,8 @@ async function readOptionalJson(response: Response): Promise<unknown> {
 // GET /api/meal-plan 응답 항목의 형태입니다. SavedMealPlan과 키 구조가 달라 별도로 변환합니다.
 interface ApiSavedMealPlan {
   id: number;
-  goal: GoalType;
-  durationDays: PlanDuration;
+  goal: "MAINTAIN" | "WEIGHT_LOSS" | "WEIGHT_GAIN";
+  durationDays: number; // 백엔드는 1·3·7·14 등 임의의 값을 반환할 수 있어 number로 받습니다.
   height: number;
   weight: number;
   age: number;
@@ -58,12 +47,84 @@ interface ApiSavedMealPlan {
   createdAt: string;
 }
 
-function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
-  const baseMealPlan = selectClosestMealPlan(item.targetCalories, item.durationDays);
-  const mealPlan = mergeMealPlanWithAi(baseMealPlan, item.aiMealPlanResponse);
+function mapGoalFromBackend(goal: string): GoalType {
+  if (goal === "WEIGHT_LOSS") return "lose";
+  if (goal === "WEIGHT_GAIN") return "gain";
+  return "maintain";
+}
+
+function aiResponseToMealPlan(
+  planId: string,
+  aiResponse: AIMealPlanResponse,
+  targetCalories: number,
+  durationDays: number,
+): MealPlan {
+  const days: DayMeal[] = aiResponse.days.map((aiDay) => {
+    const meals: Meal[] = aiDay.meals.map((aiMeal) => {
+      const mealId = `${planId}-day${aiDay.dayNumber}-${aiMeal.mealType}`;
+      const foods: MealFood[] = aiMeal.foods.map((food, i) => ({
+        id: `${mealId}-food${i}`,
+        name: food.name,
+        amount: food.amount,
+        calories: food.calories,
+        shoppingCategory: "vegetable",
+        shoppingKeyword: food.shoppingKeyword,
+        protein: food.protein,
+        carbohydrate: food.carbohydrate,
+        fat: food.fat,
+      }));
+
+      const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0);
+      const totalProtein = aiMeal.foods.reduce((sum, f) => sum + f.protein, 0);
+      const totalCarbs = aiMeal.foods.reduce((sum, f) => sum + f.carbohydrate, 0);
+      const totalFat = aiMeal.foods.reduce((sum, f) => sum + f.fat, 0);
+
+      return {
+        id: mealId,
+        mealType: aiMeal.mealType,
+        title: aiMeal.title,
+        name: aiMeal.foods.map((f) => f.name).join(", "),
+        calories: totalCalories,
+        protein: totalProtein,
+        carbs: totalCarbs,
+        fat: totalFat,
+        foods,
+      };
+    });
+
+    const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
+    return {
+      id: `${planId}-day${aiDay.dayNumber}`,
+      day: aiDay.dayNumber,
+      title: `${aiDay.dayNumber}일차`,
+      totalCalories,
+      meals,
+    };
+  });
+
+  const totalCalories = days.reduce((sum, d) => sum + d.totalCalories, 0);
+  const averageCalories = days.length > 0 ? Math.round(totalCalories / days.length) : 0;
 
   return {
-    id: String(item.id),
+    id: planId,
+    targetCalories,
+    durationDays: durationDays as PlanDuration,
+    averageCalories,
+    days,
+  };
+}
+
+function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
+  const planId = String(item.id);
+  const mealPlan = aiResponseToMealPlan(
+    planId,
+    item.aiMealPlanResponse,
+    item.targetCalories,
+    item.durationDays,
+  );
+
+  return {
+    id: planId,
     savedAt: item.createdAt,
     profile: {
       height: item.height,
@@ -71,7 +132,7 @@ function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
       age: item.age,
       gender: item.gender === "FEMALE" ? "female" : "male",
     },
-    goal: item.goal,
+    goal: mapGoalFromBackend(item.goal),
     target: {
       bmr: item.bmr,
       tdee: item.tdee,
@@ -80,7 +141,7 @@ function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
       carbsGram: item.carbsGram,
       fatGram: item.fatGram,
     },
-    planDuration: item.durationDays,
+    planDuration: item.durationDays as PlanDuration,
     mealPlan,
   };
 }
@@ -89,8 +150,7 @@ export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
   const items = await apiFetch<ApiSavedMealPlan[]>(getApiUrl(API_ENDPOINTS.MEAL_PLAN), {
     httpErrorMessage: "저장된 식단 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
     networkErrorMessage: "저장된 식단 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
-  });
-  console.log(JSON.stringify(items, null, 2));
+  });  
   return Array.isArray(items) ? items.map(toSavedMealPlanFromApi) : [];
 }
 

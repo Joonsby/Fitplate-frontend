@@ -1,5 +1,5 @@
 // ResultPage 복원에 필요한 AI 식단 스냅샷을 메모리에서 관리하는 훅입니다.
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { generateMealPlanFromApi } from "../api/mealPlanApi";
 import { mergeMealPlanWithAi } from "../utils/mealPlanMerger";
 import type {
@@ -46,13 +46,20 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     () => loadSnapshot(),
   );
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const isInFlightRef = useRef(false);
+
+  const markGenerating = () => setIsGenerating(true);
 
   useEffect(() => {
     saveSnapshot(resultSnapshot);
   }, [resultSnapshot]);
 
   const generateAiMealPlan = async (mealPlan: MealPlan) => {
+    if (isInFlightRef.current) return null;
+    isInFlightRef.current = true;
+    setIsGenerating(true);
     setIsAiLoading(true);
     setAiError(null);
 
@@ -73,6 +80,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
         mealPlan: mergedMealPlan,
       };
       setResultSnapshot(snapshot);
+      sessionStorage.removeItem("adRewardAvailable");
 
       return mergedMealPlan;
     } catch (error) {
@@ -85,18 +93,24 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
 
       return null;
     } finally {
+      isInFlightRef.current = false;
+      setIsGenerating(false);
       setIsAiLoading(false);
     }
   };
 
   const resetAiMealPlan = () => {
+    isInFlightRef.current = false;
     setAiError(null);
     setIsAiLoading(false);
+    setIsGenerating(false);
   };
 
   return {
     resultSnapshot,
     isAiLoading,
+    isGenerating,
+    markGenerating,
     aiError,
     generateAiMealPlan,
     resetAiMealPlan,

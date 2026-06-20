@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   AIMealPlanResponse,
   GoalType,
   PlanDuration,
@@ -42,7 +42,7 @@ interface BackendMealPlanGenerateResponse {
  * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
  *   통째로 삭제하면 됩니다.
  */
-const USE_TEMPORARY_MEAL_PLAN_DATA = true;
+const USE_TEMPORARY_MEAL_PLAN_DATA = false;
 
 /**
  * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.
@@ -215,9 +215,7 @@ export async function generateMealPlanFromApi({
   const accessToken = getAccessToken();
   if (!accessToken) {
     throw new Error("인증 토큰이 없습니다. 로그인 상태를 확인해주세요.");
-  }
-
-  console.log(profile);
+  }  
 
   const data = await apiFetch<BackendMealPlanGenerateResponse>(
     getApiUrl(API_ENDPOINTS.MEAL_PLAN),

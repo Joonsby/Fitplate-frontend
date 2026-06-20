@@ -26,9 +26,7 @@ export interface ResultScreenProps {
   isSavedView: boolean;
   isAiLoading: boolean;
   aiError: string | null;
-  savedAt?: string;
-  onLoginRequired: () => void;
-  onSaveMealPlan?: () => void;
+  savedAt?: string;    
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
   onBack: () => void;
@@ -47,8 +45,7 @@ export function ResultScreen({
   savedAt,
   target,
   onFavoriteFoodToggle,
-  onRetryAiGenerate,
-  onSaveMealPlan,
+  onRetryAiGenerate,  
   onBack,
   onGoalReselect,
   onRestart,
@@ -106,8 +103,7 @@ export function ResultScreen({
             <div className="mealPlanSummaryInner">
               {aiError == null ? (
                 <div className="nutritionSummary">
-                  <NutritionPanel target={target} />
-                  <Button onClick={onSaveMealPlan}>식단 저장하기</Button>
+                  <NutritionPanel target={target} />                  
                 </div>
               ) : null}
 

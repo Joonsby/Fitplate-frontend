@@ -5,7 +5,7 @@
 
 // 개발 환경에서는 localhost:8080을 사용합니다.
 // 배포 환경에서는 실제 서버 URL로 교체하면 됩니다.
-export const API_BASE_URL = "http://localhost:8080";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 // API 엔드포인트입니다.
 export const API_ENDPOINTS = {

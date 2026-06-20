@@ -4,3 +4,5 @@ dist
 .claude
 *.ait
 dev-server.*.log
+.env
+.env.*

@@ -1,0 +1,1 @@
+export const FULL_SCREEN_AD_GROUP_ID = 'ait-ad-test-interstitial-id'

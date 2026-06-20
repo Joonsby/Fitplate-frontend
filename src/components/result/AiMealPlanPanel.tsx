@@ -1,5 +1,5 @@
-// AI 식단 로딩/에러/결과 상태를 보여주는 패널 컴포넌트입니다.
-import { Loader } from "@toss/tds-mobile";
+import { useNavigate } from "react-router-dom";
+import { Button, Loader, BottomCTA, Stepper, StepperRow } from "@toss/tds-mobile";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { AiDayCard } from "./AiDayCard";
 import type { MealPlan, NutritionTarget } from "../../types/fitplate";
@@ -24,13 +24,71 @@ export function AiMealPlanPanel({
   mealPlan,
   onRetryAiGenerate,
 }: AiMealPlanPanelProps) {
+  const navigate = useNavigate();
   if (isAiLoading) {
     return (
-      <main className="appShell" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "16px" }}>
-        <Loader size="large" />
-        <h3>AI가 식단을 생성하고 있어요</h3>
-        <p>신체정보와 목표를 바탕으로 맞춤 식단을 구성하는 중입니다.</p>
-      </main>
+      <main
+        className="appShell"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transform: "translateY(50px)",
+          }}
+        >
+          <Loader size="large" label="AI가 식단을 생성하고 있어요" />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",            
+          }}
+        >
+          <Stepper delay={1}>
+            <StepperRow
+              left={<StepperRow.NumberIcon number={1} />}
+              center={
+                <StepperRow.Texts
+                  type="A"
+                  title="사용자 프로필 반영"
+                  description="신체정보와 목표를 바탕으로 맞춤 식단을 구성하는 중입니다."
+                />
+              }
+            />
+            <StepperRow
+              left={<StepperRow.NumberIcon number={2} />}
+              center={
+                <StepperRow.Texts
+                  type="A"
+                  title="AI 식단 자동 생성"
+                  description="화면을 닫아도 생성이 완료되면 저장된 식단에 보관돼요."
+                />
+              }
+            />
+            <StepperRow
+              left={<StepperRow.NumberIcon number={3} />}
+              center={
+                <StepperRow.Texts
+                  type="A"
+                  title="식단 자동 저장"
+                  description="잠시 후 저장된 식단에서 확인할 수 있어요."
+                />
+              }
+              hideLine
+            />
+          </Stepper>
+          <BottomCTA.Single onClick={() => navigate(-1)}>뒤로 가기</BottomCTA.Single>
+        </div>
+      </main>      
     );
   }
 
@@ -45,10 +103,8 @@ export function AiMealPlanPanel({
           {aiError.split("\n").map((line, i) => (
             <span key={i}>{line}<br /></span>
           ))}
-        </p>
-        <button type="button" onClick={onRetryAiGenerate}>
-          다시 생성하기
-        </button>
+        </p>        
+        <Button color="danger" variant="fill" onClick={onRetryAiGenerate}>다시 생성하기</Button>
       </section>
     );
   }

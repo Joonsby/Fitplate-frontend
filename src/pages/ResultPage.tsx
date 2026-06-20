@@ -8,7 +8,6 @@ import type {
   MealFood,
   MealPlan,
   NutritionTarget,
-  PlanDuration,
   ResultSnapshot,
   SavedMealPlan,
   UserProfile,
@@ -17,7 +16,6 @@ import type {
 interface ResultPageProps {
   profile: UserProfile;
   goal: GoalType;
-  planDuration: PlanDuration;
   nutritionTarget: NutritionTarget;
   selectedMealPlan: MealPlan;
   viewingSavedMealPlan: SavedMealPlan | null;
@@ -33,7 +31,6 @@ interface ResultPageProps {
 export function ResultPage({
   profile,
   goal,
-  planDuration,
   nutritionTarget,
   selectedMealPlan,
   viewingSavedMealPlan,

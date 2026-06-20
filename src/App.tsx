@@ -130,6 +130,8 @@ function App() {
     navigate(-1);
   };
 
+  
+
   return (
     <main className="appShell">
       <AppTopTitle
@@ -163,7 +165,6 @@ function App() {
             <ResultPage
               profile={profile}
               goal={goal}
-              planDuration={planDuration}
               nutritionTarget={nutritionTarget}
               selectedMealPlan={selectedMealPlan}
               viewingSavedMealPlan={viewingSavedMealPlan}

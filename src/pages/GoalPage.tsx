@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { GoalSelector } from "../components/forms/GoalSelector";
 import type {
+  GenerationStatus,
   GoalType,
   MealPlan,
   NutritionTarget,
@@ -18,7 +19,7 @@ interface GoalPageProps {
   onBack: () => void;
   onGeneratedStart: () => void;
   generateAiMealPlan: (mealPlan: MealPlan) => Promise<MealPlan | null>;
-  isGenerating: boolean;
+  generationStatus: GenerationStatus;
   markGenerating: () => void;
 }
 
@@ -31,7 +32,7 @@ export function GoalPage({
   onBack,
   onGeneratedStart,
   generateAiMealPlan,
-  isGenerating,
+  generationStatus,
   markGenerating,
 }: GoalPageProps) {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export function GoalPage({
       onGoalChange={onGoalChange}
       onDurationChange={onDurationChange}
       onNext={() => void handleNext()}
-      isGenerating={isGenerating}
+      generationStatus={generationStatus}
       onStartGenerating={markGenerating}
     />
   );

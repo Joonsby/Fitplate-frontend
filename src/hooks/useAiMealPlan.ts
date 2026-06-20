@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { generateMealPlanFromApi } from "../api/mealPlanApi";
 import { mergeMealPlanWithAi } from "../utils/mealPlanMerger";
 import type {
+  GenerationStatus,
   GoalType,
   MealPlan,
   NutritionTarget,
@@ -12,6 +13,17 @@ import type {
 } from "../types/fitplate";
 
 const SESSION_KEY = "fitplate_result_snapshot";
+const GENERATION_STATUS_KEY = "mealPlanGenerationStatus";
+
+function loadGenerationStatus(): GenerationStatus {
+  const raw = sessionStorage.getItem(GENERATION_STATUS_KEY);
+  if (raw === "generating" || raw === "failed") return raw;
+  return "idle";
+}
+
+function saveGenerationStatus(status: GenerationStatus): void {
+  sessionStorage.setItem(GENERATION_STATUS_KEY, status);
+}
 
 function loadSnapshot(): ResultSnapshot | null {
   try {
@@ -46,11 +58,14 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     () => loadSnapshot(),
   );
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStatus, setGenerationStatus] = useState<GenerationStatus>(() => loadGenerationStatus());
   const [aiError, setAiError] = useState<string | null>(null);
   const isInFlightRef = useRef(false);
 
-  const markGenerating = () => setIsGenerating(true);
+  const markGenerating = () => {
+    saveGenerationStatus("generating");
+    setGenerationStatus("generating");
+  };
 
   useEffect(() => {
     saveSnapshot(resultSnapshot);
@@ -59,7 +74,8 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
   const generateAiMealPlan = async (mealPlan: MealPlan) => {
     if (isInFlightRef.current) return null;
     isInFlightRef.current = true;
-    setIsGenerating(true);
+    saveGenerationStatus("generating");
+    setGenerationStatus("generating");
     setIsAiLoading(true);
     setAiError(null);
 
@@ -80,11 +96,15 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
         mealPlan: mergedMealPlan,
       };
       setResultSnapshot(snapshot);
+      saveGenerationStatus("idle");
+      setGenerationStatus("idle");
       sessionStorage.removeItem("adRewardAvailable");
 
       return mergedMealPlan;
     } catch (error) {
       console.error("AI 식단 생성 실패:", error);
+      saveGenerationStatus("failed");
+      setGenerationStatus("failed");
       setAiError(
         error instanceof Error
           ? error.message
@@ -94,7 +114,6 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
       return null;
     } finally {
       isInFlightRef.current = false;
-      setIsGenerating(false);
       setIsAiLoading(false);
     }
   };
@@ -103,13 +122,12 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     isInFlightRef.current = false;
     setAiError(null);
     setIsAiLoading(false);
-    setIsGenerating(false);
   };
 
   return {
     resultSnapshot,
     isAiLoading,
-    isGenerating,
+    generationStatus,
     markGenerating,
     aiError,
     generateAiMealPlan,

@@ -1,7 +1,7 @@
 import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
-import type { GoalType, PlanDuration } from "../../types/fitplate";
+import type { GenerationStatus, GoalType, PlanDuration } from "../../types/fitplate";
 import { useFullScreenAd } from "../../ads/useFullScreenAd";
 
 interface GoalSelectorProps {
@@ -11,7 +11,7 @@ interface GoalSelectorProps {
   onDurationChange: (duration: PlanDuration) => void;
   onBack: () => void;
   onNext: () => void;
-  isGenerating: boolean;
+  generationStatus: GenerationStatus;
   onStartGenerating: () => void;
 }
 const PLAN_DURATIONS: PlanDuration[] = [3, 7, 14];
@@ -24,15 +24,16 @@ export function GoalSelector({
   onDurationChange,
   onBack,
   onNext,
-  isGenerating,
+  generationStatus,
   onStartGenerating,
 }: GoalSelectorProps) {
   const { isAdLoaded, showAd } = useFullScreenAd();
 
   const handleClickResult = () => {
-    if (isGenerating) return;
+    if (generationStatus === "generating") return;
 
-    if (sessionStorage.getItem("adRewardAvailable") === "true") {
+    const hasAdReward = sessionStorage.getItem("adRewardAvailable") === "true";
+    if (hasAdReward || generationStatus === "failed") {
       onStartGenerating();
       onNext();
       return;
@@ -100,11 +101,13 @@ export function GoalSelector({
           color="primary"
           variant="fill"
           onClick={handleClickResult}
-          disabled={isGenerating}
+          disabled={generationStatus === "generating"}
         >
-          {isGenerating
+          {generationStatus === "generating"
             ? "식단 생성 중..."
-            : isAdLoaded && sessionStorage.getItem("adRewardAvailable") !== "true"
+            : isAdLoaded &&
+              sessionStorage.getItem("adRewardAvailable") !== "true" &&
+              generationStatus !== "failed"
             ? "결과보기 (AD)"
             : "결과보기"}
         </Button>

@@ -81,7 +81,7 @@ button:focus{
 .nutritionSummary{
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
 }
 
 .sectionHeader {
@@ -213,7 +213,7 @@ button:focus{
 .metricGrid,
 .macroGrid {
   display: grid;
-  gap: 10px;
+  gap: 4px;
 }
 
 .metricGrid {
@@ -315,7 +315,7 @@ button:focus{
 .aiPanel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
   padding: 16px;
   border: 1px solid #d6e8ff;
   border-radius: 8px;
@@ -417,7 +417,7 @@ button:focus{
 .aiMetaGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: 4px;
 }
 
 .aiMetaGrid div {
@@ -443,7 +443,7 @@ button:focus{
 .aiDayList {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
 }
 
 .aiDayCard {
@@ -510,7 +510,7 @@ button:focus{
 .mealCard {
   display: flex;
   flex-direction: column;
-  gap: 14px;  
+  gap: 4px;  
 }
 
 .mealCardHeader {
@@ -534,7 +534,7 @@ button:focus{
 .foodList {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
 }
 
 .foodRow {
@@ -614,22 +614,20 @@ button:focus{
 .shoppingListExpand {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.35s ease, margin 0.35s ease;
-  margin-top: -7px;
-  margin-bottom: -7px;
+  margin-top: -4px;
+  transition: grid-template-rows 0.35s ease, margin-top 0.35s ease;
 }
 
 .shoppingListExpand--expanded {
   grid-template-rows: 1fr;
   margin-top: 0;
-  margin-bottom: 0;
 }
 
 .shoppingListExpand > div {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
 }
 
 .shoppingListRow {
@@ -931,7 +929,7 @@ button:focus{
 .mealSwiperRoot {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   overflow: hidden;
   min-width: 0;
 }

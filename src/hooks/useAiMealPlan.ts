@@ -134,13 +134,22 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
       return mergedMealPlan;
     } catch (error) {
       console.error("AI 식단 생성 실패:", error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "AI 식단 생성 중 알 수 없는 오류가 발생했습니다.";
       saveGenerationStatus("failed");
       setGenerationStatus("failed");
-      setAiError(
-        error instanceof Error
-          ? error.message
-          : "AI 식단 생성 중 알 수 없는 오류가 발생했습니다.",
-      );
+      setAiError(errorMessage);
+
+      const failureSnapshot: ResultSnapshot = {
+        profile: requestProfile,
+        goal: requestGoal,
+        nutritionTarget,
+        planDuration,
+        mealPlan,
+        aiError: errorMessage,
+      };
+      setResultSnapshot(failureSnapshot);
 
       return null;
     } finally {

@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { Button } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
@@ -17,9 +16,7 @@ export function SavedMealPlansScreen({
   onBack,
   onDelete,
   onView,
-}: SavedMealPlansScreenProps) {
-  const navigate = useNavigate();
-  
+}: SavedMealPlansScreenProps) {  
   return (
     <section className="screen">
       <ScreenSectionHeader

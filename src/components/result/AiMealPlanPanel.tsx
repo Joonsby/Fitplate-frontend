@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Button, Loader, BottomCTA, Stepper, StepperRow } from "@toss/tds-mobile";
+import { Button, Loader, BottomCTA, Stepper, StepperRow, Badge } from "@toss/tds-mobile";
 import logo from "../../assets/images/logo.png";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { AiDayCard } from "./AiDayCard";
@@ -107,37 +107,40 @@ export function AiMealPlanPanel({
   }
 
   return (
-    <section className="aiPanel">
-      <div className="aiPanelHeader">
-        <h3>AI 식단 결과 요약</h3>
-        <p>
-          {target.calories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한{" "}
-          {mealPlan.durationDays}일 식단입니다.
-        </p>
-      </div>
-
-      <div className="aiMetaGrid">
-        <div>
-          <span>기간</span>
-          <strong>{mealPlan.durationDays}일</strong>
+    <>
+      <Badge size="medium" color="blue" variant="weak">식단 결과는 자동으로 저장돼요.</Badge>
+      <section className="aiPanel">
+        <div className="aiPanelHeader">
+          <h3>AI 식단 결과 요약</h3>
+          <p>
+            {target.calories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한{" "}
+            {mealPlan.durationDays}일 식단입니다.
+          </p>
         </div>
-        <div>
-          <span>목표</span>
-          <strong>{target.calories.toLocaleString()} kcal</strong>
+
+        <div className="aiMetaGrid">
+          <div>
+            <span>기간</span>
+            <strong>{mealPlan.durationDays}일</strong>
+          </div>
+          <div>
+            <span>목표</span>
+            <strong>{target.calories.toLocaleString()} kcal</strong>
+          </div>
         </div>
-      </div>
 
-      <div className="aiDayList">
-        {mealPlan.days.map((dayMeal) => (
-          <AiDayCard dayMeal={dayMeal} key={dayMeal.id} />
-        ))}
-      </div>
+        <div className="aiDayList">
+          {mealPlan.days.map((dayMeal) => (
+            <AiDayCard dayMeal={dayMeal} key={dayMeal.id} />
+          ))}
+        </div>
 
-      <ul className="aiCautionList">
-        {CAUTIONS.map((caution) => (
-          <li key={caution}>{caution}</li>
-        ))}
-      </ul>
-    </section>
+        <ul className="aiCautionList">
+          {CAUTIONS.map((caution) => (
+            <li key={caution}>{caution}</li>
+          ))}
+        </ul>
+      </section>
+    </>
   );
 }

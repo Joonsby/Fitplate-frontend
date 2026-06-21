@@ -101,12 +101,14 @@ export function ResultPage({
 
   const hasSessionData = resultSnapshot != null;
   const showEmptyState = !isSavedView && !hasSessionData && !isAiLoading;
+  const sessionAiError = !isSavedView ? (resultSnapshot?.aiError ?? null) : null;
+  const effectiveAiError = aiError ?? sessionAiError;
 
   return (
     <>
       {toastElement}
       <ResultScreen
-        aiError={aiError}
+        aiError={effectiveAiError}
         favoriteFoods={favoriteFoods}
         goal={resultGoal}
         isAiLoading={isAiLoading}

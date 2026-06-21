@@ -188,12 +188,14 @@ export interface SaveMealPlanRequest {
 
 // ResultPage 복원에 필요한 전체 데이터를 메모리에 보관하는 스냅샷 타입입니다.
 // mealPlan.days[i].meals[j].name 등에 AI 병합 데이터가 포함됩니다.
+// aiError가 있으면 생성 실패 상태로 복원됩니다.
 export interface ResultSnapshot {
   profile: UserProfile;
   goal: GoalType;
   nutritionTarget: NutritionTarget;
   planDuration: PlanDuration;
   mealPlan: MealPlan;
+  aiError?: string;
 }
 
 export const GOAL_LABELS: Record<GoalType, string> = {

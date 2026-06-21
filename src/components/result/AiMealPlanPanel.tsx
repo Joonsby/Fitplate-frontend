@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button, Loader, BottomCTA, Stepper, StepperRow } from "@toss/tds-mobile";
+import logo from "../../assets/images/logo.png";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { AiDayCard } from "./AiDayCard";
 import type { MealPlan, NutritionTarget } from "../../types/fitplate";
@@ -24,35 +25,17 @@ export function AiMealPlanPanel({
   mealPlan,
   onRetryAiGenerate,
 }: AiMealPlanPanelProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
   if (isAiLoading) {
     return (
-      <main
-        className="appShell"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-        }}
-      >
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transform: "translateY(50px)",
-          }}
-        >
+      <main className="appShell aiLoadingShell">
+        <img src={logo} alt="Fitplate" className="aiLoadingLogo" />
+
+        <div className="aiLoadingCenter">
           <Loader size="large" label="AI가 식단을 생성하고 있어요" />
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",            
-          }}
-        >
+        <div className="aiLoadingSteps">
           <Stepper delay={1}>
             <StepperRow
               left={<StepperRow.NumberIcon number={1} />}
@@ -69,7 +52,7 @@ export function AiMealPlanPanel({
               center={
                 <StepperRow.Texts
                   type="A"
-                  title="AI 식단 자동 생성"
+                  title="AI 식단 자동 생성﹒저장"
                   description="화면을 닫아도 생성이 완료되면 저장된 식단에 보관돼요."
                 />
               }
@@ -79,16 +62,19 @@ export function AiMealPlanPanel({
               center={
                 <StepperRow.Texts
                   type="A"
-                  title="식단 자동 저장"
-                  description="잠시 후 저장된 식단에서 확인할 수 있어요."
+                  title="식단 생성 소요시간" 
+                  description="식단 생성은 1~2분 정도 소요될수 있어요."
                 />
               }
               hideLine
             />
           </Stepper>
+        </div>
+
+        <div className="aiLoadingCtaWrap">
           <BottomCTA.Single onClick={() => navigate(-1)}>뒤로 가기</BottomCTA.Single>
         </div>
-      </main>      
+      </main>
     );
   }
 

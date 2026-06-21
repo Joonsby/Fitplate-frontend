@@ -14,7 +14,7 @@ interface GoalSelectorProps {
   generationStatus: GenerationStatus;
   onStartGenerating: () => void;
 }
-const PLAN_DURATIONS: PlanDuration[] = [3, 7, 14];
+const PLAN_DURATIONS: PlanDuration[] = [3, 5, 7];
 const GOALS: GoalType[] = ["lose", "maintain", "gain"];
 
 export function GoalSelector({

@@ -10,8 +10,8 @@ export type GoalType = "lose" | "maintain" | "gain";
 export type GenerationStatus = "idle" | "generating" | "failed";
 
 // 기간별 식단에서 선택할 수 있는 일수입니다.
-// 3, 7, 14 외의 숫자는 TypeScript가 막아줍니다.
-export type PlanDuration = 3 | 7 | 14;
+// 3, 5, 7 외의 숫자는 TypeScript가 막아줍니다.
+export type PlanDuration = 3 | 5 | 7;
 
 // 신체정보 입력 폼에서 관리할 사용자 프로필 타입입니다.
 // bodyFatPercentage 뒤의 ?는 입력하지 않아도 되는 선택값이라는 뜻입니다.
@@ -102,7 +102,7 @@ export interface DayMeal {
 }
 
 // 기간별 식단 전체를 표현하는 타입입니다.
-// durationDays는 3일/7일/14일 중 현재 식단의 기간입니다.
+// durationDays는 3일/5일/7일 중 현재 식단의 기간입니다.
 export interface MealPlan {
   id: string;
   targetCalories: number;

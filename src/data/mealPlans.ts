@@ -1,7 +1,7 @@
 import type { DayMeal, Meal, MealPlan, PlanDuration } from "../types/fitplate";
 
 // AI API 없이 사용하는 고정 더미 식단 데이터입니다.
-// 먼저 칼로리 기준별 하루 식단 템플릿을 만들고, 아래에서 3일/7일/14일 식단으로 확장합니다.
+// 먼저 칼로리 기준별 하루 식단 템플릿을 만들고, 아래에서 3일/5일/7일 식단으로 확장합니다.
 const DAILY_MEAL_TEMPLATES: Record<number, Meal[]> = {
   1600: [
     {
@@ -193,7 +193,7 @@ const DAILY_MEAL_TEMPLATES: Record<number, Meal[]> = {
   ],
 };
 
-const PLAN_DURATIONS: PlanDuration[] = [3, 7, 14];
+const PLAN_DURATIONS: PlanDuration[] = [3, 5, 7];
 
 // 하루 식단 템플릿을 복사해서 N일치 DayMeal 배열로 만듭니다.
 // 실제 서비스에서는 날짜별 메뉴가 달라지겠지만, MVP에서는 더미 템플릿을 반복합니다.

@@ -47,8 +47,8 @@ export function SavedMealPlansScreen({
           </div>
         )}
 
-        <Button variant="weak" onClick={() => navigate('/')}>
-            식단 생성하기
+        <Button variant="weak" onClick={onBack}>
+            돌아가기
           </Button>
       </div>
     </section>

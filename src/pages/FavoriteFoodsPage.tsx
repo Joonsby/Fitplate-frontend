@@ -17,6 +17,8 @@ export function FavoriteFoodsPage({
   const { showToast, toastElement } = useToast();
 
   const handleDeleteFavoriteFood = async (favoriteFoodId: number) => {
+    const foodName = favoriteFoods.find((f) => f.favoriteFoodId === favoriteFoodId)?.name;
+
     try {
       await deleteFavoriteFood(favoriteFoodId);
     } catch (error) {
@@ -33,6 +35,7 @@ export function FavoriteFoodsPage({
     setFavoriteFoods((currentFavoriteFoods) =>
       currentFavoriteFoods.filter((favoriteFood) => favoriteFood.favoriteFoodId !== favoriteFoodId),
     );
+    if (foodName) showToast(`${foodName}을 즐겨찾는 음식에서 삭제하였습니다.`, "error");
   };
 
   return (

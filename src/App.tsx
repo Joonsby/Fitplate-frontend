@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { login, getMyUserProfile } from "./api/authApi";
 import { saveAccessToken } from "./api/authToken";
 import { getSavedMealPlans } from "./api/mealPlanStorageApi";
@@ -24,7 +24,8 @@ type LoginStatus = "loading" | "success" | "error";
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");  
+  const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");
+  const isNavigatingRef = useRef(false);
 
   const {
     profile,
@@ -133,6 +134,9 @@ function App() {
   const isMainMenuPage = ["/saved-plans", "/favorite-foods"].includes(location.pathname);
 
   const goToSavedPlans = async () => {
+    if (isNavigatingRef.current) return;
+    isNavigatingRef.current = true;
+
     clearViewingSavedMealPlan();
     resetAiMealPlan();
 
@@ -144,6 +148,7 @@ function App() {
     }
 
     navigate("/saved-plans", { replace: isMainMenuPage });
+    isNavigatingRef.current = false;
   };
 
   const goToFavoriteFoods = () => {

@@ -20,6 +20,7 @@ export interface UserProfile {
   weight: number;
   age: number;
   gender: Gender;
+  bmi?: number;
   bodyFatPercentage?: number;
 }
 

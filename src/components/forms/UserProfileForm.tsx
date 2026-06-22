@@ -10,7 +10,7 @@ interface UserProfileFormProps {
   onNext: () => void;
 }
 
-type ProfileFieldName = "height" | "weight" | "age" | "bodyFatPercentage";
+type ProfileFieldName = "height" | "weight" | "age" | "bmi" | "bodyFatPercentage";
 
 type ProfileFieldValues = Record<ProfileFieldName, string>;
 type ProfileFieldErrors = Partial<Record<ProfileFieldName, string>>;
@@ -45,6 +45,7 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
     height: String(profile.height),
     weight: String(profile.weight),
     age: String(profile.age),
+    bmi: profile.bmi == null ? "" : String(profile.bmi),
     bodyFatPercentage:
       profile.bodyFatPercentage == null ? "" : String(profile.bodyFatPercentage),
   });
@@ -94,6 +95,7 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
       weight: Number(fieldValues.weight),
       age: Number(fieldValues.age),
       gender: selectedGender,
+      bmi: fieldValues.bmi.trim() === "" ? undefined : Number(fieldValues.bmi),
       bodyFatPercentage:
         fieldValues.bodyFatPercentage.trim() === ""
           ? undefined

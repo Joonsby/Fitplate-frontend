@@ -8,6 +8,7 @@ export function useMealPlanSelection() {
     height: 170,
     weight: 68,
     age: 30,
+    bmi: 0,
     gender: "male",
   });
 

@@ -43,6 +43,7 @@ export async function getMyUserProfile(): Promise<UserProfile | null> {
     weight: data.weight,
     age: data.age,
     gender: data.gender === "FEMALE" ? "female" : "male",
+    bmi : data.bmi,
     bodyFatPercentage: data.bodyFatPercentage,
   };
 }

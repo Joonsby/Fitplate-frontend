@@ -55,12 +55,13 @@ function App() {
     try{
       const data = await login();
       saveAccessToken(data.accessToken);
-      setLoginStatus("success");
 
       const userProfile = await getMyUserProfile();
       if (userProfile !== null) {
         setProfile(userProfile);
       }
+
+      setLoginStatus("success");
 
       getFavoriteFoods()
         .then(setFavoriteFoods)

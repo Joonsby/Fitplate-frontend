@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useToast } from "../hooks/useToast";
 import { FavoriteFoodsScreen } from "../components/screens/FavoriteFoodsScreen";
 import { deleteFavoriteFood } from "../api/favoriteFoodsApi";
@@ -6,15 +7,21 @@ import type { FavoriteFood } from "../types/fitplate";
 interface FavoriteFoodsPageProps {
   favoriteFoods: FavoriteFood[];
   setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
+  isLoading: boolean;
   onBack: () => void;
 }
 
 export function FavoriteFoodsPage({
   favoriteFoods,
   setFavoriteFoods,
+  isLoading,
   onBack,
 }: FavoriteFoodsPageProps) {
   const { showToast, toastElement } = useToast();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleDeleteFavoriteFood = async (favoriteFoodId: number) => {
     const foodName = favoriteFoods.find((f) => f.favoriteFoodId === favoriteFoodId)?.name;
@@ -43,6 +50,7 @@ export function FavoriteFoodsPage({
       {toastElement}
       <FavoriteFoodsScreen
         favoriteFoods={favoriteFoods}
+        isLoading={isLoading}
         onBack={onBack}
         onDelete={handleDeleteFavoriteFood}
       />

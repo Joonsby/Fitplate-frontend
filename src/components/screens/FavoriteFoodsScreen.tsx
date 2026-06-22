@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, ConfirmDialog } from "@toss/tds-mobile";
+import { Button, ConfirmDialog, Skeleton } from "@toss/tds-mobile";
 import { getShoppingHref } from "../../utils/shoppingHref";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
@@ -7,12 +7,14 @@ import type { FavoriteFood } from "../../types/fitplate";
 
 interface FavoriteFoodsScreenProps {
   favoriteFoods: FavoriteFood[];
+  isLoading: boolean;
   onBack: () => void;
   onDelete: (id: number) => void;
 }
 
 export function FavoriteFoodsScreen({
   favoriteFoods,
+  isLoading,
   onBack,
   onDelete,
 }: FavoriteFoodsScreenProps) {
@@ -52,7 +54,9 @@ export function FavoriteFoodsScreen({
         />
 
         <div className="favoriteFoodsContent">
-          {favoriteFoods.length === 0 ? (
+          {isLoading && favoriteFoods.length === 0 ? (
+            <Skeleton pattern="topListWithIcon" style={{ width: "100%" }} />
+          ) : favoriteFoods.length === 0 ? (
             <EmptyState
               title="아직 즐겨찾기한 음식이 없어요"
               description="결과 화면에서 음식 옆의 별 버튼을 눌러 추가할 수 있습니다."

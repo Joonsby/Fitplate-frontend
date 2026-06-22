@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ConfirmDialog } from "@toss/tds-mobile";
 import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ interface SavedMealPlansPageProps {
   setViewingSavedMealPlan: React.Dispatch<
     React.SetStateAction<SavedMealPlan | null>
   >;
+  isLoading: boolean;
   onBack: () => void;
 }
 
@@ -19,12 +20,17 @@ export function SavedMealPlansPage({
   savedMealPlans,
   setSavedMealPlans,
   setViewingSavedMealPlan,
+  isLoading,
   onBack,
 }: SavedMealPlansPageProps) {
   const navigate = useNavigate();
   const { showToast, toastElement } = useToast();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleDeleteSavedMealPlan = (id: string) => {
     setPendingDeleteId(id);
@@ -83,6 +89,7 @@ export function SavedMealPlansPage({
       />
       <SavedMealPlansScreen
         savedMealPlans={savedMealPlans}
+        isLoading={isLoading}
         onBack={onBack}
         onDelete={handleDeleteSavedMealPlan}
         onView={handleViewSavedMealPlan}

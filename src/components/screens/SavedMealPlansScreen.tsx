@@ -1,4 +1,4 @@
-import { Button } from "@toss/tds-mobile";
+import { Button, Skeleton } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
@@ -6,6 +6,7 @@ import type { SavedMealPlan } from "../../types/fitplate";
 
 interface SavedMealPlansScreenProps {
   savedMealPlans: SavedMealPlan[];
+  isLoading: boolean;
   onBack: () => void;
   onDelete: (id: string) => void;
   onView: (savedMealPlan: SavedMealPlan) => void;
@@ -13,6 +14,7 @@ interface SavedMealPlansScreenProps {
 
 export function SavedMealPlansScreen({
   savedMealPlans,
+  isLoading,
   onBack,
   onDelete,
   onView,
@@ -26,7 +28,9 @@ export function SavedMealPlansScreen({
       />
 
       <div className="savedMealPlansContent">
-        {savedMealPlans.length === 0 ? (
+        {isLoading && savedMealPlans.length === 0 ? (
+          <Skeleton pattern="topListWithIcon" style={{ width: "100%" }} />
+        ) : savedMealPlans.length === 0 ? (
           <EmptyState
             title="아직 저장된 식단이 없어요"
             description="식단을 생성하면 식단이 자동으로 저장됩니다."

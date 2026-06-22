@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useToast } from "../hooks/useToast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ResultScreen } from "../components/screens/ResultScreen";
@@ -47,6 +48,10 @@ export function ResultPage({
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast, toastElement } = useToast();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // source는 navigate() 호출 시 state로 주입되며, 히스토리 엔트리별로 독립적으로 관리됨.
   // 뒤로가기로 진입하면 해당 엔트리의 state를 읽으므로 source가 없어 session으로 분기됨.

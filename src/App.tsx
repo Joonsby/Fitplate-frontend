@@ -25,6 +25,8 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");
+  const [isLoadingSavedMealPlans, setIsLoadingSavedMealPlans] = useState(false);
+  const [isLoadingFavoriteFoods, setIsLoadingFavoriteFoods] = useState(true);
   const isNavigatingRef = useRef(false);
 
   const {
@@ -65,13 +67,24 @@ function App() {
       setLoginStatus("success");
 
       getFavoriteFoods()
-        .then(setFavoriteFoods)
-        .catch((err) => console.error("즐겨찾기 목록 조회 실패:", err));
+        .then((foods) => {
+          setFavoriteFoods(foods);
+          setIsLoadingFavoriteFoods(false);
+        })
+        .catch((err) => {
+          console.error("즐겨찾기 목록 조회 실패:", err);
+          showToast("즐겨찾기 목록을 불러오지 못했습니다.", "error");
+          setIsLoadingFavoriteFoods(false);
+        });
     } catch (error) {
       console.error("[Login] 실패", error);
       setLoginStatus("error");
     }
   }, [setProfile, setFavoriteFoods]);
+
+  useEffect(() => {
+    window.history.scrollRestoration = 'manual';
+  }, []);
 
   useEffect(() => {
     checkLogin();
@@ -139,15 +152,20 @@ function App() {
 
     clearViewingSavedMealPlan();
     resetAiMealPlan();
+    navigate("/saved-plans", { replace: isMainMenuPage });
+
+    const isFirstLoad = savedMealPlans.length === 0;
+    if (isFirstLoad) setIsLoadingSavedMealPlans(true);
 
     try {
-      const savedMealPlans = await getSavedMealPlans();
-      setSavedMealPlans(savedMealPlans);
+      const fetched = await getSavedMealPlans();
+      setSavedMealPlans(fetched);
     } catch (error) {
       console.error("저장된 식단 목록 조회 실패:", error);
+      showToast("저장된 식단 목록을 불러오지 못했습니다.", "error");
     }
 
-    navigate("/saved-plans", { replace: isMainMenuPage });
+    if (isFirstLoad) setIsLoadingSavedMealPlans(false);
     isNavigatingRef.current = false;
   };
 
@@ -219,6 +237,7 @@ function App() {
               savedMealPlans={savedMealPlans}
               setSavedMealPlans={setSavedMealPlans}
               setViewingSavedMealPlan={setViewingSavedMealPlan}
+              isLoading={isLoadingSavedMealPlans}
               onBack={onBack}
             />
           }
@@ -229,6 +248,7 @@ function App() {
             <FavoriteFoodsPage
               favoriteFoods={favoriteFoods}
               setFavoriteFoods={setFavoriteFoods}
+              isLoading={isLoadingFavoriteFoods}
               onBack={onBack}
             />
           }

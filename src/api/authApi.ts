@@ -38,6 +38,7 @@ export async function getMyUserProfile(): Promise<UserProfile | null> {
   }
 
   const data = await response.json();
+  console.log(data);
   return {
     height: data.height,
     weight: data.weight,

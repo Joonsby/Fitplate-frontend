@@ -9,9 +9,6 @@ export type GoalType = "lose" | "maintain" | "gain";
 // 식단 생성 진행 상태입니다. sessionStorage에 지속되어 페이지 이동 후에도 유지됩니다.
 export type GenerationStatus = "idle" | "generating" | "failed";
 
-// 기간별 식단에서 선택할 수 있는 일수입니다.
-// 3, 5, 7 외의 숫자는 TypeScript가 막아줍니다.
-export type PlanDuration = 3 | 5 | 7;
 
 // 신체정보 입력 폼에서 관리할 사용자 프로필 타입입니다.
 // bodyFatPercentage 뒤의 ?는 입력하지 않아도 되는 선택값이라는 뜻입니다.
@@ -103,11 +100,10 @@ export interface DayMeal {
 }
 
 // 기간별 식단 전체를 표현하는 타입입니다.
-// durationDays는 3일/5일/7일 중 현재 식단의 기간입니다.
 export interface MealPlan {
   id: string;
   targetCalories: number;
-  durationDays: PlanDuration;
+  durationDays: number;
   averageCalories: number;
   days: DayMeal[];
 }
@@ -141,32 +137,9 @@ export interface AIMeal {
   foods: AIFood[];
 }
 
-// AI 응답 안의 하루 식단 타입입니다.
-export interface AIDayMealPlan {
-  dayNumber: number;
-  meals: AIMeal[];
-}
-
-// AI 식단 응답 전체 타입입니다.
+// AI 식단 응답 전체 타입입니다. 백엔드는 하루치 meals 배열만 반환합니다.
 export interface AIMealPlanResponse {
-  days: AIDayMealPlan[];
-}
-
-// 백엔드 식단 생성 API 전체 응답 타입입니다.
-export interface MealPlanGenerateResponse {
-  age: number;
-  height: number;
-  weight: number;
-  gender: "MALE" | "FEMALE";
-  goal: "WEIGHT_LOSS" | "MAINTAIN" | "WEIGHT_GAIN";
-  bmr: number;
-  tdee: number;
-  targetCalories: number;
-  proteinGram: number;
-  carbsGram: number;
-  fatGram: number;
-  durationDays: PlanDuration;
-  aiMealPlanResponse: AIMealPlanResponse;
+  meals: AIMeal[];
 }
 
 // 다시 보기 화면에 필요한 저장 식단 타입입니다.
@@ -175,26 +148,16 @@ export interface SavedMealPlan {
   savedAt: string;
   profile: UserProfile;
   goal: GoalType;
-  target: NutritionTarget;
-  planDuration: PlanDuration;
+  target: NutritionTarget;  
   mealPlan: MealPlan;
 }
 
-// 식단 저장 요청 타입입니다. SavedMealPlan과 거의 비슷하지만, id나 savedAt 같은 필드는 제외하고, AI 응답은 선택값으로 둡니다.
-export interface SaveMealPlanRequest {
-  goal: GoalType;
-  durationDays: number;
-  aiMealPlanResponse: AIMealPlanResponse;
-}
-
 // ResultPage 복원에 필요한 전체 데이터를 메모리에 보관하는 스냅샷 타입입니다.
-// mealPlan.days[i].meals[j].name 등에 AI 병합 데이터가 포함됩니다.
 // aiError가 있으면 생성 실패 상태로 복원됩니다.
 export interface ResultSnapshot {
   profile: UserProfile;
   goal: GoalType;
   nutritionTarget: NutritionTarget;
-  planDuration: PlanDuration;
   mealPlan: MealPlan;
   aiError?: string;
 }

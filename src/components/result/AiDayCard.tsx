@@ -12,11 +12,6 @@ export function AiDayCard({ dayMeal }: AiDayCardProps) {
 
   return (
     <article className="aiDayCard">
-      <div className="dayMealHeader">
-        <strong>{dayMeal.day}일차</strong>
-        <span>{dayMeal.totalCalories.toLocaleString()} kcal</span>
-      </div>
-
       <p>아침: {breakfast?.name ?? "-"}</p>
       <p>점심: {lunch?.name ?? "-"}</p>
       <p>저녁: {dinner?.name ?? "-"}</p>

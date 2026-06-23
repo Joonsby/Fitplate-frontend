@@ -1,7 +1,6 @@
 ﻿import type {
   AIMealPlanResponse,
   GoalType,
-  PlanDuration,
   UserProfile,
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
@@ -14,7 +13,6 @@ interface BackendMealPlanGenerateResponse {
   age: number;
   gender: string;
   goal: string;
-  durationDays: PlanDuration;
   targetCalories: number;
   bmr: number;
   tdee: number;
@@ -42,7 +40,7 @@ interface BackendMealPlanGenerateResponse {
  * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
  *   통째로 삭제하면 됩니다.
  */
-const USE_TEMPORARY_MEAL_PLAN_DATA = false;
+const USE_TEMPORARY_MEAL_PLAN_DATA = true;
 
 /**
  * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.
@@ -62,7 +60,6 @@ const TEMPORARY_MEAL_PLAN_RESPONSE: BackendMealPlanGenerateResponse = {
   age: 30,
   gender: "MALE",
   goal: "MAINTAIN",
-  durationDays: 3,
   targetCalories: 2157,
   bmr: 1598,
   tdee: 2157,
@@ -70,109 +67,35 @@ const TEMPORARY_MEAL_PLAN_RESPONSE: BackendMealPlanGenerateResponse = {
   carbsGram: 295,
   fatGram: 60,
   aiMealPlanResponse: {
-    days: [
+    meals: [
       {
-        dayNumber: 1,
-        meals: [
-          {
-            mealType: "breakfast",
-            title: "아침 식단",
-            foods: [
-              { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
-              { name: "닭가슴살 구이", amount: "120g", calories: 135, protein: 28.0, carbohydrate: 0.0, fat: 2.0, shoppingKeyword: "닭가슴살 슬라이스" },
-              { name: "계란후라이", amount: "1개", calories: 80, protein: 6.0, carbohydrate: 0.5, fat: 6.0, shoppingKeyword: "계란" },
-              { name: "시금치나물", amount: "50g", calories: 35, protein: 2.0, carbohydrate: 3.0, fat: 2.0, shoppingKeyword: "시금치" },
-            ],
-          },
-          {
-            mealType: "lunch",
-            title: "점심 식단",
-            foods: [
-              { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
-              { name: "소고기 안심 구이", amount: "120g", calories: 180, protein: 25.0, carbohydrate: 0.0, fat: 8.0, shoppingKeyword: "소고기 안심" },
-              { name: "쌈채소", amount: "50g", calories: 10, protein: 1.0, carbohydrate: 2.0, fat: 0.0, shoppingKeyword: "쌈채소" },
-              { name: "된장찌개", amount: "200g", calories: 80, protein: 5.0, carbohydrate: 8.0, fat: 3.0, shoppingKeyword: "찌개용 된장" },
-            ],
-          },
-          {
-            mealType: "dinner",
-            title: "저녁 식단",
-            foods: [
-              { name: "고구마", amount: "200g", calories: 240, protein: 3.0, carbohydrate: 58.0, fat: 0.4, shoppingKeyword: "꿀고구마" },
-              { name: "연어 구이", amount: "130g", calories: 260, protein: 26.0, carbohydrate: 0.0, fat: 16.5, shoppingKeyword: "냉동 연어 필렛" },
-              { name: "양상추 샐러드", amount: "100g", calories: 15, protein: 1.0, carbohydrate: 3.0, fat: 0.0, shoppingKeyword: "양상추" },
-              { name: "두부", amount: "100g", calories: 80, protein: 8.0, carbohydrate: 3.0, fat: 4.5, shoppingKeyword: "국산 두부" },
-            ],
-          },
+        mealType: "breakfast",
+        title: "아침 식단",
+        foods: [
+          { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
+          { name: "닭가슴살 구이", amount: "120g", calories: 135, protein: 28.0, carbohydrate: 0.0, fat: 2.0, shoppingKeyword: "닭가슴살 슬라이스" },
+          { name: "계란후라이", amount: "1개", calories: 80, protein: 6.0, carbohydrate: 0.5, fat: 6.0, shoppingKeyword: "계란" },
+          { name: "시금치나물", amount: "50g", calories: 35, protein: 2.0, carbohydrate: 3.0, fat: 2.0, shoppingKeyword: "시금치" },
         ],
       },
       {
-        dayNumber: 2,
-        meals: [
-          {
-            mealType: "breakfast",
-            title: "아침 식단",
-            foods: [
-              { name: "오트밀", amount: "60g", calories: 220, protein: 8.0, carbohydrate: 40.0, fat: 4.0, shoppingKeyword: "오트밀" },
-              { name: "저지방 우유", amount: "200ml", calories: 80, protein: 6.0, carbohydrate: 10.0, fat: 2.0, shoppingKeyword: "저지방 우유" },
-              { name: "사과", amount: "150g", calories: 80, protein: 0.5, carbohydrate: 20.0, fat: 0.2, shoppingKeyword: "부사 사과" },
-              { name: "아몬드", amount: "15g", calories: 90, protein: 3.0, carbohydrate: 3.0, fat: 8.0, shoppingKeyword: "아몬드" },
-            ],
-          },
-          {
-            mealType: "lunch",
-            title: "점심 식단",
-            foods: [
-              { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
-              { name: "삼치구이", amount: "120g", calories: 180, protein: 24.0, carbohydrate: 0.0, fat: 8.0, shoppingKeyword: "삼치 필렛" },
-              { name: "무생채", amount: "70g", calories: 30, protein: 1.0, carbohydrate: 6.0, fat: 0.0, shoppingKeyword: "무" },
-              { name: "미역국", amount: "200g", calories: 50, protein: 2.0, carbohydrate: 4.0, fat: 3.0, shoppingKeyword: "건미역" },
-            ],
-          },
-          {
-            mealType: "dinner",
-            title: "저녁 식단",
-            foods: [
-              { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
-              { name: "돼지 안심 장조림", amount: "120g", calories: 170, protein: 30.0, carbohydrate: 2.0, fat: 4.0, shoppingKeyword: "돼지고기 안심" },
-              { name: "콩나물무침", amount: "80g", calories: 40, protein: 3.0, carbohydrate: 4.0, fat: 1.5, shoppingKeyword: "콩나물" },
-              { name: "배추김치", amount: "50g", calories: 15, protein: 1.0, carbohydrate: 3.0, fat: 0.0, shoppingKeyword: "배추김치" },
-            ],
-          },
+        mealType: "lunch",
+        title: "점심 식단",
+        foods: [
+          { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
+          { name: "소고기 안심 구이", amount: "120g", calories: 180, protein: 25.0, carbohydrate: 0.0, fat: 8.0, shoppingKeyword: "소고기 안심" },
+          { name: "쌈채소", amount: "50g", calories: 10, protein: 1.0, carbohydrate: 2.0, fat: 0.0, shoppingKeyword: "쌈채소" },
+          { name: "된장찌개", amount: "200g", calories: 80, protein: 5.0, carbohydrate: 8.0, fat: 3.0, shoppingKeyword: "찌개용 된장" },
         ],
       },
       {
-        dayNumber: 3,
-        meals: [
-          {
-            mealType: "breakfast",
-            title: "아침 식단",
-            foods: [
-              { name: "통밀빵", amount: "70g", calories: 180, protein: 8.0, carbohydrate: 35.0, fat: 2.0, shoppingKeyword: "통밀식빵" },
-              { name: "계란후라이", amount: "2개", calories: 160, protein: 12.0, carbohydrate: 1.0, fat: 12.0, shoppingKeyword: "계란" },
-              { name: "바나나", amount: "1개", calories: 100, protein: 1.0, carbohydrate: 25.0, fat: 0.3, shoppingKeyword: "바나나" },
-            ],
-          },
-          {
-            mealType: "lunch",
-            title: "점심 식단",
-            foods: [
-              { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
-              { name: "오징어 데침", amount: "150g", calories: 130, protein: 27.0, carbohydrate: 1.0, fat: 1.5, shoppingKeyword: "손질 오징어" },
-              { name: "브로콜리", amount: "100g", calories: 35, protein: 3.0, carbohydrate: 6.0, fat: 0.3, shoppingKeyword: "브로콜리" },
-              { name: "구운 새송이버섯", amount: "100g", calories: 30, protein: 2.0, carbohydrate: 5.0, fat: 0.0, shoppingKeyword: "새송이버섯" },
-            ],
-          },
-          {
-            mealType: "dinner",
-            title: "저녁 식단",
-            foods: [
-              { name: "현미밥", amount: "200g", calories: 307, protein: 6.7, carbohydrate: 64.0, fat: 2.7, shoppingKeyword: "즉석 현미밥" },
-              { name: "소고기 우둔살 구이", amount: "130g", calories: 195, protein: 28.0, carbohydrate: 0.0, fat: 8.0, shoppingKeyword: "소고기 우둔살" },
-              { name: "양파 구이", amount: "80g", calories: 35, protein: 1.0, carbohydrate: 8.0, fat: 0.0, shoppingKeyword: "양파" },
-              { name: "상추", amount: "50g", calories: 10, protein: 1.0, carbohydrate: 2.0, fat: 0.0, shoppingKeyword: "상추" },
-            ],
-          },
+        mealType: "dinner",
+        title: "저녁 식단",
+        foods: [
+          { name: "고구마", amount: "200g", calories: 240, protein: 3.0, carbohydrate: 58.0, fat: 0.4, shoppingKeyword: "꿀고구마" },
+          { name: "연어 구이", amount: "130g", calories: 260, protein: 26.0, carbohydrate: 0.0, fat: 16.5, shoppingKeyword: "냉동 연어 필렛" },
+          { name: "양상추 샐러드", amount: "100g", calories: 15, protein: 1.0, carbohydrate: 3.0, fat: 0.0, shoppingKeyword: "양상추" },
+          { name: "두부", amount: "100g", calories: 80, protein: 8.0, carbohydrate: 3.0, fat: 4.5, shoppingKeyword: "국산 두부" },
         ],
       },
     ],
@@ -192,11 +115,9 @@ function mapGenderToBackend(gender: UserProfile["gender"]): string {
 export async function generateMealPlanFromApi({
   profile,
   goal,
-  durationDays,
 }: {
   profile: UserProfile;
   goal: GoalType;
-  durationDays: PlanDuration;
 }): Promise<BackendMealPlanGenerateResponse> {
   const requestBody = {
     height: profile.height,
@@ -205,7 +126,6 @@ export async function generateMealPlanFromApi({
     age: profile.age,
     bodyFatRate: profile.bodyFatPercentage ?? null,
     goal: mapGoalToBackend(goal),
-    durationDays: durationDays,
   };
 
   if (USE_TEMPORARY_MEAL_PLAN_DATA) {

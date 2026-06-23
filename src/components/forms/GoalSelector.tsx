@@ -1,27 +1,22 @@
 import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
-import type { GenerationStatus, GoalType, PlanDuration } from "../../types/fitplate";
+import type { GenerationStatus, GoalType } from "../../types/fitplate";
 import { useFullScreenAd } from "../../ads/useFullScreenAd";
 
 interface GoalSelectorProps {
   selectedGoal: GoalType;
-  selectedDuration: PlanDuration;
   onGoalChange: (goal: GoalType) => void;
-  onDurationChange: (duration: PlanDuration) => void;
   onBack: () => void;
   onNext: () => void;
   generationStatus: GenerationStatus;
   onStartGenerating: () => void;
 }
-const PLAN_DURATIONS: PlanDuration[] = [3, 5, 7];
 const GOALS: GoalType[] = ["lose", "maintain", "gain"];
 
 export function GoalSelector({
   selectedGoal,
-  selectedDuration,
   onGoalChange,
-  onDurationChange,
   onBack,
   onNext,
   generationStatus,
@@ -54,7 +49,7 @@ export function GoalSelector({
         className="goalSelectorHeader"
         step="2단계"
         title="목표 선택"
-        description="AI 식단 생성 전에 목표와 기간을 먼저 확정합니다."
+        description="AI 식단 생성 전에 목표를 확정합니다."
       />
 
       <div className="goalList">
@@ -72,26 +67,6 @@ export function GoalSelector({
         ))}
       </div>
       <Post.Paragraph color="#4a5568" typography="t7">*TDEE : 현재 활동량을 기준으로 하루에 소비하는 총 칼로리입니다.</Post.Paragraph>
-      <div className="durationPanel">
-        <h3>식단 기간</h3>
-
-        <div className="durationButtons">
-          {PLAN_DURATIONS.map((duration) => (
-            <button
-              key={duration}
-              type="button"
-              className={
-                selectedDuration === duration
-                  ? "durationButton selected"
-                  : "durationButton"
-              }
-              onClick={() => onDurationChange(duration)}
-            >
-              {duration}일
-            </button>
-          ))}
-        </div>
-      </div>
 
       <div className="buttonRow">
         <Button variant="weak" onClick={onBack}>

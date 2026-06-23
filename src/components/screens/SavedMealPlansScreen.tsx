@@ -76,7 +76,7 @@ function SavedMealPlanCard({
     <article className="savedPlanCard">
       <div>
         <strong>
-          {GOAL_LABELS[savedMealPlan.goal]} · {savedMealPlan.planDuration}일 식단
+          {GOAL_LABELS[savedMealPlan.goal]} 식단
         </strong>
         <p>{savedDate}</p>
         <span>

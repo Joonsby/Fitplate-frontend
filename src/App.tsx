@@ -17,8 +17,6 @@ import { useSavedMealPlans } from "./hooks/useSavedMealPlans";
 import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
 import { useToast } from "./hooks/useToast";
 import { Loader, Result, Asset } from "@toss/tds-mobile";
-import type { MealPlan } from "./types/fitplate";
-
 type LoginStatus = "loading" | "success" | "error";
 
 function App() {
@@ -28,17 +26,15 @@ function App() {
   const [isLoadingSavedMealPlans, setIsLoadingSavedMealPlans] = useState(false);
   const [isLoadingFavoriteFoods, setIsLoadingFavoriteFoods] = useState(true);
   const isNavigatingRef = useRef(false);
-
   const {
     profile,
     setProfile,
     goal,
     setGoal,
-    planDuration,
-    setPlanDuration,
     nutritionTarget,
-    selectedMealPlan,
   } = useMealPlanSelection();
+
+  console.log(profile);
 
   const {
     savedMealPlans,
@@ -98,25 +94,32 @@ function App() {
     aiError,
     generateAiMealPlan,
     resetAiMealPlan,
-  } = useAiMealPlan({ profile, goal, nutritionTarget, planDuration });
+  } = useAiMealPlan({ profile, goal, nutritionTarget });
 
   const handleGenerationSuccess = () => {
     clearAiRequestParams();
     showToast("식단 생성이 완료되었습니다. 저장된 식단 메뉴에서 확인해 주세요.", "success");
+    navigate("/result");
   };
 
   const handleGenerationError = () => {
     showToast("식단 생성에 실패했습니다. 광고 없이 다시 생성할 수 있습니다.", "error");
+    navigate("/result");
   };
 
-  const generateAiMealPlanWithEvents = async (mealPlan: MealPlan) => {
-    const result = await generateAiMealPlan(mealPlan);
-    if (result !== null) {
-      handleGenerationSuccess();
-    } else {
+  const generateAiMealPlanWithEvents = async () => {
+    try {
+      const result = await generateAiMealPlan();
+      if (result !== null) {
+        handleGenerationSuccess();
+      } else {
+        handleGenerationError();
+      }
+      return result;
+    } catch {
       handleGenerationError();
+      return null;
     }
-    return result;
   };
 
 
@@ -198,11 +201,7 @@ function App() {
           element={
             <GoalPage
               goal={goal}
-              planDuration={planDuration}
-              selectedMealPlan={selectedMealPlan}
-              nutritionTarget={nutritionTarget}
               onGoalChange={setGoal}
-              onDurationChange={setPlanDuration}
               onBack={onBack}
               onGeneratedStart={clearViewingSavedMealPlan}
               generateAiMealPlan={generateAiMealPlanWithEvents}
@@ -218,7 +217,6 @@ function App() {
               profile={profile}
               goal={goal}
               nutritionTarget={nutritionTarget}
-              selectedMealPlan={selectedMealPlan}
               viewingSavedMealPlan={viewingSavedMealPlan}
               favoriteFoods={favoriteFoods}
               setFavoriteFoods={setFavoriteFoods}
@@ -226,6 +224,7 @@ function App() {
               aiError={aiError}
               isAiLoading={isAiLoading}
               generateAiMealPlan={generateAiMealPlanWithEvents}
+              onSaved={() => {}}
               onBack={onBack}
             />
           }

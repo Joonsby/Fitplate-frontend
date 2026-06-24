@@ -1,13 +1,12 @@
 // ResultPage 복원에 필요한 AI 식단 스냅샷을 메모리에서 관리하는 훅입니다.
 import { useState, useEffect, useRef } from "react";
 import { generateMealPlanFromApi } from "../api/mealPlanApi";
-import { mergeMealPlanWithAi } from "../utils/mealPlanMerger";
+import { buildMealPlanFromAiResponse } from "../utils/mealPlanMerger";
 import type {
   GenerationStatus,
   GoalType,
   MealPlan,
   NutritionTarget,
-  PlanDuration,
   ResultSnapshot,
   UserProfile,
 } from "../types/fitplate";
@@ -68,14 +67,21 @@ function saveSnapshot(snapshot: ResultSnapshot | null): void {
   }
 }
 
+const EMPTY_MEAL_PLAN: MealPlan = {
+  id: "empty",
+  targetCalories: 0,
+  durationDays: 0,
+  averageCalories: 0,
+  days: [],
+};
+
 interface UseAiMealPlanParams {
   profile: UserProfile;
   goal: GoalType;
   nutritionTarget: NutritionTarget;
-  planDuration: PlanDuration;
 }
 
-export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: UseAiMealPlanParams) {
+export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanParams) {
   const [resultSnapshot, setResultSnapshot] = useState<ResultSnapshot | null>(
     () => loadSnapshot(),
   );
@@ -93,7 +99,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     saveSnapshot(resultSnapshot);
   }, [resultSnapshot]);
 
-  const generateAiMealPlan = async (mealPlan: MealPlan) => {
+  const generateAiMealPlan = async () => {
     if (isInFlightRef.current) return null;
     isInFlightRef.current = true;
     saveGenerationStatus("generating");
@@ -113,17 +119,23 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
       const response = await generateMealPlanFromApi({
         profile: requestProfile,
         goal: requestGoal,
-        durationDays: mealPlan.durationDays,
       });
 
-      const mergedMealPlan = mergeMealPlanWithAi(mealPlan, response.aiMealPlanResponse);
+      let mealPlan: MealPlan;
+      try {
+        mealPlan = buildMealPlanFromAiResponse(
+          response.aiMealPlanResponse,
+          response.targetCalories,
+        );
+      } catch {
+        throw new Error("AI가 생성한 식단 데이터를 처리하지 못했습니다.\n잠시 후 다시 시도해주세요.");
+      }
 
       const snapshot: ResultSnapshot = {
         profile: requestProfile,
         goal: requestGoal,
         nutritionTarget,
-        planDuration,
-        mealPlan: mergedMealPlan,
+        mealPlan,
       };
       setResultSnapshot(snapshot);
       saveGenerationStatus("idle");
@@ -131,7 +143,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
       sessionStorage.removeItem("adRewardAvailable");
       clearAiRequestParams();
 
-      return mergedMealPlan;
+      return mealPlan;
     } catch (error) {
       console.error("AI 식단 생성 실패:", error);
       const errorMessage = error instanceof Error
@@ -145,8 +157,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
         profile: requestProfile,
         goal: requestGoal,
         nutritionTarget,
-        planDuration,
-        mealPlan,
+        mealPlan: EMPTY_MEAL_PLAN,
         aiError: errorMessage,
       };
       setResultSnapshot(failureSnapshot);
@@ -162,6 +173,8 @@ export function useAiMealPlan({ profile, goal, nutritionTarget, planDuration }: 
     isInFlightRef.current = false;
     setAiError(null);
     setIsAiLoading(false);
+    saveGenerationStatus("idle");
+    setGenerationStatus("idle");
   };
 
   return {

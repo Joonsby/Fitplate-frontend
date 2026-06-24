@@ -1,5 +1,5 @@
-// AI 응답과 규칙 기반 식단을 통합 구조로 병합하고 역추출하는 유틸입니다.
-import type { AIFood, AIMealPlanResponse, MealFood, MealPlan } from "../types/fitplate";
+// AI 응답을 프론트엔드 MealPlan으로 변환하고 역추출하는 유틸입니다.
+import type { AIFood, AIMealPlanResponse, DayMeal, Meal, MealFood, MealPlan } from "../types/fitplate";
 
 function aifoodToMealFood(food: AIFood, mealId: string, index: number): MealFood {
   return {
@@ -15,50 +15,57 @@ function aifoodToMealFood(food: AIFood, mealId: string, index: number): MealFood
   };
 }
 
-export function mergeMealPlanWithAi(mealPlan: MealPlan, aiResponse: AIMealPlanResponse): MealPlan {
-  const mergedDays = mealPlan.days.map((day, index) => {
-    const aiDay = aiResponse.days[index];
-    if (aiDay == null) return day;
+// 백엔드 단일 일자 AI 응답을 1일차 MealPlan으로 변환합니다.
+export function buildMealPlanFromAiResponse(
+  aiResponse: AIMealPlanResponse,
+  targetCalories: number,
+): MealPlan {
+  const planId = `ai-${Date.now()}`;
 
-    const mergedMeals = day.meals.map((meal) => {
-      const aiMeal = aiDay.meals.find((m) => m.mealType === meal.mealType);
-      if (aiMeal == null) return meal;
+  const meals: Meal[] = (aiResponse.meals ?? []).map((aiMeal) => {
+    const mealId = `${planId}-${aiMeal.mealType}`;
+    const foods = aiMeal.foods.map((f, i) => aifoodToMealFood(f, mealId, i));
+    const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0);
+    const totalProtein = aiMeal.foods.reduce((sum, f) => sum + f.protein, 0);
+    const totalCarbs = aiMeal.foods.reduce((sum, f) => sum + f.carbohydrate, 0);
+    const totalFat = aiMeal.foods.reduce((sum, f) => sum + f.fat, 0);
 
-      const foods = aiMeal.foods.map((f, i) =>
-        aifoodToMealFood(f, `day${aiDay.dayNumber}-${aiMeal.mealType}`, i),
-      );
-      const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0);
-      const totalProtein = aiMeal.foods.reduce((sum, f) => sum + f.protein, 0);
-      const totalCarbs = aiMeal.foods.reduce((sum, f) => sum + f.carbohydrate, 0);
-      const totalFat = aiMeal.foods.reduce((sum, f) => sum + f.fat, 0);
-
-      return {
-        ...meal,
-        name: aiMeal.foods.map((f) => f.name).join(", "),
-        calories: totalCalories,
-        protein: totalProtein,
-        carbs: totalCarbs,
-        fat: totalFat,
-        foods,
-      };
-    });
-
-    const totalCalories = mergedMeals.reduce((sum, m) => sum + m.calories, 0);
-    return { ...day, totalCalories, meals: mergedMeals };
+    return {
+      id: mealId,
+      mealType: aiMeal.mealType,
+      title: aiMeal.title,
+      name: aiMeal.foods.map((f) => f.name).join(", "),
+      calories: totalCalories,
+      protein: totalProtein,
+      carbs: totalCarbs,
+      fat: totalFat,
+      foods,
+    };
   });
 
-  const totalCalories = mergedDays.reduce((sum, d) => sum + d.totalCalories, 0);
-  const averageCalories = Math.round(totalCalories / (mergedDays.length || 1));
+  const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
+  const day: DayMeal = {
+    id: `${planId}-day1`,
+    day: 1,
+    title: "1일차",
+    totalCalories,
+    meals,
+  };
 
-  return { ...mealPlan, days: mergedDays, averageCalories };
+  return {
+    id: planId,
+    targetCalories,
+    durationDays: 1,
+    averageCalories: totalCalories,
+    days: [day],
+  };
 }
 
-// 백엔드 저장 시 aiMealPlanResponse 형식이 필요한 경우 역추출합니다.
+// 백엔드 저장 시 필요한 aiMealPlanResponse 형식으로 역추출합니다. 1일차 meals만 사용합니다.
 export function extractAiResponseFromMealPlan(mealPlan: MealPlan): AIMealPlanResponse {
-  return {
-    days: mealPlan.days.map((day, index) => ({
-      dayNumber: index + 1,
-      meals: day.meals.map((meal) => ({
+  const firstDay = mealPlan.days[0];
+  const meals = firstDay != null
+    ? firstDay.meals.map((meal) => ({
         mealType: meal.mealType,
         title: meal.title,
         foods: meal.foods.map((food) => ({
@@ -70,7 +77,7 @@ export function extractAiResponseFromMealPlan(mealPlan: MealPlan): AIMealPlanRes
           fat: food.fat ?? 0,
           shoppingKeyword: food.shoppingKeyword ?? food.name,
         })),
-      })),
-    })),
-  };
+      }))
+    : [];
+  return { meals };
 }

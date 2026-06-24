@@ -1,6 +1,16 @@
 // 공통 HTTP 요청 유틸리티
 import { getAccessToken } from "./authToken";
 
+export class HttpError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "HttpError";
+  }
+}
+
 export interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
@@ -61,7 +71,7 @@ export async function apiFetch<T>(
       statusText: response.statusText,
       body: errorText,
     });
-    throw new Error(httpErrorMessage);
+    throw new HttpError(response.status, httpErrorMessage);
   }
 
   return response.json() as Promise<T>;
@@ -86,6 +96,6 @@ export async function apiFetchVoid(
       statusText: response.statusText,
       body: errorText,
     });
-    throw new Error(httpErrorMessage);
+    throw new HttpError(response.status, httpErrorMessage);
   }
 }

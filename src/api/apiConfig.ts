@@ -10,7 +10,6 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 // API 엔드포인트입니다.
 export const API_ENDPOINTS = {
   MEAL_PLAN: "/api/meal-plan",
-  MEAL_PLAN_SAVE: "/api/meal-plan/save",
   AUTH_DEV_LOGIN: "/api/auth/dev-login",
   AUTH_TOSS_LOGIN: "/api/auth/toss-login",
   USER_PROFILE_ME: "/api/user-profile/me",

@@ -1,8 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "../hooks/useToast";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ResultScreen } from "../components/screens/ResultScreen";
 import { toggleFavoriteFood } from "../api/favoriteFoodsApi";
+import { saveMealPlan } from "../api/mealPlanStorageApi";
+import { HttpError } from "../api/httpClient";
+import { extractAiResponseFromMealPlan } from "../utils/mealPlanMerger";
 import type {
   FavoriteFood,
   GoalType,
@@ -14,18 +17,26 @@ import type {
   UserProfile,
 } from "../types/fitplate";
 
+const EMPTY_MEAL_PLAN: MealPlan = {
+  id: "empty",
+  targetCalories: 0,
+  durationDays: 0,
+  averageCalories: 0,
+  days: [],
+};
+
 interface ResultPageProps {
   profile: UserProfile;
   goal: GoalType;
   nutritionTarget: NutritionTarget;
-  selectedMealPlan: MealPlan;
   viewingSavedMealPlan: SavedMealPlan | null;
   favoriteFoods: FavoriteFood[];
   setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
   resultSnapshot: ResultSnapshot | null;
   aiError: string | null;
   isAiLoading: boolean;
-  generateAiMealPlan: (mealPlan: MealPlan) => Promise<MealPlan | null>;
+  generateAiMealPlan: () => Promise<MealPlan | null>;
+  onSaved: () => void;
   onBack: () => void;
 }
 
@@ -35,7 +46,6 @@ export function ResultPage({
   profile,
   goal,
   nutritionTarget,
-  selectedMealPlan,
   viewingSavedMealPlan,
   favoriteFoods,
   setFavoriteFoods,
@@ -43,11 +53,13 @@ export function ResultPage({
   aiError,
   isAiLoading,
   generateAiMealPlan,
+  onSaved,
   onBack,
 }: ResultPageProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast, toastElement } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -62,7 +74,7 @@ export function ResultPage({
   const resultProfile = dbData?.profile ?? resultSnapshot?.profile ?? profile;
   const resultGoal = dbData?.goal ?? resultSnapshot?.goal ?? goal;
   const resultTarget = dbData?.target ?? resultSnapshot?.nutritionTarget ?? nutritionTarget;
-  const resultMealPlan = dbData?.mealPlan ?? resultSnapshot?.mealPlan ?? selectedMealPlan;  
+  const resultMealPlan = dbData?.mealPlan ?? resultSnapshot?.mealPlan ?? EMPTY_MEAL_PLAN;
 
   const handleToggleFavoriteFood = async (food: MealFood) => {
     try {
@@ -104,6 +116,32 @@ export function ResultPage({
     }
   };
 
+  const handleSaveMealPlan = async () => {
+    setIsSaving(true);
+    const aiMealPlanResponse = extractAiResponseFromMealPlan(resultMealPlan);
+    try {
+      await saveMealPlan({
+        profile: resultProfile,
+        goal: resultGoal,
+        target: resultTarget,
+        aiMealPlanResponse,
+      });
+      onSaved();
+      showToast("식단이 저장되었습니다.", "success");
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 409) {
+        showToast("이미 저장된 식단입니다.", "error");
+      } else {
+        showToast(
+          error instanceof Error ? error.message : "식단 저장 중 알 수 없는 오류가 발생했습니다.",
+          "error",
+        );
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const hasSessionData = resultSnapshot != null;
   const showEmptyState = !isSavedView && !hasSessionData && !isAiLoading;
   const sessionAiError = !isSavedView ? (resultSnapshot?.aiError ?? null) : null;
@@ -124,7 +162,9 @@ export function ResultPage({
         target={resultTarget}
         showEmptyState={showEmptyState}
         onFavoriteFoodToggle={handleToggleFavoriteFood}
-        onRetryAiGenerate={() => void generateAiMealPlan(resultMealPlan)}
+        isSaving={isSaving}
+        onRetryAiGenerate={() => void generateAiMealPlan()}
+        onSaveMealPlan={handleSaveMealPlan}
         onBack={onBack}
         onGoalReselect={() => navigate("/goal", { state: { from: "/result" } })}
         onRestart={() => navigate("/")}

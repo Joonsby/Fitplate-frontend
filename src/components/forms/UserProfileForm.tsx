@@ -48,7 +48,7 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
     bmi: profile.bmi == null ? "" : String(profile.bmi),
     bodyFatPercentage:
       profile.bodyFatPercentage == null ? "" : String(profile.bodyFatPercentage),
-  });
+  });  
   const [fieldErrors, setFieldErrors] = useState<ProfileFieldErrors>({});
 
   const updateNumberField =

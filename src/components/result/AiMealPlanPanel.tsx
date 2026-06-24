@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { Button, Loader, BottomCTA, Stepper, StepperRow, Badge } from "@toss/tds-mobile";
+import { Button, Loader, BottomCTA, Stepper, StepperRow } from "@toss/tds-mobile";
 import logo from "../../assets/images/logo.png";
 import { NutritionPanel } from "../common/NutritionPanel";
-import { AiDayCard } from "./AiDayCard";
-import type { MealPlan, NutritionTarget } from "../../types/fitplate";
+import { FoodRow } from "./FoodRow";
+import type { AIMealPlanResponse, MealFood, NutritionTarget } from "../../types/fitplate";
 
 const CAUTIONS = [
   "의학적 진단이나 치료 목적의 식단이 아닙니다.",
@@ -14,7 +14,9 @@ export interface AiMealPlanPanelProps {
   isAiLoading: boolean;
   aiError: string | null;
   target: NutritionTarget;
-  mealPlan: MealPlan;
+  aiMealPlan: AIMealPlanResponse | null;
+  favoriteFoodNames: Set<string>;
+  onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
 }
 
@@ -22,10 +24,13 @@ export function AiMealPlanPanel({
   isAiLoading,
   aiError,
   target,
-  mealPlan,
+  aiMealPlan,
+  favoriteFoodNames,
+  onFavoriteFoodToggle,
   onRetryAiGenerate,
 }: AiMealPlanPanelProps) {
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
+
   if (isAiLoading) {
     return (
       <main className="appShell aiLoadingShell">
@@ -52,7 +57,7 @@ export function AiMealPlanPanel({
               center={
                 <StepperRow.Texts
                   type="A"
-                  title="AI 식단 자동 생성﹒저장"
+                  title="AI 식단 자동 생성·저장"
                   description="화면을 닫아도 생성이 완료되면 저장된 식단에 보관돼요."
                 />
               }
@@ -62,7 +67,7 @@ export function AiMealPlanPanel({
               center={
                 <StepperRow.Texts
                   type="A"
-                  title="식단 생성 소요시간" 
+                  title="식단 생성 소요시간"
                   description="식단 생성은 1~2분 정도 소요될수 있어요."
                 />
               }
@@ -89,13 +94,13 @@ export function AiMealPlanPanel({
           {aiError.split("\n").map((line, i) => (
             <span key={i}>{line}<br /></span>
           ))}
-        </p>        
+        </p>
         <Button color="danger" variant="fill" onClick={onRetryAiGenerate}>다시 생성하기</Button>
       </section>
     );
   }
 
-  const hasAiData = mealPlan.days.length > 0 && mealPlan.days[0].meals[0]?.name != null;
+  const hasAiData = (aiMealPlan?.meals.length ?? 0) > 0;
 
   if (!hasAiData) {
     return (
@@ -108,31 +113,49 @@ export function AiMealPlanPanel({
 
   return (
     <>
-      <Badge size="medium" color="blue" variant="weak">식단 결과는 자동으로 저장돼요.</Badge>
       <section className="aiPanel">
         <div className="aiPanelHeader">
           <h3>AI 식단 결과 요약</h3>
           <p>
-            {target.calories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한{" "}
-            {mealPlan.durationDays}일 식단입니다.
+            {target.calories.toLocaleString()}kcal 목표에 맞춰 AI가 생성한 식단입니다.
           </p>
         </div>
 
-        <div className="aiMetaGrid">
-          <div>
-            <span>기간</span>
-            <strong>{mealPlan.durationDays}일</strong>
-          </div>
-          <div>
-            <span>목표</span>
-            <strong>{target.calories.toLocaleString()} kcal</strong>
-          </div>
-        </div>
-
         <div className="aiDayList">
-          {mealPlan.days.map((dayMeal) => (
-            <AiDayCard dayMeal={dayMeal} key={dayMeal.id} />
-          ))}
+          {aiMealPlan!.meals.map((meal) => {
+            const mealCalories = meal.foods.reduce((sum, f) => sum + f.calories, 0);
+            return (
+              <div className="mealCard" key={meal.mealType}>
+                <div className="mealCardHeader">
+                  <strong>{meal.title}</strong>
+                  <span>{mealCalories} kcal</span>
+                </div>
+                <div className="foodList">
+                  {meal.foods.map((food, i) => {
+                    const mealFood: MealFood = {
+                      id: `${meal.mealType}-food${i}`,
+                      name: food.name,
+                      amount: food.amount,
+                      calories: food.calories,
+                      shoppingCategory: "vegetable",
+                      shoppingKeyword: food.shoppingKeyword,
+                      protein: food.protein,
+                      carbohydrate: food.carbohydrate,
+                      fat: food.fat,
+                    };
+                    return (
+                      <FoodRow
+                        food={mealFood}
+                        isFavorite={favoriteFoodNames.has(food.name)}
+                        key={mealFood.id}
+                        onFavoriteFoodToggle={onFavoriteFoodToggle}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <ul className="aiCautionList">

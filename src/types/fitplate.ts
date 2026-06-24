@@ -18,7 +18,7 @@ export interface UserProfile {
   age: number;
   gender: Gender;
   bmi?: number;
-  bodyFatPercentage?: number;
+  bodyFatRate?: number;
 }
 
 // 결과 화면에 보여줄 하루 영양 목표 타입입니다.

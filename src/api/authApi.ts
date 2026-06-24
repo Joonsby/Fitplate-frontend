@@ -44,7 +44,7 @@ export async function getMyUserProfile(): Promise<UserProfile | null> {
     age: data.age,
     gender: data.gender === "FEMALE" ? "female" : "male",
     bmi : data.bmi,
-    bodyFatPercentage: data.bodyFatPercentage,
+    bodyFatRate: data.bodyFatPercentage,
   };
 }
 

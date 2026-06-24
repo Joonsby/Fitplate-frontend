@@ -22,7 +22,7 @@ export function buildMealPlanFromAiResponse(
 ): MealPlan {
   const planId = `ai-${Date.now()}`;
 
-  const meals: Meal[] = aiResponse.meals.map((aiMeal) => {
+  const meals: Meal[] = (aiResponse.meals ?? []).map((aiMeal) => {
     const mealId = `${planId}-${aiMeal.mealType}`;
     const foods = aiMeal.foods.map((f, i) => aifoodToMealFood(f, mealId, i));
     const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0);

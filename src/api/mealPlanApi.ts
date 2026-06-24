@@ -40,7 +40,7 @@ interface BackendMealPlanGenerateResponse {
  * - 백엔드 연동이 완료되면 이 값을 false로 바꾸거나, 이 임시 데이터 블록을
  *   통째로 삭제하면 됩니다.
  */
-const USE_TEMPORARY_MEAL_PLAN_DATA = true;
+const USE_TEMPORARY_MEAL_PLAN_DATA = false;
 
 /**
  * 백엔드 응답과 동일한 모양으로 만든 임시 식단 템플릿입니다.
@@ -146,7 +146,6 @@ export async function generateMealPlanFromApi({
       httpErrorMessage: "AI 식단 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
     }
   );
-
-  console.log(JSON.stringify(data, null, 2));
+  
   return data;
 }

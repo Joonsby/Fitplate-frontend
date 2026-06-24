@@ -121,10 +121,15 @@ export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanP
         goal: requestGoal,
       });
 
-      const mealPlan = buildMealPlanFromAiResponse(
-        response.aiMealPlanResponse,
-        response.targetCalories,
-      );
+      let mealPlan: MealPlan;
+      try {
+        mealPlan = buildMealPlanFromAiResponse(
+          response.aiMealPlanResponse,
+          response.targetCalories,
+        );
+      } catch {
+        throw new Error("AI가 생성한 식단 데이터를 처리하지 못했습니다.\n잠시 후 다시 시도해주세요.");
+      }
 
       const snapshot: ResultSnapshot = {
         profile: requestProfile,
@@ -168,6 +173,8 @@ export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanP
     isInFlightRef.current = false;
     setAiError(null);
     setIsAiLoading(false);
+    saveGenerationStatus("idle");
+    setGenerationStatus("idle");
   };
 
   return {

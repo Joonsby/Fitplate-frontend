@@ -57,7 +57,7 @@ export function AiMealPlanPanel({
               center={
                 <StepperRow.Texts
                   type="A"
-                  title="AI 식단 자동 생성"
+                  title="AI 식단 자동 생성·저장"
                   description="화면을 닫아도 생성이 완료되면 저장된 식단에 보관돼요."
                 />
               }

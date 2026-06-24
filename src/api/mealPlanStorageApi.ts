@@ -54,7 +54,7 @@ function aiResponseToMealPlan(
   aiResponse: AIMealPlanResponse,
   targetCalories: number,
 ): MealPlan {
-  const meals: Meal[] = aiResponse.meals.map((aiMeal) => {
+  const meals: Meal[] = (aiResponse.meals ?? []).map((aiMeal) => {
     const mealId = `${planId}-day1-${aiMeal.mealType}`;
     const foods: MealFood[] = aiMeal.foods.map((food, i) => ({
       id: `${mealId}-food${i}`,
@@ -221,18 +221,4 @@ export async function saveMealPlan({
     fatGram: target.fatGram,
     aiMealPlanResponse,
   };
-
-  try {
-    await apiFetchVoid(getApiUrl(API_ENDPOINTS.MEAL_PLAN_SAVE), {
-      method: "POST",
-      body,
-      networkErrorMessage: "식단 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
-      httpErrorMessage: "식단 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
-    });
-  } catch (error) {
-    if (error instanceof HttpError && error.status === 409) {
-      throw new HttpError(409, "이미 저장된 식단입니다.");
-    }
-    throw error;
-  }
 }

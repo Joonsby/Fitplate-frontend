@@ -26,8 +26,6 @@ function App() {
   const [isLoadingSavedMealPlans, setIsLoadingSavedMealPlans] = useState(false);
   const [isLoadingFavoriteFoods, setIsLoadingFavoriteFoods] = useState(true);
   const isNavigatingRef = useRef(false);
-  const [isSaved, setIsSaved] = useState(false);
-
   const {
     profile,
     setProfile,
@@ -35,6 +33,8 @@ function App() {
     setGoal,
     nutritionTarget,
   } = useMealPlanSelection();
+
+  console.log(profile);
 
   const {
     savedMealPlans,
@@ -99,20 +99,27 @@ function App() {
   const handleGenerationSuccess = () => {
     clearAiRequestParams();
     showToast("식단 생성이 완료되었습니다. 저장된 식단 메뉴에서 확인해 주세요.", "success");
+    navigate("/result");
   };
 
   const handleGenerationError = () => {
     showToast("식단 생성에 실패했습니다. 광고 없이 다시 생성할 수 있습니다.", "error");
+    navigate("/result");
   };
 
   const generateAiMealPlanWithEvents = async () => {
-    const result = await generateAiMealPlan();
-    if (result !== null) {
-      handleGenerationSuccess();
-    } else {
+    try {
+      const result = await generateAiMealPlan();
+      if (result !== null) {
+        handleGenerationSuccess();
+      } else {
+        handleGenerationError();
+      }
+      return result;
+    } catch {
       handleGenerationError();
+      return null;
     }
-    return result;
   };
 
 
@@ -196,15 +203,10 @@ function App() {
               goal={goal}
               onGoalChange={setGoal}
               onBack={onBack}
-              onGeneratedStart={() => {
-                clearViewingSavedMealPlan();
-                setIsSaved(false);
-              }}
+              onGeneratedStart={clearViewingSavedMealPlan}
               generateAiMealPlan={generateAiMealPlanWithEvents}
               generationStatus={generationStatus}
               markGenerating={markGenerating}
-              resultSnapshot={resultSnapshot}
-              isSaved={isSaved}
             />
           }
         />
@@ -222,8 +224,7 @@ function App() {
               aiError={aiError}
               isAiLoading={isAiLoading}
               generateAiMealPlan={generateAiMealPlanWithEvents}
-              isSaved={isSaved}
-              onSaved={() => setIsSaved(true)}
+              onSaved={() => {}}
               onBack={onBack}
             />
           }

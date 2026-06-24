@@ -36,7 +36,6 @@ interface ResultPageProps {
   aiError: string | null;
   isAiLoading: boolean;
   generateAiMealPlan: () => Promise<MealPlan | null>;
-  isSaved: boolean;
   onSaved: () => void;
   onBack: () => void;
 }
@@ -54,7 +53,6 @@ export function ResultPage({
   aiError,
   isAiLoading,
   generateAiMealPlan,
-  isSaved,
   onSaved,
   onBack,
 }: ResultPageProps) {
@@ -164,7 +162,6 @@ export function ResultPage({
         target={resultTarget}
         showEmptyState={showEmptyState}
         onFavoriteFoodToggle={handleToggleFavoriteFood}
-        isSaved={isSaved}
         isSaving={isSaving}
         onRetryAiGenerate={() => void generateAiMealPlan()}
         onSaveMealPlan={handleSaveMealPlan}

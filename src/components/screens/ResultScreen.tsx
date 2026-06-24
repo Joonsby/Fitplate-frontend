@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, ConfirmDialog, Post } from "@toss/tds-mobile";
+import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
@@ -26,7 +25,6 @@ export interface ResultScreenProps {
   isSavedView: boolean;
   isAiLoading: boolean;
   isSaving: boolean;
-  isSaved: boolean;
   aiError: string | null;
   savedAt?: string;
   showEmptyState: boolean;
@@ -42,8 +40,6 @@ export function ResultScreen({
   favoriteFoods,
   goal,
   isAiLoading,
-  isSaved,
-  isSaving,
   isSavedView,
   mealPlan,
   profile,
@@ -51,13 +47,12 @@ export function ResultScreen({
   target,
   showEmptyState,
   onFavoriteFoodToggle,
-  onRetryAiGenerate,  
+  onRetryAiGenerate,
   onBack,
   onGoalReselect,
   onRestart,
 }: ResultScreenProps) {
   const navigate = useNavigate();
-  const [restartConfirmOpen, setRestartConfirmOpen] = useState(false);
   const favoriteFoodNames = new Set(
     favoriteFoods.map((favoriteFood) => favoriteFood.name),
   );
@@ -95,19 +90,6 @@ export function ResultScreen({
   }
 
   return (
-    <>
-      <ConfirmDialog
-        open={restartConfirmOpen}
-        title={<ConfirmDialog.Title>처음부터</ConfirmDialog.Title>}
-        description={
-          <ConfirmDialog.Description>
-            {'저장되지 않은 현재 식단은 사라집니다.\n처음부터 다시 시작하시겠습니까?'}
-          </ConfirmDialog.Description>
-        }
-        cancelButton={<ConfirmDialog.CancelButton onClick={() => setRestartConfirmOpen(false)}>취소</ConfirmDialog.CancelButton>}
-        confirmButton={<ConfirmDialog.ConfirmButton onClick={() => { setRestartConfirmOpen(false); onRestart(); }}>시작</ConfirmDialog.ConfirmButton>}
-        onClose={() => setRestartConfirmOpen(false)}
-      />
     <section className="screen">
       {shouldShowFallbackFailure ? (
         <AiMealPlanFailureScreen
@@ -169,21 +151,11 @@ export function ResultScreen({
             <Button variant="weak" onClick={isSavedView ? onBack : onGoalReselect}>
               {isSavedView ? "목록으로" : "목표 다시 선택"}
             </Button>
-            <Button
-              variant="weak"
-              onClick={() => {
-                if (!isSavedView && hasAiData && !isSaved) {
-                  setRestartConfirmOpen(true);
-                  return;
-                }
-                onRestart();
-              }}
-            >
+            <Button variant="weak" onClick={onRestart}>
               처음부터
             </Button>
           </div>        
       ) : null}
     </section>
-    </>
   );
 }

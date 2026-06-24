@@ -10,7 +10,7 @@ interface UserProfileFormProps {
   onNext: () => void;
 }
 
-type ProfileFieldName = "height" | "weight" | "age" | "bmi" | "bodyFatPercentage";
+type ProfileFieldName = "height" | "weight" | "age" | "bmi" | "bodyFatRate";
 
 type ProfileFieldValues = Record<ProfileFieldName, string>;
 type ProfileFieldErrors = Partial<Record<ProfileFieldName, string>>;
@@ -46,8 +46,8 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
     weight: String(profile.weight),
     age: String(profile.age),
     bmi: profile.bmi == null ? "" : String(profile.bmi),
-    bodyFatPercentage:
-      profile.bodyFatPercentage == null ? "" : String(profile.bodyFatPercentage),
+    bodyFatRate:
+      profile.bodyFatRate == null ? "" : String(profile.bodyFatRate),
   });  
   const [fieldErrors, setFieldErrors] = useState<ProfileFieldErrors>({});
 
@@ -96,10 +96,10 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
       age: Number(fieldValues.age),
       gender: selectedGender,
       bmi: fieldValues.bmi.trim() === "" ? undefined : Number(fieldValues.bmi),
-      bodyFatPercentage:
-        fieldValues.bodyFatPercentage.trim() === ""
+      bodyFatRate:
+        fieldValues.bodyFatRate.trim() === ""
           ? undefined
-          : Number(fieldValues.bodyFatPercentage),
+          : Number(fieldValues.bodyFatRate),
     });
     onNext();
   };
@@ -157,19 +157,19 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
         />
         <TextField
           containerProps={{
-            className: getTextFieldClassName("bodyFatPercentage"),
+            className: getTextFieldClassName("bodyFatRate"),
           }}
-          hasError={fieldErrors.bodyFatPercentage != null}
-          help={fieldErrors.bodyFatPercentage}
+          hasError={fieldErrors.bodyFatRate != null}
+          help={fieldErrors.bodyFatRate}
           label="체지방률(선택)"
           labelOption="sustain"
           placeholder="체지방률을 입력하세요"
           suffix="%"
-          value={fieldValues.bodyFatPercentage}
+          value={fieldValues.bodyFatRate}
           variant="box"
           onBlur={blurNumberField}
-          onChange={updateNumberField("bodyFatPercentage")}
-          onFocus={focusNumberField("bodyFatPercentage")}
+          onChange={updateNumberField("bodyFatRate")}
+          onFocus={focusNumberField("bodyFatRate")}
         />
       </div>
 

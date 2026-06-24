@@ -124,7 +124,7 @@ export async function generateMealPlanFromApi({
     weight: profile.weight,
     gender: mapGenderToBackend(profile.gender),
     age: profile.age,
-    bodyFatRate: profile.bodyFatPercentage ?? null,
+    bodyFatRate: profile.bodyFatRate ?? null,
     goal: mapGoalToBackend(goal),
   };
 
@@ -146,6 +146,5 @@ export async function generateMealPlanFromApi({
       httpErrorMessage: "AI 식단 생성에 실패했습니다. 잠시 후 다시 시도해주세요.",
     }
   );
-  
   return data;
 }

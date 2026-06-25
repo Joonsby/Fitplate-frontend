@@ -29,10 +29,10 @@ function sanitizeProfile(profile: UserProfile): UserProfile {
     height: ensurePositiveNumber(profile.height, 170),
     weight: ensurePositiveNumber(profile.weight, 60),
     age: ensurePositiveNumber(profile.age, 30),
-    bodyFatPercentage:
-      profile.bodyFatPercentage == null
+    bodyFatRate:
+      profile.bodyFatRate == null
         ? undefined
-        : ensurePositiveNumber(profile.bodyFatPercentage, 0),
+        : ensurePositiveNumber(profile.bodyFatRate, 0),
   };
 }
 

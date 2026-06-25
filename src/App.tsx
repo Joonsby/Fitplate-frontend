@@ -33,9 +33,6 @@ function App() {
     setGoal,
     nutritionTarget,
   } = useMealPlanSelection();
-
-  console.log(profile);
-
   const {
     savedMealPlans,
     setSavedMealPlans,

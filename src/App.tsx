@@ -11,18 +11,19 @@ import { GoalPage } from "./pages/GoalPage";
 import { ResultPage } from "./pages/ResultPage";
 import { SavedMealPlansPage } from "./pages/SavedMealPlansPage";
 import { FavoriteFoodsPage } from "./pages/FavoriteFoodsPage";
+import { IntroPage } from "./pages/IntroPage";
 import { useAiMealPlan, clearAiRequestParams } from "./hooks/useAiMealPlan";
 import { useMealPlanSelection } from "./hooks/useMealPlanSelection";
 import { useSavedMealPlans } from "./hooks/useSavedMealPlans";
 import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
 import { useToast } from "./hooks/useToast";
 import { Loader, Result, Asset } from "@toss/tds-mobile";
-type LoginStatus = "loading" | "success" | "error";
+type LoginStatus = "intro" | "loading" | "success" | "error";
 
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");
+  const [loginStatus, setLoginStatus] = useState<LoginStatus>("intro");
   const [isLoadingSavedMealPlans, setIsLoadingSavedMealPlans] = useState(false);
   const [isLoadingFavoriteFoods, setIsLoadingFavoriteFoods] = useState(true);
   const isNavigatingRef = useRef(false);
@@ -79,10 +80,6 @@ function App() {
     window.history.scrollRestoration = 'manual';
   }, []);
 
-  useEffect(() => {
-    checkLogin();
-  }, [checkLogin]);
-
   const {
     resultSnapshot,
     isAiLoading,
@@ -119,6 +116,10 @@ function App() {
     }
   };
 
+
+  if (loginStatus === "intro") {
+    return <IntroPage onStart={checkLogin} />;
+  }
 
   if (loginStatus === "loading") {
     return (

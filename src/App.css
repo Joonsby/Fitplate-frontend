@@ -14,6 +14,121 @@ button:focus{
   background: #fdfdfd;
 }
 
+.introPage {
+  box-sizing: border-box;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  gap: 28px;
+  padding: 28px 24px max(24px, env(safe-area-inset-bottom));
+  color: #191f28;
+  background: #ffffff;
+}
+
+.introHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.introLogo {
+  width: 112px;
+  height: auto;
+  align-self: center;
+}
+
+.introHeader h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.3;
+  letter-spacing: -0.7px;
+  word-break: keep-all;
+}
+
+.introHeader p {
+  margin: 12px 0 0;
+  color: #6b7684;
+  font-size: 16px;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.introPreview {
+  margin: 0;
+}
+
+.introPreview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #e5e8eb;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(49, 130, 246, 0.08);
+}
+
+.introPreview figcaption {
+  margin-top: 10px;
+  color: #8b95a1;
+  font-size: 12px;
+  text-align: center;
+}
+
+.introBenefits {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.introBenefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.introBenefits li > span {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #3182f6;
+  background: #edf6ff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.introBenefits strong {
+  font-size: 16px;
+}
+
+.introBenefits p {
+  margin: 4px 0 0;
+  color: #6b7684;
+  font-size: 14px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.introFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.introFooter p {
+  margin: 0;
+  color: #8b95a1;
+  font-size: 12px;
+  text-align: center;
+}
+
 .appTopTitle,
 .appTopSubtitle {
   display: flex;

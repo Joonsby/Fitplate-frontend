@@ -105,7 +105,7 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
   };
 
   return (
-    <section className="screen profileFormScreen">
+    <section className="screen">
       <ScreenSectionHeader
         description="키, 몸무게, 나이, 성별을 입력하면 결과 화면에서 목표를 계산합니다."
         step="1단계"
@@ -119,8 +119,6 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
           help={fieldErrors.height}
           label="키"
           labelOption="sustain"
-          paddingBottom={2}
-          paddingTop={2}
           placeholder="키를 입력하세요"
           suffix="cm"
           value={fieldValues.height}
@@ -135,8 +133,6 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
           help={fieldErrors.weight}
           label="몸무게"
           labelOption="sustain"
-          paddingBottom={2}
-          paddingTop={2}
           placeholder="몸무게를 입력하세요"
           suffix="kg"
           value={fieldValues.weight}
@@ -151,8 +147,6 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
           help={fieldErrors.age}
           label="나이"
           labelOption="sustain"
-          paddingBottom={2}
-          paddingTop={2}
           placeholder="나이를 입력하세요"
           suffix="세"
           value={fieldValues.age}
@@ -169,8 +163,6 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
           help={fieldErrors.bodyFatRate}
           label="체지방률(선택)"
           labelOption="sustain"
-          paddingBottom={2}
-          paddingTop={2}
           placeholder="체지방률을 입력하세요"
           suffix="%"
           value={fieldValues.bodyFatRate}
@@ -183,14 +175,12 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
 
       <div className="choiceGroup" aria-label="성별 선택">
         <Button
-          size="small"
           variant={selectedGender === "male" ? "fill" : "weak"}
           onClick={() => setSelectedGender("male")}
         >
           남성
         </Button>
         <Button
-          size="small"
           variant={selectedGender === "female" ? "fill" : "weak"}
           onClick={() => setSelectedGender("female")}
         >
@@ -199,7 +189,7 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
       </div>
 
       <div className="selectGroup">
-        <Button size="small" disabled={!isProfileValid} onClick={handleNext}>
+        <Button disabled={!isProfileValid} onClick={handleNext}>
           목표 선택하기
         </Button>
       </div>

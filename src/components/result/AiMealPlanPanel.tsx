@@ -10,6 +10,12 @@ const CAUTIONS = [
   "알레르기와 개인 질환이 있다면 전문가와 상담하세요.",
 ];
 
+const MEAL_TYPE_LABELS = {
+  breakfast: "아침",
+  lunch: "점심",
+  dinner: "저녁",
+} satisfies Record<AIMealPlanResponse["meals"][number]["mealType"], string>;
+
 export interface AiMealPlanPanelProps {
   isAiLoading: boolean;
   aiError: string | null;
@@ -127,7 +133,7 @@ export function AiMealPlanPanel({
             return (
               <div className="mealCard" key={meal.mealType}>
                 <div className="mealCardHeader">
-                  <strong>{meal.title}</strong>
+                  <strong>{MEAL_TYPE_LABELS[meal.mealType]}</strong>
                   <span>{mealCalories} kcal</span>
                 </div>
                 <div className="foodList">

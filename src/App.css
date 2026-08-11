@@ -162,6 +162,29 @@ button:focus{
   padding: 8px 24px 24px;
 }
 
+@media (max-width: 480px) {
+  .profileFormScreen .sectionHeader {
+    gap: 2px;
+    padding: 4px 24px 2px;
+  }
+
+  .profileFormScreen .fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 24px;
+  }
+
+  .profileFormScreen .choiceGroup {
+    gap: 8px;
+    padding: 8px 24px;
+  }
+
+  .profileFormScreen .selectGroup {
+    padding: 2px 24px max(8px, env(safe-area-inset-bottom));
+  }
+}
+
 .goalCard {
   border: 1px solid #e5e8eb;
   border-radius: 8px;

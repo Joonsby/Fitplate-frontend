@@ -83,17 +83,7 @@ When creating a new file:
 
 Why: agents read files selectively, not whole codebases. A one-line Korean header gives instant context so the next session (human or agent) can navigate without re-reading the entire file.
 
-## 7. Plan + Checklist + Context Notes
-
-**Before any non-trivial task, produce three artifacts. Don't start coding without them.**
-
-- **Plan** — what we're building and why.
-- **Checklist** (`checklist.md`) — concrete tasks as checkboxes. Tick as you go.
-- **Context Notes** (`context-notes.md`) — decisions made during the work and the reasoning behind them. Append continuously.
-
-If the user gives only a plan and asks you to start coding, stop and ask: "Should I create the checklist and context notes first?" The next session — yours or someone else's — needs the notes to pick up where you left off without re-deriving every decision.
-
-## 8. Run Tests Before Marking Complete
+## 7. Run Tests Before Marking Complete
 
 **If you touched code, run the tests before saying "done".**
 
@@ -103,6 +93,15 @@ If the user gives only a plan and asks you to start coding, stop and ask: "Shoul
 - Run tests proactively, before the user signals "끝", "완료", "다 됐어" — not after.
 
 This is the step LLMs skip most often. Treat it as non-negotiable.
+
+## 8. Clean Up Temporary AI Work Documents
+
+**AI-generated work documents must not remain after development is complete.**
+
+- Create temporary Markdown files such as `checklist.md` or `context-notes.md` only when they are genuinely useful during active development.
+- Delete all AI-generated temporary work documents when the related development work is complete, unless the user explicitly asks to preserve them.
+- Before staging or committing, inspect the working tree for unnecessary Markdown files and remove them from the commit scope.
+- Do not commit temporary planning, checklist, scratch, or context files that are no longer needed by the completed feature.
 
 ## 9. Commits Require Explicit User Approval
 
@@ -115,6 +114,7 @@ This is the step LLMs skip most often. Treat it as non-negotiable.
 - Every requested commit message must follow the `<type>: <Korean description>` convention and the description must be written in Korean.
 - Use the conventional type that matches the change, such as `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, or `revert`.
 - Keep each commit limited to one logical change so its Korean description accurately summarizes the diff.
+- Before every commit, verify that no unnecessary AI-generated Markdown files remain in the working tree or staging area.
 
 ## 10. Read Errors, Don't Guess
 

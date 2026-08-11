@@ -104,16 +104,17 @@ If the user gives only a plan and asks you to start coding, stop and ask: "Shoul
 
 This is the step LLMs skip most often. Treat it as non-negotiable.
 
-## 9. Semantic Commits
+## 9. Commits Require Explicit User Approval
 
-**Commit when one logical change is complete. Don't wait for the user to ask.**
+**Do not create a commit unless the user explicitly asks for one.**
 
-- The test: "Can I describe this commit in one sentence?" If yes, commit. If no, the changes are still mixed — split them.
-- Good: "auth 미들웨어 추가". Bad: "auth 추가하고 UI도 고치고 버그도 수정" (split into 3).
-- Don't accumulate 20 unrelated edits and lose the ability to roll back individually.
-- Don't commit just to commit — meaningful units only.
-
-Note: For solo prototypes or throwaway scripts, group commits loosely if it slows you down. The point is reversibility, not ceremony.
+- Finishing an implementation, passing tests, or completing a checklist does not authorize a commit.
+- Leave verified changes in the working tree and report them to the user.
+- Commit only after an explicit instruction such as "commit this" or "커밋해줘".
+- When a commit is requested, include only the requested logical change and preserve unrelated working-tree changes.
+- Every requested commit message must follow the `<type>: <Korean description>` convention and the description must be written in Korean.
+- Use the conventional type that matches the change, such as `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, or `revert`.
+- Keep each commit limited to one logical change so its Korean description accurately summarizes the diff.
 
 ## 10. Read Errors, Don't Guess
 
@@ -126,6 +127,16 @@ When something fails:
 - If unclear, add a print/log to verify state — then fix.
 
 This is the step LLMs skip most often after "run tests". They guess from error keywords and apply the most-recent-pattern fix. That's how a one-line bug becomes a three-file refactor.
+
+## 11. Keep UI Element Sizing Consistent
+
+**Treat controls on the same screen as one visual system.**
+
+- When resizing a mobile screen, inspect input fields, buttons, typography, spacing, and touch targets together.
+- Do not shrink only buttons while leaving adjacent input fields visually large.
+- Prefer reducing excessive spacing before making interactive controls unnecessarily small.
+- Preserve a clear hierarchy while keeping related controls visually balanced and usable.
+- Verify the result at representative mobile viewport sizes before declaring the UI change complete.
 
 ---
 

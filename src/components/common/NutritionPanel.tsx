@@ -9,23 +9,48 @@ export interface NutritionPanelProps {
 }
 
 export function NutritionPanel({ target }: NutritionPanelProps) {
+  const macros = [
+    { label: "탄수화물", value: target.carbsGram, kcal: target.carbsGram * 4, tone: "carbs" },
+    { label: "단백질", value: target.proteinGram, kcal: target.proteinGram * 4, tone: "protein" },
+    { label: "지방", value: target.fatGram, kcal: target.fatGram * 9, tone: "fat" },
+  ] as const;
+  const macroKcal = macros.reduce((sum, macro) => sum + macro.kcal, 0) || 1;
+
   return (
-    <>
+    <div className="nutritionPanel">
       <div className="caloriePanel">
-        <span>목표 칼로리</span>
-        <strong>{target.calories.toLocaleString()} kcal</strong>
+        <span>하루 목표 칼로리</span>
+        <strong>
+          {target.calories.toLocaleString()}
+          <small>kcal</small>
+        </strong>
+        <div className="metricGrid">
+          <MetricItem label="기초대사량" abbr="BMR" value={target.bmr} unit="kcal" />
+          <MetricItem label="총소비량" abbr="TDEE" value={target.tdee} unit="kcal" />
+        </div>
       </div>
 
-      <div className="metricGrid">
-        <MetricItem label="BMR" value={target.bmr} unit="kcal" />
-        <MetricItem label="TDEE" value={target.tdee} unit="kcal" />
+      <div className="card macroCard">
+        <div className="macroBar" aria-hidden="true">
+          {macros.map((macro) => (
+            <span
+              key={macro.tone}
+              className={`macroTone--${macro.tone}`}
+              style={{ width: `${(macro.kcal / macroKcal) * 100}%` }}
+            />
+          ))}
+        </div>
+        <div className="macroGrid">
+          {macros.map((macro) => (
+            <MacroItem
+              key={macro.tone}
+              label={macro.label}
+              value={macro.value}
+              tone={macro.tone}
+            />
+          ))}
+        </div>
       </div>
-
-      <div className="macroGrid">
-        <MacroItem label="단백질" value={target.proteinGram} />
-        <MacroItem label="탄수화물" value={target.carbsGram} />
-        <MacroItem label="지방" value={target.fatGram} />
-      </div>
-    </>
+    </div>
   );
 }

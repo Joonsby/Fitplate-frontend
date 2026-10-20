@@ -1,7 +1,7 @@
 // 로그인 전에 Fitplate의 주요 가치를 소개하는 인트로 화면
 import "./IntroPage.css";
-import { Button } from "@toss/tds-mobile";
-import logoImage from "../assets/images/logo.png";
+import { Button } from "../components/common/Button";
+import { BrandLogo } from "../components/common/BrandLogo";
 import mealPlanPreviewImage from "../assets/images/intro-meal-plan-preview.png";
 
 interface IntroPageProps {
@@ -12,7 +12,9 @@ export function IntroPage({ onStart }: IntroPageProps) {
   return (
     <main className="introPage">
       <header className="introHeader">
-        <img className="introLogo" src={logoImage} alt="Fitplate" />
+        <div className="introLogo">
+          <BrandLogo size="large" tagline />
+        </div>
         <div>
           <h1>내 몸에 맞는 식단을<br />간편하게 시작해 보세요</h1>
           <p>신체 정보와 목표를 바탕으로 하루 영양 기준과 식단을 확인할 수 있어요.</p>
@@ -35,7 +37,7 @@ export function IntroPage({ onStart }: IntroPageProps) {
 
       <footer className="introFooter">
         <p>식단 기록을 안전하게 저장하기 위해 로그인이 필요해요.</p>
-        <Button color="primary" display="block" size="large" onClick={onStart}>
+        <Button block onClick={onStart}>
           토스로 시작하기
         </Button>
       </footer>

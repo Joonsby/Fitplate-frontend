@@ -1,62 +1,62 @@
 /* AI 식단 생성 실패와 재시도 안내를 꾸밉니다. */
 
-.aiFailureSection{
-  padding:24px;
-}
-
-.aiFailureScreen {
+.aiFailure {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 22px;
-  border: 1px solid #ffd6d9;
-  border-radius: 8px;
-  background: #fff7f8;
+  gap: 16px;
 }
 
-.aiFailureScreen h2 {
-  margin: 4px 0 8px;
-  color: #191f28;
-  font-size: 24px;
-  line-height: 1.3;
+.aiFailureHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 20px;
+  border-radius: 24px;
+  background: var(--fp-surface);
+  box-shadow: var(--fp-shadow-card);
+  text-align: center;
 }
 
-.aiFailureScreen p {
+.aiFailureIcon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 14px;
+  place-items: center;
+  border-radius: 18px;
+  color: var(--fp-error);
+  background: var(--fp-error-soft);
+}
+
+.aiFailureIcon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.aiFailureHead h1 {
   margin: 0;
-  color: #4e5968;
+  color: var(--fp-ink);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.aiFailureHead > p {
+  margin: 8px 0 0;
+  color: var(--fp-sub);
   font-size: 14px;
   line-height: 1.5;
+  word-break: keep-all;
 }
 
-.failureSummaryGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.failureSummaryGrid div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px 12px;
-  border-radius: 8px;
-  background: #ffffff;
-}
-
-.failureSummaryGrid span {
-  color: #8b95a1;
-  font-size: 12px;
-}
-
-.failureSummaryGrid strong {
-  color: #333d4b;
-  font-size: 16px;
-}
-
-.failureReason {
-  padding: 12px;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #f04452 !important;
-  font-weight: 700;
+.aiFailureHead > .failureReason {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 16px 0 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  color: var(--fp-error);
+  background: var(--fp-error-soft);
+  font-size: 13px;
+  font-weight: 600;
 }

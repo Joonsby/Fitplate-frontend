@@ -1,0 +1,50 @@
+/* 화면 위쪽에 잠깐 나타나는 알림을 꾸밉니다. */
+.fpToast {
+  position: fixed;
+  z-index: 50;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 12px 18px 12px 14px;
+  border-radius: 16px;
+  color: #ffffff;
+  background: rgba(20, 28, 43, 0.94);
+  box-shadow: 0 10px 30px rgba(20, 28, 43, 0.25);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: keep-all;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -16px);
+  transition:
+    opacity 0.2s,
+    transform 0.25s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+.fpToast.isOpen {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.fpToastIcon {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+}
+.fpToastIcon svg {
+  width: 14px;
+  height: 14px;
+}
+.fpToast--success .fpToastIcon {
+  background: var(--fp-success);
+}
+.fpToast--error .fpToastIcon {
+  background: var(--fp-error);
+}

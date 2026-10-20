@@ -1,15 +1,18 @@
+// 저장된 식단 목록을 카드로 보여주고 다시 보기·삭제를 연결합니다.
 import "../../styles/layout.css";
 import "./SavedMealPlansScreen.css";
-import { Button, Skeleton } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
+import { SkeletonList } from "../common/SkeletonList";
+import { Button } from "../common/Button";
+import { BookmarkIcon, ChevronRightIcon } from "../common/Icons";
 import type { SavedMealPlan } from "../../types/fitplate";
 
 interface SavedMealPlansScreenProps {
   savedMealPlans: SavedMealPlan[];
   isLoading: boolean;
-  onBack: () => void;
+  onCreate: () => void;
   onDelete: (id: string) => void;
   onView: (savedMealPlan: SavedMealPlan) => void;
 }
@@ -17,43 +20,41 @@ interface SavedMealPlansScreenProps {
 export function SavedMealPlansScreen({
   savedMealPlans,
   isLoading,
-  onBack,
+  onCreate,
   onDelete,
   onView,
-}: SavedMealPlansScreenProps) {  
+}: SavedMealPlansScreenProps) {
   return (
     <section className="screen">
       <ScreenSectionHeader
-        description="저장된 식단을 확인하고 다시 볼 수 있습니다."
-        step="저장 목록"
-        title="저장된 식단"
+        title="저장 식단"
+        description="만든 식단은 자동으로 저장돼요. 눌러서 다시 볼 수 있어요."
       />
 
-      <div className="savedMealPlansContent">
-        {isLoading && savedMealPlans.length === 0 ? (
-          <Skeleton pattern="topListWithIcon" style={{ width: "100%" }} />
-        ) : savedMealPlans.length === 0 ? (
-          <EmptyState
-            title="아직 저장된 식단이 없어요"
-            description="식단을 생성하면 식단이 자동으로 저장됩니다."
-          />
-        ) : (
-          <div className="savedPlanList">
-            {savedMealPlans.map((savedMealPlan) => (
-              <SavedMealPlanCard
-                key={savedMealPlan.id}
-                savedMealPlan={savedMealPlan}
-                onDelete={onDelete}
-                onView={onView}
-              />
-            ))}
-          </div>
-        )}
-
-        <Button variant="weak" onClick={onBack}>
-            돌아가기
+      {isLoading && savedMealPlans.length === 0 ? (
+        <SkeletonList />
+      ) : savedMealPlans.length === 0 ? (
+        <EmptyState
+          icon={<BookmarkIcon />}
+          title="아직 저장된 식단이 없어요"
+          description="식단을 만들면 이곳에 자동으로 모여요."
+        >
+          <Button block size="medium" onClick={onCreate}>
+            새 식단 만들기
           </Button>
-      </div>
+        </EmptyState>
+      ) : (
+        <div className="screenList">
+          {savedMealPlans.map((savedMealPlan) => (
+            <SavedMealPlanCard
+              key={savedMealPlan.id}
+              savedMealPlan={savedMealPlan}
+              onDelete={onDelete}
+              onView={onView}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -64,34 +65,31 @@ interface SavedMealPlanCardProps {
   onView: (savedMealPlan: SavedMealPlan) => void;
 }
 
-function SavedMealPlanCard({
-  savedMealPlan,
-  onDelete,
-  onView,
-}: SavedMealPlanCardProps) {
+function SavedMealPlanCard({ savedMealPlan, onDelete, onView }: SavedMealPlanCardProps) {
   const savedDate = new Date(savedMealPlan.savedAt).toLocaleString("ko-KR", {
     dateStyle: "medium",
     timeStyle: "short",
   });
 
   return (
-    <article className="savedPlanCard">
-      <div>
-        <strong>
-          {GOAL_LABELS[savedMealPlan.goal]} 식단
-        </strong>
-        <p>{savedDate}</p>
-        <span>
-          목표 {savedMealPlan.target.calories.toLocaleString()} kcal · 기준{" "}
-          {savedMealPlan.mealPlan.targetCalories.toLocaleString()} kcal
+    <article className="card savedPlanCard">
+      <button type="button" className="savedPlanMain" onClick={() => onView(savedMealPlan)}>
+        <span className="goalChip">{GOAL_LABELS[savedMealPlan.goal]}</span>
+        <span className="savedPlanText">
+          <strong>하루 {savedMealPlan.target.calories.toLocaleString()} kcal 식단</strong>
+          <span>{savedDate}</span>
         </span>
-      </div>
-
-      <div className="savedPlanActions">
-        <button type="button" onClick={() => onView(savedMealPlan)}>
-          다시 보기
-        </button>
-        <button type="button" onClick={() => onDelete(savedMealPlan.id)}>
+        <ChevronRightIcon className="savedPlanChevron" />
+      </button>
+      <div className="savedPlanFooter">
+        <span>
+          {savedMealPlan.profile.height}cm · {savedMealPlan.profile.weight}kg 기준
+        </span>
+        <button
+          type="button"
+          className="savedPlanDelete"
+          onClick={() => onDelete(savedMealPlan.id)}
+        >
           삭제
         </button>
       </div>

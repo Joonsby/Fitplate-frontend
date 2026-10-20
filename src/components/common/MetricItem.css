@@ -3,19 +3,31 @@
 .metricItem {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 12px;
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background: #ffffff;
-  text-align: center;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .metricItem span {
-  color: #6b7684;
-  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .metricItem strong {
-  font-size: 19px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.metricItem em {
+  font-style: normal;
+}
+
+@media (max-width: 350px) {
+  .metricItem em {
+    display: none;
+  }
 }

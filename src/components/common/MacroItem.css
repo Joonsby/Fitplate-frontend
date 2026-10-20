@@ -3,19 +3,35 @@
 .macroItem {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 12px;
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background: #ffffff;
-  text-align: center;
+  gap: 4px;
 }
 
 .macroItem span {
-  color: #6b7684;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fp-sub);
   font-size: 13px;
+  font-weight: 600;
+}
+
+.macroItem i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
 }
 
 .macroItem strong {
-  font-size: 19px;
+  color: var(--fp-ink);
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.macroItem strong small {
+  margin-left: 2px;
+  color: var(--fp-sub);
+  font-size: 13px;
+  font-weight: 600;
 }

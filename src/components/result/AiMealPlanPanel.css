@@ -1,73 +1,17 @@
 /* AI 식단 결과와 생성 대기 화면 및 애니메이션을 꾸밉니다. */
 
-.aiPanel {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  border: 1px solid #d6e8ff;
-  border-radius: 8px;
-  background: #f7fbff;
+@keyframes aiStepIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.aiPanel.error {
-  border-color: #ffd6d9;
-  background: #fff7f8;
-}
-
-.aiPanel h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.aiPanel p {
-  margin: 0;
-  color: #4e5968;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.aiPanelHeader {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.aiPanelHeader span {
-  flex: 0 0 auto;
-  color: #3182f6;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.aiMetaGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-}
-
-.aiMetaGrid div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 10px;
-  border-radius: 8px;
-  background: #ffffff;
-  border : 1px solid #e5e8eb
-}
-
-.aiMetaGrid span {
-  color: #8b95a1;
-  font-size: 11px;
-}
-
-.aiMetaGrid strong {
-  color: #333d4b;
-  font-size: 13px;
-}
-
-.aiDayList {
+.aiResult {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -75,53 +19,122 @@
 
 .aiCautionList {
   margin: 0;
-  padding-left: 18px;
-  color: #6b7684;
+  padding: 14px 16px 14px 32px;
+  border-radius: 16px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
   font-size: 12px;
+  line-height: 1.6;
+}
+
+.aiPanelError,
+.aiPanelEmpty {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aiPanelError h2,
+.aiPanelEmpty h2 {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.aiPanelError > p,
+.aiPanelEmpty > p {
+  margin: 0;
+  color: var(--fp-sub);
+  font-size: 14px;
   line-height: 1.5;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.aiPanelError > p {
+  padding: 12px 14px;
+  border-radius: 14px;
+  color: var(--fp-error);
+  background: var(--fp-error-soft);
+  font-weight: 600;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.aiLoadingShell {
+/* 생성 중 화면 */
+.aiLoading {
+  box-sizing: border-box;
   display: flex;
+  min-height: calc(100svh - var(--app-top-space, 0px) - var(--app-bottom-space, 0px) - 32px);
   flex-direction: column;
-  height: 100vh;
-}
-
-.aiLoadingLogo {
-  display: block;
-  width: 132px;
-  height: auto;
-  margin: 32px auto 0;
-  opacity: 0;
-  animation: fadeIn 0.4s ease forwards;
-  animation-delay: 1s;
+  gap: 24px;
 }
 
 .aiLoadingCenter {
-  flex: 1;
   display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 20px;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.aiLoadingCenter h1 {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.6px;
 }
 
 .aiLoadingSteps {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--fp-surface);
+  box-shadow: var(--fp-shadow-card);
+  list-style: none;
 }
 
-.aiLoadingCtaWrap {
+.aiLoadingSteps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   opacity: 0;
-  animation: fadeIn 0.4s ease forwards;
-  animation-delay: 1s;
+  animation: aiStepIn 0.4s ease-out forwards;
+}
+
+.aiLoadingStepNumber {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--fp-navy);
+  background: var(--fp-blue-soft);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.aiLoadingSteps strong {
+  color: var(--fp-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.aiLoadingSteps p {
+  margin: 3px 0 0;
+  color: var(--fp-sub);
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.aiLoadingBack {
+  opacity: 0;
+  animation: aiStepIn 0.4s ease-out 1.2s forwards;
 }

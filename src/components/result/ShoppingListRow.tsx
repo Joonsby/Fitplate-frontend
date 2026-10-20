@@ -1,7 +1,7 @@
 // 중복 재료를 합친 장보기 리스트 한 줄입니다.
 import "../common/FoodRow.css";
 import "./ShoppingListRow.css";
-import { Button } from "@toss/tds-mobile";
+import { Button } from "../common/Button";
 import { getShoppingHref } from "../../utils/shoppingHref";
 import type { MealFood, ShoppingListItem } from "../../types/fitplate";
 
@@ -41,8 +41,8 @@ export function ShoppingListRow({ isFavorite, item, onFavoriteFoodToggle }: Shop
           ★
         </button>
         <Button
-          size="medium"
-          variant="weak"
+          size="small"
+          variant="secondary"
           onClick={() => window.open(shoppingHref, "_blank", "noopener,noreferrer")}
         >
           구매하기

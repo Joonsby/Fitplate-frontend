@@ -1,7 +1,60 @@
 /* 앱 최상위 화면의 공통 배경과 높이를 정의합니다. */
 
 .appShell {
+  --app-top-space: max(8px, env(safe-area-inset-top));
+  --app-bottom-space: max(16px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
   min-height: 100vh;
-  color: #191f28;
-  background: #fdfdfd;
+  padding-top: var(--app-top-space);
+  padding-bottom: var(--app-bottom-space);
+  color: var(--fp-ink);
+  background: var(--fp-bg);
+}
+
+.appShell--withBottomNav {
+  --app-bottom-space: calc(96px + env(safe-area-inset-bottom));
+}
+
+.appCenter {
+  box-sizing: border-box;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: var(--fp-bg);
+  text-align: center;
+}
+
+.appCenter h1 {
+  margin: 8px 0 0;
+  color: var(--fp-ink);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.appCenter p {
+  margin: 0 0 12px;
+  color: var(--fp-sub);
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.appCenterIcon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border-radius: 22px;
+  color: var(--fp-error);
+  background: var(--fp-error-soft);
+}
+
+.appCenterIcon svg {
+  width: 32px;
+  height: 32px;
 }

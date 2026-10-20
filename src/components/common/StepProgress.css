@@ -1,0 +1,29 @@
+/* 온보딩 단계 표시 막대를 꾸밉니다. */
+.stepProgress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.stepProgressLabel {
+  flex: 0 0 auto;
+  color: var(--fp-sub);
+  font-size: 13px;
+  font-weight: 600;
+}
+.stepProgressLabel strong {
+  color: var(--fp-blue);
+}
+.stepProgressBar {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 4px;
+  max-width: 96px;
+}
+.stepProgressBar span {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fp-line);
+}
+.stepProgressBar span.isDone {
+  background: linear-gradient(90deg, var(--fp-navy), var(--fp-blue));
+}

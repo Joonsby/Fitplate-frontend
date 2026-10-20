@@ -1,24 +1,26 @@
+// 즐겨찾기한 음식 목록을 보여주고 구매·삭제를 연결합니다.
 import "../../styles/layout.css";
 import "../common/FoodRow.css";
 import "./FavoriteFoodsScreen.css";
 import { useState } from "react";
-import { Button, ConfirmDialog, Skeleton } from "@toss/tds-mobile";
 import { getShoppingHref } from "../../utils/shoppingHref";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
+import { SkeletonList } from "../common/SkeletonList";
+import { ConfirmDialog } from "../common/ConfirmDialog";
+import { Button } from "../common/Button";
+import { CartIcon, StarIcon } from "../common/Icons";
 import type { FavoriteFood } from "../../types/fitplate";
 
 interface FavoriteFoodsScreenProps {
   favoriteFoods: FavoriteFood[];
   isLoading: boolean;
-  onBack: () => void;
   onDelete: (id: number) => void;
 }
 
 export function FavoriteFoodsScreen({
   favoriteFoods,
   isLoading,
-  onBack,
   onDelete,
 }: FavoriteFoodsScreenProps) {
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
@@ -27,48 +29,38 @@ export function FavoriteFoodsScreen({
     <>
       <ConfirmDialog
         open={pendingDeleteId !== null}
-        title="즐겨찾기 삭제"
-        description="이 음식을 즐겨찾기에서 삭제하시겠습니까?"
-        confirmButton={
-          <ConfirmDialog.ConfirmButton
-            onClick={() => {
-              if (pendingDeleteId !== null) {
-                onDelete(pendingDeleteId);
-              }
-              setPendingDeleteId(null);
-            }}
-          >
-            삭제
-          </ConfirmDialog.ConfirmButton>
-        }
-        cancelButton={
-          <ConfirmDialog.CancelButton onClick={() => setPendingDeleteId(null)}>
-            취소
-          </ConfirmDialog.CancelButton>
-        }
-        onClose={() => setPendingDeleteId(null)}
+        title="즐겨찾기에서 뺄까요?"
+        description="식단 결과 화면에서 별을 눌러 다시 추가할 수 있어요."
+        confirmLabel="삭제"
+        onConfirm={() => {
+          if (pendingDeleteId !== null) {
+            onDelete(pendingDeleteId);
+          }
+          setPendingDeleteId(null);
+        }}
+        onCancel={() => setPendingDeleteId(null)}
       />
 
       <section className="screen">
         <ScreenSectionHeader
-          description="자주 사용하는 음식일수록 목록 위에 표시됩니다."
-          step="즐겨찾기"
-          title="즐겨찾기 음식"
+          title="즐겨찾기"
+          description="자주 찾는 음식일수록 위에 보여요."
         />
 
-        <div className="favoriteFoodsContent">
-          {isLoading && favoriteFoods.length === 0 ? (
-            <Skeleton pattern="topListWithIcon" style={{ width: "100%" }} />
-          ) : favoriteFoods.length === 0 ? (
-            <EmptyState
-              title="아직 즐겨찾기한 음식이 없어요"
-              description="결과 화면에서 음식 옆의 별 버튼을 눌러 추가할 수 있습니다."
-            />
-          ) : (
-            <div className="favoriteFoodList">
+        {isLoading && favoriteFoods.length === 0 ? (
+          <SkeletonList />
+        ) : favoriteFoods.length === 0 ? (
+          <EmptyState
+            icon={<StarIcon />}
+            title="아직 즐겨찾기한 음식이 없어요"
+            description="식단 결과에서 음식 옆의 별을 누르면 여기에 모여요."
+          />
+        ) : (
+          <div className="card favoriteFoodCard">
+            <div className="foodList">
               {favoriteFoods.map((food) => (
                 <div className="foodRow" key={food.favoriteFoodId}>
-                  <div>
+                  <div className="foodRowInfo">
                     <strong>{food.name}</strong>
                     <span>
                       {food.amount} · {food.calories} kcal
@@ -76,14 +68,22 @@ export function FavoriteFoodsScreen({
                   </div>
                   <div className="foodRowActions">
                     <Button
-                      size="medium"
-                      onClick={() => window.open(getShoppingHref(food.shoppingCategory, food.shoppingKeyword), "_blank", "noopener,noreferrer")}
+                      size="small"
+                      variant="secondary"
+                      onClick={() =>
+                        window.open(
+                          getShoppingHref(food.shoppingCategory, food.shoppingKeyword),
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
                     >
-                      구매하기
+                      <CartIcon />
+                      구매
                     </Button>
                     <Button
-                      size="medium"
-                      variant="weak"
+                      size="small"
+                      variant="ghost"
                       onClick={() => setPendingDeleteId(food.favoriteFoodId)}
                     >
                       삭제
@@ -92,12 +92,8 @@ export function FavoriteFoodsScreen({
                 </div>
               ))}
             </div>
-          )}
-
-          <Button variant="weak" onClick={onBack}>
-            돌아가기
-          </Button>
-        </div>
+          </div>
+        )}
       </section>
     </>
   );

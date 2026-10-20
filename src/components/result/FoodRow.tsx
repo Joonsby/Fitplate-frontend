@@ -1,6 +1,7 @@
 // 식단 안의 음식 한 줄을 보여주는 컴포넌트입니다.
 import "../common/FoodRow.css";
-import { Button } from "@toss/tds-mobile";
+import { Button } from "../common/Button";
+import { CartIcon, StarIcon } from "../common/Icons";
 import { getShoppingHref } from "../../utils/shoppingHref";
 import type { MealFood } from "../../types/fitplate";
 
@@ -15,7 +16,7 @@ export function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps
 
   return (
     <div className="foodRow">
-      <div>
+      <div className="foodRowInfo">
         <strong>{food.name}</strong>
         <span>
           {food.amount} · {food.calories} kcal
@@ -25,17 +26,19 @@ export function FoodRow({ food, isFavorite, onFavoriteFoodToggle }: FoodRowProps
         <button
           type="button"
           aria-label={`${food.name} 즐겨찾기`}
+          aria-pressed={isFavorite}
           className={isFavorite ? "favoriteFoodButton selected" : "favoriteFoodButton"}
           onClick={() => onFavoriteFoodToggle(food)}
         >
-          ★
+          <StarIcon />
         </button>
         <Button
-          size="medium"
-          variant="weak"
+          size="small"
+          variant="secondary"
           onClick={() => window.open(shoppingHref, "_blank", "noopener,noreferrer")}
         >
-          구매하기
+          <CartIcon />
+          구매
         </Button>
       </div>
     </div>

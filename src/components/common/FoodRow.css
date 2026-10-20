@@ -1,75 +1,82 @@
 /* 음식 행과 즐겨찾기 및 구매 동작의 공통 스타일을 정의합니다. */
 
-.foodRow {
+.foodList {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background : #fff;
-}
-
-.foodRow div {
-  display: flex;
-  flex-direction: row;
-  gap: 3px;
-  min-width: 0;
-}
-
-.foodRow div:first-child{
   flex-direction: column;
 }
 
-.foodRow .foodRowActions{
-  flex-direction: row;
-  gap: 10px;
+.foodRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
 }
 
-.foodRow strong {
-  color: #333d4b;
-  font-size: 14px;
+.foodRow + .foodRow {
+  border-top: 1px solid var(--fp-line);
 }
 
-.foodRow span {
-  color: #8b95a1;
-  font-size: 12px;
+.foodRowInfo {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.foodRowInfo strong {
+  color: var(--fp-ink);
+  font-size: 15px;
+  font-weight: 700;
+  word-break: keep-all;
+}
+
+.foodRowInfo span {
+  color: var(--fp-sub);
+  font-size: 13px;
 }
 
 .foodRowActions {
   display: flex;
-  align-items: center;
   flex: 0 0 auto;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
 }
 
 .favoriteFoodButton {
-  width: 34px;
-  height: 34px;
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #b0b8c1;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  color: var(--fp-placeholder);
+  background: var(--fp-field);
   cursor: pointer;
-  font-size: 15px;
-  font-weight: 800;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    transform 0.12s;
+}
+
+.favoriteFoodButton svg {
+  width: 18px;
+  height: 18px;
 }
 
 .favoriteFoodButton.selected {
-  border-color: #f9c23c;
-  background: #fff7df;
-  color: #f2a900;
+  color: var(--fp-star);
+  background: #fff6dc;
 }
 
-.buyFoodButton {
-  flex: 0 0 auto;
-  min-width: 66px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: #edf6ff;
-  color: #1b64da;
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
+.favoriteFoodButton.selected svg {
+  fill: currentColor;
+}
+
+.favoriteFoodButton:active {
+  transform: scale(0.92);
+}
+
+.favoriteFoodButton:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
 }

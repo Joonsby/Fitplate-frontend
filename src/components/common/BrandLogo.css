@@ -1,0 +1,46 @@
+/* 로고 마크와 워드마크의 크기별 배치를 꾸밉니다. */
+
+.brandLogo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandLogoRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.brandMark {
+  flex: 0 0 auto;
+}
+
+.brandWordmark {
+  color: var(--fp-navy);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.brandWordmark span {
+  color: var(--fp-sky);
+}
+
+.brandLogo--large .brandLogoRow {
+  gap: 10px;
+}
+
+.brandLogo--large .brandWordmark {
+  font-size: 32px;
+  letter-spacing: -1px;
+}
+
+.brandTagline {
+  color: var(--fp-sub);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}

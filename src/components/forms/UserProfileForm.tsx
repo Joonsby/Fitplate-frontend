@@ -1,103 +1,123 @@
-import "../../styles/layout.css";
+// 신체 정보를 자체 입력 UI로 수집하고 목표 선택 단계로 전달합니다.
 import "./UserProfileForm.css";
-import { Button, TextField } from "@toss/tds-mobile";
-import { useState } from "react";
-import type { ChangeEvent } from "react";
-import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
+import { useId, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import type { Gender, UserProfile } from "../../types/fitplate";
+import { Button } from "../common/Button";
+import { ArrowRightIcon } from "../common/Icons";
+import { StepProgress } from "../common/StepProgress";
 
 interface UserProfileFormProps {
   profile: UserProfile;
   onProfileSave: (profile: UserProfile) => void;
   onNext: () => void;
+  mode?: "onboarding" | "edit";
+  startEmpty?: boolean;
 }
 
-type ProfileFieldName = "height" | "weight" | "age" | "bmi" | "bodyFatRate";
-
+type ProfileFieldName = "height" | "weight" | "age" | "bodyFatRate";
 type ProfileFieldValues = Record<ProfileFieldName, string>;
 type ProfileFieldErrors = Partial<Record<ProfileFieldName, string>>;
 
-const NUMBER_TYPE_ERROR_MESSAGE = "숫자만 입력할 수 있어요.";
-const NEGATIVE_NUMBER_ERROR_MESSAGE = "0보다 큰 숫자만 입력할 수 있어요.";
+const PROFILE_FIELDS = [
+  {
+    name: "height",
+    label: "키",
+    unit: "cm",
+    placeholder: "170",
+    optional: false,
+  },
+  {
+    name: "weight",
+    label: "몸무게",
+    unit: "kg",
+    placeholder: "68",
+    optional: false,
+  },
+  {
+    name: "age",
+    label: "나이",
+    unit: "세",
+    placeholder: "30",
+    optional: false,
+  },
+  {
+    name: "bodyFatRate",
+    label: "체지방률",
+    unit: "%",
+    placeholder: "비워도 돼요",
+    optional: true,
+  },
+] as const;
+
+const GENDER_OPTIONS = [
+  { value: "male", label: "남성" },
+  { value: "female", label: "여성" },
+] as const;
 
 function validateNumberField(value: string): string | null {
   const trimmedValue = value.trim();
-
-  if (trimmedValue === "") {
-    return null;
-  }
-
-  if (Number.isNaN(Number(trimmedValue))) {
-    return NUMBER_TYPE_ERROR_MESSAGE;
-  }
-
-  if (Number(trimmedValue) <= 0) {
-    return NEGATIVE_NUMBER_ERROR_MESSAGE;
-  }
-
+  if (trimmedValue === "") return null;
+  if (!Number.isFinite(Number(trimmedValue))) return "숫자만 입력할 수 있어요.";
+  if (Number(trimmedValue) <= 0) return "0보다 큰 숫자만 입력할 수 있어요.";
   return null;
 }
 
-export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileFormProps) {
+export function UserProfileForm({
+  profile,
+  onProfileSave,
+  onNext,
+  mode = "onboarding",
+  startEmpty = false,
+}: UserProfileFormProps) {
+  const isOnboarding = mode === "onboarding";
+  const formId = useId();
   const [selectedGender, setSelectedGender] = useState<Gender>(profile.gender);
-  const [focusedField, setFocusedField] = useState<ProfileFieldName | null>(
-    null,
-  );
   const [fieldValues, setFieldValues] = useState<ProfileFieldValues>({
-    height: String(profile.height),
-    weight: String(profile.weight),
-    age: String(profile.age),
-    bmi: profile.bmi == null ? "" : String(profile.bmi),
-    bodyFatRate:
-      profile.bodyFatRate == null ? "" : String(profile.bodyFatRate),
-  });  
+    height: startEmpty ? "" : String(profile.height),
+    weight: startEmpty ? "" : String(profile.weight),
+    age: startEmpty ? "" : String(profile.age),
+    bodyFatRate: profile.bodyFatRate == null ? "" : String(profile.bodyFatRate),
+  });
   const [fieldErrors, setFieldErrors] = useState<ProfileFieldErrors>({});
 
   const updateNumberField =
-    (fieldName: ProfileFieldName) =>
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (fieldName: ProfileFieldName) => (event: ChangeEvent<HTMLInputElement>) => {
       const nextValue = event.target.value;
-      const nextError = validateNumberField(nextValue);
-
-      setFieldValues((previousValues) => ({
-        ...previousValues,
-        [fieldName]: nextValue,
-      }));
-      setFieldErrors((previousErrors) => ({
-        ...previousErrors,
-        [fieldName]: nextError ?? undefined,
+      setFieldValues((previous) => ({ ...previous, [fieldName]: nextValue }));
+      setFieldErrors((previous) => ({
+        ...previous,
+        [fieldName]: validateNumberField(nextValue) ?? undefined,
       }));
     };
 
-  const focusNumberField =
-    (fieldName: ProfileFieldName) =>
-    () => {
-      setFocusedField(fieldName);
-    };
+  const isProfileValid = PROFILE_FIELDS.every(
+    (field) =>
+      (field.optional || fieldValues[field.name].trim() !== "") &&
+      validateNumberField(fieldValues[field.name]) === null,
+  );
 
-  const blurNumberField = () => {
-    setFocusedField(null);
-  };
-
-  const getTextFieldClassName = (fieldName: ProfileFieldName) =>
-    focusedField === fieldName
-      ? "profileTextField isFocused"
-      : "profileTextField";
-
-  const hasFieldError = Object.values(fieldErrors).some(Boolean);
-  const hasRequiredEmptyField =
-    fieldValues.height.trim() === "" ||
-    fieldValues.weight.trim() === "" ||
-    fieldValues.age.trim() === "";
-  const isProfileValid = !hasFieldError && !hasRequiredEmptyField;
-
-  const handleNext = () => {
+  const handleNext = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!isProfileValid) {
+      setFieldErrors(
+        Object.fromEntries(
+          PROFILE_FIELDS.map((field) => [
+            field.name,
+            !field.optional && fieldValues[field.name].trim() === ""
+              ? "입력해 주세요."
+              : (validateNumberField(fieldValues[field.name]) ?? undefined),
+          ]),
+        ),
+      );
+      return;
+    }
     onProfileSave({
       height: Number(fieldValues.height),
       weight: Number(fieldValues.weight),
       age: Number(fieldValues.age),
       gender: selectedGender,
-      bmi: fieldValues.bmi.trim() === "" ? undefined : Number(fieldValues.bmi),
+      bmi: profile.bmi,
       bodyFatRate:
         fieldValues.bodyFatRate.trim() === ""
           ? undefined
@@ -107,94 +127,110 @@ export function UserProfileForm({ profile, onProfileSave, onNext }: UserProfileF
   };
 
   return (
-    <section className="screen">
-      <ScreenSectionHeader
-        description="키, 몸무게, 나이, 성별을 입력하면 결과 화면에서 목표를 계산합니다."
-        step="1단계"
-        title="신체정보 입력"
-      />
+    <form
+      className="profileForm"
+      onSubmit={handleNext}
+      noValidate
+      aria-labelledby={`${formId}-title`}
+    >
+      <header className="profileFormHeader">
+        {isOnboarding ? (
+          <StepProgress current={1} total={2} />
+        ) : null}
+        <h1 id={`${formId}-title`}>
+          {isOnboarding ? (
+            <>
+              내 몸 정보를
+              <br />
+              알려주세요
+            </>
+          ) : (
+            "내 정보"
+          )}
+        </h1>
+        <p>
+          {isOnboarding
+            ? "하루 칼로리와 영양소 목표를 계산하는 데 사용해요."
+            : "바꾼 정보는 다음 식단을 만들 때 반영돼요."}
+        </p>
+      </header>
 
-      <div className="fieldGroup">
-        <TextField
-          containerProps={{ className: getTextFieldClassName("height") }}
-          hasError={fieldErrors.height != null}
-          help={fieldErrors.height}
-          label="키"
-          labelOption="sustain"
-          placeholder="키를 입력하세요"
-          suffix="cm"
-          value={fieldValues.height}
-          variant="box"
-          onBlur={blurNumberField}
-          onChange={updateNumberField("height")}
-          onFocus={focusNumberField("height")}
-        />
-        <TextField
-          containerProps={{ className: getTextFieldClassName("weight") }}
-          hasError={fieldErrors.weight != null}
-          help={fieldErrors.weight}
-          label="몸무게"
-          labelOption="sustain"
-          placeholder="몸무게를 입력하세요"
-          suffix="kg"
-          value={fieldValues.weight}
-          variant="box"
-          onBlur={blurNumberField}
-          onChange={updateNumberField("weight")}
-          onFocus={focusNumberField("weight")}
-        />
-        <TextField
-          containerProps={{ className: getTextFieldClassName("age") }}
-          hasError={fieldErrors.age != null}
-          help={fieldErrors.age}
-          label="나이"
-          labelOption="sustain"
-          placeholder="나이를 입력하세요"
-          suffix="세"
-          value={fieldValues.age}
-          variant="box"
-          onBlur={blurNumberField}
-          onChange={updateNumberField("age")}
-          onFocus={focusNumberField("age")}
-        />
-        <TextField
-          containerProps={{
-            className: getTextFieldClassName("bodyFatRate"),
-          }}
-          hasError={fieldErrors.bodyFatRate != null}
-          help={fieldErrors.bodyFatRate}
-          label="체지방률(선택)"
-          labelOption="sustain"
-          placeholder="체지방률을 입력하세요"
-          suffix="%"
-          value={fieldValues.bodyFatRate}
-          variant="box"
-          onBlur={blurNumberField}
-          onChange={updateNumberField("bodyFatRate")}
-          onFocus={focusNumberField("bodyFatRate")}
-        />
-      </div>
+      <section className="profileCard" aria-label="신체 정보 입력">
+        <fieldset className="profileGender">
+          <legend>성별</legend>
+          <div
+            className={`profileSegment${selectedGender === "female" ? " isSecond" : ""}`}
+          >
+            <span className="profileSegmentThumb" aria-hidden="true" />
+            {GENDER_OPTIONS.map((option) => (
+              <button
+                type="button"
+                key={option.value}
+                className={selectedGender === option.value ? "isSelected" : ""}
+                aria-pressed={selectedGender === option.value}
+                onClick={() => setSelectedGender(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
-      <div className="choiceGroup" aria-label="성별 선택">
-        <Button
-          variant={selectedGender === "male" ? "fill" : "weak"}
-          onClick={() => setSelectedGender("male")}
-        >
-          남성
-        </Button>
-        <Button
-          variant={selectedGender === "female" ? "fill" : "weak"}
-          onClick={() => setSelectedGender("female")}
-        >
-          여성
-        </Button>
-      </div>
+        <div className="profileFieldGrid">
+          {PROFILE_FIELDS.map((field) => {
+            const inputId = `${formId}-${field.name}`;
+            const error = fieldErrors[field.name];
+            return (
+              <div className="profileField" key={field.name}>
+                <label htmlFor={inputId}>
+                  {field.label}
+                  {field.optional ? (
+                    <span className="profileOptional">선택</span>
+                  ) : null}
+                </label>
+                <div className={`profileInputWrap${error ? " hasError" : ""}`}>
+                  <input
+                    id={inputId}
+                    name={field.name}
+                    type="text"
+                    inputMode={field.name === "age" ? "numeric" : "decimal"}
+                    autoComplete="off"
+                    required={!field.optional}
+                    placeholder={field.placeholder}
+                    value={fieldValues[field.name]}
+                    onChange={updateNumberField(field.name)}
+                    aria-invalid={error != null}
+                    aria-describedby={error ? `${inputId}-error` : undefined}
+                  />
+                  <span className="profileUnit" aria-hidden="true">
+                    {field.unit}
+                  </span>
+                </div>
+                {error ? (
+                  <span
+                    className="profileFieldError"
+                    id={`${inputId}-error`}
+                    role="alert"
+                  >
+                    {error}
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
-      <div className="selectGroup">
-        <Button disabled={!isProfileValid} onClick={handleNext}>
-          목표 선택하기
-        </Button>
-      </div>
-    </section>
+      <Button className="profileSubmit" type="submit" block>
+        {isOnboarding ? (
+          <>
+            목표 선택하러 가기
+            <ArrowRightIcon />
+          </>
+        ) : (
+          "저장하기"
+        )}
+      </Button>
+    </form>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ConfirmDialog } from "@toss/tds-mobile";
+import { ConfirmDialog } from "../components/common/ConfirmDialog";
 import { useToast } from "../hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { SavedMealPlansScreen } from "../components/screens/SavedMealPlansScreen";
@@ -13,7 +13,7 @@ interface SavedMealPlansPageProps {
     React.SetStateAction<SavedMealPlan | null>
   >;
   isLoading: boolean;
-  onBack: () => void;
+  onCreate: () => void;
 }
 
 export function SavedMealPlansPage({
@@ -21,7 +21,7 @@ export function SavedMealPlansPage({
   setSavedMealPlans,
   setViewingSavedMealPlan,
   isLoading,
-  onBack,
+  onCreate,
 }: SavedMealPlansPageProps) {
   const navigate = useNavigate();
   const { showToast, toastElement } = useToast();
@@ -77,20 +77,16 @@ export function SavedMealPlansPage({
       {toastElement}
       <ConfirmDialog
         open={confirmOpen}
-        title={<ConfirmDialog.Title>저장된 식단을 삭제하시겠습니까?</ConfirmDialog.Title>}
-        description={
-          <ConfirmDialog.Description>
-            {'식단을 삭제 하시면 되돌릴수 없습니다.'}
-          </ConfirmDialog.Description>
-        }
-        cancelButton={<ConfirmDialog.CancelButton onClick={handleCancelDelete}>취소</ConfirmDialog.CancelButton>}
-        confirmButton={<ConfirmDialog.ConfirmButton onClick={() => void handleConfirmDelete()}>확인</ConfirmDialog.ConfirmButton>}
-        onClose={handleCancelDelete}
+        title="저장된 식단을 삭제할까요?"
+        description="삭제한 식단은 되돌릴 수 없어요."
+        confirmLabel="삭제"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={handleCancelDelete}
       />
       <SavedMealPlansScreen
         savedMealPlans={savedMealPlans}
         isLoading={isLoading}
-        onBack={onBack}
+        onCreate={onCreate}
         onDelete={handleDeleteSavedMealPlan}
         onView={handleViewSavedMealPlan}
       />

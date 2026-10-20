@@ -2,14 +2,18 @@
 import "./MetricItem.css";
 export interface MetricItemProps {
   label: string;
+  abbr?: string;
   value: number;
   unit: string;
 }
 
-export function MetricItem({ label, value, unit }: MetricItemProps) {
+export function MetricItem({ label, abbr, value, unit }: MetricItemProps) {
   return (
     <div className="metricItem">
-      <span>{label}</span>
+      <span>
+        {label}
+        {abbr ? <em> {abbr}</em> : null}
+      </span>
       <strong>
         {value.toLocaleString()} {unit}
       </strong>

@@ -1,0 +1,168 @@
+/* 식단 만들기 탭의 대표 카드와 내 정보 요약, 최근 식단 카드를 꾸밉니다. */
+
+.createHero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  padding: 22px 20px 20px;
+  border-radius: 24px;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--fp-navy) 0%, var(--fp-blue) 70%, var(--fp-sky) 100%);
+  box-shadow: 0 14px 32px rgba(23, 56, 143, 0.25);
+}
+
+.createHero::after {
+  position: absolute;
+  top: -48px;
+  right: -40px;
+  width: 168px;
+  height: 168px;
+  border: 22px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  content: "";
+}
+
+.createHeroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.createHeroBadge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.createHero strong {
+  margin-top: 14px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.5px;
+}
+
+.createHero p {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+}
+
+.createHeroButton {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 54px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 16px;
+  color: var(--fp-navy);
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(10, 30, 80, 0.18);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+
+.createHeroButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+.createHeroButton:active {
+  transform: scale(0.98);
+}
+
+.createHeroButton:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7) !important;
+  outline-offset: 2px;
+}
+
+.profileSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 18px 8px;
+}
+
+.profileSummary div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.profileSummary div + div {
+  border-left: 1px solid var(--fp-line);
+}
+
+.profileSummary dt {
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.profileSummary dd {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.profileSummary dd span {
+  margin-left: 2px;
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.recentPlan {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recentPlanText {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recentPlanText strong {
+  color: var(--fp-ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.recentPlanText span {
+  color: var(--fp-sub);
+  font-size: 13px;
+}
+
+.recentPlanChevron {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--fp-placeholder);
+}

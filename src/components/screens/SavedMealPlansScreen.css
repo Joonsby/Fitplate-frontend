@@ -1,61 +1,82 @@
 /* 저장된 식단 목록과 카드 동작을 꾸밉니다. */
 
 .savedPlanCard {
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background: #ffffff;
+  padding: 0;
+  overflow: hidden;
 }
 
-.savedPlanList {
+.savedPlanMain {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 12px;
-}
-
-.savedPlanCard {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 16px;
-}
-
-.savedPlanCard strong {
-  color: #333d4b;
-  font-size: 16px;
-}
-
-.savedPlanCard p {
-  margin: 6px 0 0;
-  color: #8b95a1;
-  font-size: 13px;
-}
-
-.savedPlanCard span {
-  display: block;
-  margin-top: 6px;
-  color: #4e5968;
-  font-size: 13px;
-}
-
-.savedPlanActions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.savedPlanActions button {
-  min-height: 40px;
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #333d4b;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 18px 16px 14px 18px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
-  font-size: 14px;
+}
+
+.savedPlanMain:focus-visible {
+  outline: 3px solid rgba(47, 127, 224, 0.35) !important;
+  outline-offset: -3px;
+}
+
+.savedPlanText {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.savedPlanText strong {
+  color: var(--fp-ink);
+  font-size: 16px;
   font-weight: 700;
 }
 
-.savedPlanActions button:first-child {
-  border-color: #3182f6;
-  background: #edf6ff;
-  color: #1b64da;
+.savedPlanText span {
+  color: var(--fp-sub);
+  font-size: 13px;
+}
+
+.savedPlanChevron {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--fp-placeholder);
+}
+
+.savedPlanFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 18px;
+  padding: 6px 0 8px;
+  border-top: 1px solid var(--fp-line);
+}
+
+.savedPlanFooter > span {
+  color: var(--fp-sub);
+  font-size: 13px;
+}
+
+.savedPlanDelete {
+  min-height: 36px;
+  padding: 0 4px;
+  border: 0;
+  color: var(--fp-sub);
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.savedPlanDelete:active {
+  color: var(--fp-error);
 }

@@ -3,13 +3,20 @@ import "./MacroItem.css";
 export interface MacroItemProps {
   label: string;
   value: number;
+  tone: "carbs" | "protein" | "fat";
 }
 
-export function MacroItem({ label, value }: MacroItemProps) {
+export function MacroItem({ label, value, tone }: MacroItemProps) {
   return (
     <div className="macroItem">
-      <span>{label}</span>
-      <strong>{value}g</strong>
+      <span>
+        <i className={`macroTone--${tone}`} aria-hidden="true" />
+        {label}
+      </span>
+      <strong>
+        {value}
+        <small>g</small>
+      </strong>
     </div>
   );
 }

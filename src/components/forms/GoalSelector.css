@@ -1,83 +1,120 @@
-/* 목표 선택 카드와 식단 기간 선택 영역을 꾸밉니다. */
+/* 목표 선택 카드와 식단 생성 버튼을 꾸밉니다. */
 
-.goalSelectorScreen {
-  gap: 12px;
+.goalScreen {
+  min-height: calc(
+    100svh - 56px - var(--app-top-space, 0px) - var(--app-bottom-space, 0px)
+  );
 }
 
 .goalList {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.goalList{
-  padding: 0 24px;
+  margin-top: 4px;
 }
 
 .goalCard {
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #333d4b;
-  cursor: pointer;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 18px;
-  text-align: left;
+  align-items: center;
+  gap: 14px;
+  box-sizing: border-box;
   width: 100%;
-}
-
-.goalCard.selected {
-  border-color: #3182f6;
-  background: #edf6ff;
-}
-
-.goalCard strong {
-  font-size: 18px;
-}
-
-.goalCard span {
-  color: #6b7684;
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.durationPanel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding:0 24px;
-}
-
-.durationPanel h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.durationButtons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.durationButton {
-  min-height: 44px;
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #4e5968;
+  padding: 18px 16px;
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  color: var(--fp-ink);
+  background: var(--fp-surface);
+  box-shadow: var(--fp-shadow-card);
+  font: inherit;
+  text-align: left;
   cursor: pointer;
-  font-size: 15px;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.goalCard.isSelected {
+  border-color: var(--fp-blue);
+  background: #f7faff;
+}
+.goalCard:focus-visible {
+  outline: 3px solid rgba(47, 127, 224, 0.35) !important;
+  outline-offset: 2px;
+}
+
+.goalIcon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+.goalIcon svg {
+  width: 22px;
+  height: 22px;
+}
+.goalCard.isSelected .goalIcon {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--fp-navy), var(--fp-blue));
+}
+
+.goalText {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+}
+.goalText strong {
+  font-size: 17px;
   font-weight: 700;
 }
-
-.durationButton.selected {
-  border-color: #3182f6;
-  background: #edf6ff;
-  color: #1b64da;
+.goalText span {
+  color: var(--fp-sub);
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: keep-all;
 }
 
-.durationButton:disabled {
-  cursor: default;
+.goalKcal {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+.goalKcal strong {
+  color: var(--fp-ink);
+  font-size: 17px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.goalCard.isSelected .goalKcal strong {
+  color: var(--fp-navy);
+}
+
+.goalNote {
+  margin: -6px 0 0;
+  color: var(--fp-sub);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.goalSubmit {
+  margin-top: auto;
+}
+
+.goalAdChip {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 12px;
+  font-weight: 700;
 }

@@ -1,34 +1,86 @@
 /* 목표 열량과 영양 지표의 배치를 정의합니다. */
 
+.nutritionPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .caloriePanel {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 22px;
-  border-radius: 8px;
-  background: rgba(100, 168, 255, 0.15);
-  border:1px solid #e5e8eb
+  padding: 20px;
+  border-radius: 24px;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--fp-navy) 0%, var(--fp-blue) 75%, var(--fp-sky) 100%);
+  box-shadow: 0 14px 32px rgba(23, 56, 143, 0.22);
 }
 
-.caloriePanel span {
+.caloriePanel > span {
+  color: rgba(255, 255, 255, 0.82);
   font-size: 14px;
+  font-weight: 600;
 }
 
-.caloriePanel strong {
-  font-size: 32px;
+.caloriePanel > strong {
+  margin-top: 4px;
+  font-size: 36px;
+  font-weight: 800;
   line-height: 1.15;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
 }
 
-.metricGrid,
-.macroGrid {
-  display: grid;
-  gap: 4px;
+.caloriePanel > strong small {
+  margin-left: 4px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .metricGrid {
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.macroCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+}
+
+.macroBar {
+  display: flex;
+  overflow: hidden;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--fp-field);
+}
+
+.macroBar span + span {
+  margin-left: 2px;
 }
 
 .macroGrid {
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.macroTone--carbs {
+  --macro-color: #e8a317;
+  background: var(--macro-color);
+}
+
+.macroTone--protein {
+  --macro-color: var(--fp-blue);
+  background: var(--macro-color);
+}
+
+.macroTone--fat {
+  --macro-color: #1fa28a;
+  background: var(--macro-color);
 }

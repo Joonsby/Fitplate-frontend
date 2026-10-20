@@ -1,0 +1,59 @@
+/* 본문과 안전 영역을 구분하는 네 개의 하단 메뉴를 꾸밉니다. */
+.appBottomBar {
+  position: fixed;
+  z-index: 20;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: 50%;
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 448px;
+  padding: 7px 6px;
+  border: 1px solid #e6ebf2;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(22, 53, 122, 0.08);
+  transform: translateX(-50%);
+}
+
+.appBottomNav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.appBottomNav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 5px 2px;
+  border: 0;
+  border-radius: 13px;
+  color: #5f6b7a;
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.appBottomNav svg {
+  width: 21px;
+  height: 21px;
+}
+.appBottomNav button:hover {
+  background: #f4f7fb;
+}
+.appBottomNav button.isActive {
+  color: #17388f;
+  background: #eaf2fc;
+  font-weight: 700;
+}
+.appBottomNav button:focus-visible {
+  outline: 2px solid #2f7fe0 !important;
+  outline-offset: 1px;
+}

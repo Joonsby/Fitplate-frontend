@@ -1,41 +1,49 @@
-/* 앱 상단 로고와 메뉴 바로가기를 꾸밉니다. */
+/* 앱 상단의 브랜드 표시와 뒤로 가기 막대를 꾸밉니다. */
 
-.appTopTitle,
-.appTopSubtitle {
+.homeTopBar {
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
-  width: 100%;
-  text-align: center;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  padding: 8px 20px;
 }
 
-.appTopTitle {
-  padding-top: 6px;
-}
-
-.appTopSubtitle {
-  margin: 8px auto 0;
-  color: #333d4b;
-  font-size: 17px;
-  font-weight: 800;
-  line-height: 1.38;
-  letter-spacing: 0;
-  word-break: keep-all;
-}
-
-.appLogo {
-  display: block;
-  width: 132px;
-  height: auto;
-  object-fit: contain;
-}
-
-.savedPlansShortcut,
-.topShortcutGrid {
-  padding: 8px 24px;
-}
-
-.topShortcutGrid {
+.topBackButton {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  width: 40px;
+  height: 40px;
+  margin-left: -10px;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  color: var(--fp-ink);
+  background: transparent;
+  cursor: pointer;
+}
+
+.topBackButton:active {
+  background: var(--fp-field);
+}
+
+.topBackButton:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
+}
+
+.topBackButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+.topBarTitle {
+  color: var(--fp-ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+@media (max-width: 350px) {
+  .homeTopBar {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
 }

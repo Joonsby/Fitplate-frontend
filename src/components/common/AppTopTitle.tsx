@@ -1,41 +1,28 @@
+// 앱 상단 막대 — 탭 화면에서는 브랜드를, 흐름 화면에서는 뒤로 가기와 제목을 보여줍니다.
 import "./AppTopTitle.css";
-import { Top,Button } from "@toss/tds-mobile";
-import logoImage from "../../assets/images/logo.png";
+import { ChevronLeftIcon } from "./Icons";
+import { BrandLogo } from "./BrandLogo";
 
 interface AppTopTitleProps {
-  isResultPage: boolean;
-  isAiLoading: boolean;
-  onSavedPlansClick: () => void;
-  onFavoriteFoodsClick: () => void;
+  title?: string;
+  onBack?: () => void;
 }
 
-export function AppTopTitle({ isResultPage, isAiLoading, onSavedPlansClick, onFavoriteFoodsClick }: AppTopTitleProps) {
-  if (isResultPage && isAiLoading) {
-    return null;
+export function AppTopTitle({ title, onBack }: AppTopTitleProps) {
+  if (onBack) {
+    return (
+      <header className="homeTopBar">
+        <button type="button" className="topBackButton" onClick={onBack} aria-label="뒤로 가기">
+          <ChevronLeftIcon />
+        </button>
+        {title ? <span className="topBarTitle">{title}</span> : null}
+      </header>
+    );
   }
 
   return (
-    <>
-      <Top
-        title={
-          <div className="appTopTitle">
-            <img className="appLogo" src={logoImage} alt="fitplate" />
-          </div>
-        }
-        subtitleBottom={
-          <div className="appTopSubtitle">
-            신체정보와 목표로 하루 식단 기준을 확인하세요
-          </div>
-        }
-      />
-      <div className="topShortcutGrid">
-        <Button color="primary" variant="weak" onClick={onSavedPlansClick}>
-          저장된 식단
-        </Button>
-        <Button color="primary" variant="weak" onClick={onFavoriteFoodsClick}>
-          즐겨찾기 음식
-        </Button>
-      </div>
-    </>
+    <header className="homeTopBar">
+      <BrandLogo />
+    </header>
   );
 }

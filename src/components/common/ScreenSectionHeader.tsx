@@ -1,11 +1,11 @@
+// 화면 맨 위의 작은 안내 문구, 제목, 설명을 같은 모양으로 보여줍니다.
 import "./ScreenSectionHeader.css";
-import { Post } from "@toss/tds-mobile";
 import type { ReactNode } from "react";
 
 interface ScreenSectionHeaderProps {
-  step: string;
-  title: string;
-  description: string;
+  step?: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
   className?: string;
   children?: ReactNode;
 }
@@ -18,15 +18,11 @@ export function ScreenSectionHeader({
   children,
 }: ScreenSectionHeaderProps) {
   return (
-    <div className={`sectionHeader ${className}`.trim()}>
-      <Post.H3 color="#3182f6" typography="t7">
-        {step}
-      </Post.H3>
-      <Post.H3>{title}</Post.H3>
-      <Post.Paragraph color="#4a5568" typography="t7">
-        {description}
-      </Post.Paragraph>
+    <header className={`sectionHeader ${className}`.trim()}>
+      {step ? <div className="sectionHeaderStep">{step}</div> : null}
+      <h1>{title}</h1>
+      {description ? <p>{description}</p> : null}
       {children}
-    </div>
+    </header>
   );
 }

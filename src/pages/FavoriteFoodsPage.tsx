@@ -8,14 +8,12 @@ interface FavoriteFoodsPageProps {
   favoriteFoods: FavoriteFood[];
   setFavoriteFoods: React.Dispatch<React.SetStateAction<FavoriteFood[]>>;
   isLoading: boolean;
-  onBack: () => void;
 }
 
 export function FavoriteFoodsPage({
   favoriteFoods,
   setFavoriteFoods,
   isLoading,
-  onBack,
 }: FavoriteFoodsPageProps) {
   const { showToast, toastElement } = useToast();
 
@@ -51,7 +49,6 @@ export function FavoriteFoodsPage({
       <FavoriteFoodsScreen
         favoriteFoods={favoriteFoods}
         isLoading={isLoading}
-        onBack={onBack}
         onDelete={handleDeleteFavoriteFood}
       />
     </>

@@ -1,0 +1,34 @@
+/* 목표 열량과 영양 지표의 배치를 정의합니다. */
+
+.caloriePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 8px;
+  background: rgba(100, 168, 255, 0.15);
+  border:1px solid #e5e8eb
+}
+
+.caloriePanel span {
+  font-size: 14px;
+}
+
+.caloriePanel strong {
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.metricGrid,
+.macroGrid {
+  display: grid;
+  gap: 4px;
+}
+
+.metricGrid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.macroGrid {
+  grid-template-columns: repeat(3, 1fr);
+}

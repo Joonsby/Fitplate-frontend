@@ -1,4 +1,5 @@
 // 식단 안의 음식 한 줄을 보여주는 컴포넌트입니다.
+import "../common/FoodRow.css";
 import { Button } from "@toss/tds-mobile";
 import { getShoppingHref } from "../../utils/shoppingHref";
 import type { MealFood } from "../../types/fitplate";

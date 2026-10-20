@@ -1,4 +1,6 @@
 // 하루치 식단을 카드로 보여주는 컴포넌트입니다.
+import "./MealCard.css";
+import "./DayMealCard.css";
 import { FoodRow } from "./FoodRow";
 import type { DayMeal, MealFood } from "../../types/fitplate";
 

@@ -1,0 +1,61 @@
+/* 저장된 식단 목록과 카드 동작을 꾸밉니다. */
+
+.savedPlanCard {
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.savedPlanList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.savedPlanCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.savedPlanCard strong {
+  color: #333d4b;
+  font-size: 16px;
+}
+
+.savedPlanCard p {
+  margin: 6px 0 0;
+  color: #8b95a1;
+  font-size: 13px;
+}
+
+.savedPlanCard span {
+  display: block;
+  margin-top: 6px;
+  color: #4e5968;
+  font-size: 13px;
+}
+
+.savedPlanActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.savedPlanActions button {
+  min-height: 40px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #333d4b;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.savedPlanActions button:first-child {
+  border-color: #3182f6;
+  background: #edf6ff;
+  color: #1b64da;
+}

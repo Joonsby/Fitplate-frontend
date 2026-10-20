@@ -1,4 +1,6 @@
 // 중복 재료를 합친 장보기 리스트 한 줄입니다.
+import "../common/FoodRow.css";
+import "./ShoppingListRow.css";
 import { Button } from "@toss/tds-mobile";
 import { getShoppingHref } from "../../utils/shoppingHref";
 import type { MealFood, ShoppingListItem } from "../../types/fitplate";

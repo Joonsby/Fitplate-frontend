@@ -1,4 +1,5 @@
 // 리스트가 비어있을 때 보여주는 안내 컴포넌트입니다.
+import "./EmptyState.css";
 export interface EmptyStateProps {
   title: string;
   description: string;

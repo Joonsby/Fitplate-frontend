@@ -1,0 +1,24 @@
+/* 신체 정보 입력과 성별 선택 영역을 꾸밉니다. */
+
+.numberField {
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 0 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.choiceGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 16px 24px 24px;
+}
+
+.selectGroup {
+  display: grid;
+  padding: 8px 24px 24px;
+}

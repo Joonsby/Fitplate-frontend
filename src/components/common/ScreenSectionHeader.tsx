@@ -1,3 +1,4 @@
+import "./ScreenSectionHeader.css";
 import { Post } from "@toss/tds-mobile";
 import type { ReactNode } from "react";
 

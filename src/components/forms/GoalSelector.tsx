@@ -1,3 +1,5 @@
+import "../../styles/layout.css";
+import "./GoalSelector.css";
 import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_DESCRIPTIONS, GOAL_LABELS } from "../../types/fitplate";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";

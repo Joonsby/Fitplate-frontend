@@ -1,3 +1,6 @@
+import "../../styles/layout.css";
+import "../common/FoodRow.css";
+import "./FavoriteFoodsScreen.css";
 import { useState } from "react";
 import { Button, ConfirmDialog, Skeleton } from "@toss/tds-mobile";
 import { getShoppingHref } from "../../utils/shoppingHref";

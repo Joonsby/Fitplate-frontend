@@ -1,4 +1,5 @@
 // BMR, TDEE처럼 계산 과정의 중간값을 보여주는 작은 컴포넌트입니다.
+import "./MetricItem.css";
 export interface MetricItemProps {
   label: string;
   value: number;

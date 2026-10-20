@@ -1,4 +1,5 @@
 // AI 식단 생성 완전 실패 시 보여주는 전체 화면 컴포넌트입니다.
+import "./AiMealPlanFailureScreen.css";
 import { Button } from "@toss/tds-mobile";
 import { NutritionPanel } from "../common/NutritionPanel";
 import type { NutritionTarget } from "../../types/fitplate";

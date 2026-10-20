@@ -1,0 +1,41 @@
+/* 앱 상단 로고와 메뉴 바로가기를 꾸밉니다. */
+
+.appTopTitle,
+.appTopSubtitle {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+}
+
+.appTopTitle {
+  padding-top: 6px;
+}
+
+.appTopSubtitle {
+  margin: 8px auto 0;
+  color: #333d4b;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.38;
+  letter-spacing: 0;
+  word-break: keep-all;
+}
+
+.appLogo {
+  display: block;
+  width: 132px;
+  height: auto;
+  object-fit: contain;
+}
+
+.savedPlansShortcut,
+.topShortcutGrid {
+  padding: 8px 24px;
+}
+
+.topShortcutGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}

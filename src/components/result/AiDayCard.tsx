@@ -1,4 +1,5 @@
 // 통합된 DayMeal에서 AI 식사명을 읽어 하루 식단을 요약합니다.
+import "./AiDayCard.css";
 import type { DayMeal } from "../../types/fitplate";
 
 export interface AiDayCardProps {

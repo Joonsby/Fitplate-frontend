@@ -1,3 +1,5 @@
+import "../../styles/layout.css";
+import "./ResultScreen.css";
 import { useNavigate } from "react-router-dom";
 import { Button, Post } from "@toss/tds-mobile";
 import { GOAL_LABELS } from "../../types/fitplate";

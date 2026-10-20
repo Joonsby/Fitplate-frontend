@@ -1,3 +1,5 @@
+import "./MealCard.css";
+import "./AiMealPlanPanel.css";
 import { useNavigate } from "react-router-dom";
 import { Button, Loader, BottomCTA, Stepper, StepperRow } from "@toss/tds-mobile";
 import logo from "../../assets/images/logo.png";

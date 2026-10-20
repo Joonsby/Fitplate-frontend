@@ -1,0 +1,21 @@
+/* 기초대사량과 에너지 소비량 지표를 꾸밉니다. */
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.metricItem span {
+  color: #6b7684;
+  font-size: 13px;
+}
+
+.metricItem strong {
+  font-size: 19px;
+}

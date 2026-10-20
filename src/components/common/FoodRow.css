@@ -1,0 +1,75 @@
+/* 음식 행과 즐겨찾기 및 구매 동작의 공통 스타일을 정의합니다. */
+
+.foodRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background : #fff;
+}
+
+.foodRow div {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  min-width: 0;
+}
+
+.foodRow div:first-child{
+  flex-direction: column;
+}
+
+.foodRow .foodRowActions{
+  flex-direction: row;
+  gap: 10px;
+}
+
+.foodRow strong {
+  color: #333d4b;
+  font-size: 14px;
+}
+
+.foodRow span {
+  color: #8b95a1;
+  font-size: 12px;
+}
+
+.foodRowActions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.favoriteFoodButton {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #b0b8c1;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.favoriteFoodButton.selected {
+  border-color: #f9c23c;
+  background: #fff7df;
+  color: #f2a900;
+}
+
+.buyFoodButton {
+  flex: 0 0 auto;
+  min-width: 66px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #edf6ff;
+  color: #1b64da;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}

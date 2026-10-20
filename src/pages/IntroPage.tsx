@@ -1,4 +1,5 @@
 // 로그인 전에 Fitplate의 주요 가치를 소개하는 인트로 화면
+import "./IntroPage.css";
 import { Button } from "@toss/tds-mobile";
 import logoImage from "../assets/images/logo.png";
 import mealPlanPreviewImage from "../assets/images/intro-meal-plan-preview.png";

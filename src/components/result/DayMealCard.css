@@ -1,0 +1,94 @@
+/* 하루 식단 카드와 일차별 탐색 영역을 꾸밉니다. */
+
+.mealListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mealListHeader h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.mealListHeader span {
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dayMealCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dayMealHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+}
+
+.dayMealHeader strong {
+  font-size: 17px;
+}
+
+.dayMealHeader span {
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dayMealSwiper,
+.dayMealSwiperContainer,
+.dayMealSwiperContainer .swiper-wrapper,
+.dayMealSwiperContainer .swiper-slide {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.dayMealSwiper {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.dayMealSwiperContainer {
+  overflow: hidden;
+}
+
+.dayMealSwiperContainer .swiper-slide {
+  min-width: 0;
+  height: auto !important;
+}
+
+.dayMealSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #f7fbff;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.dayMealSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dayMealSectionHeader strong {
+  font-size: 17px;
+}
+
+.dayMealSectionHeader span {
+  color: #6b7684;
+  font-size: 13px;
+  font-weight: 700;
+}

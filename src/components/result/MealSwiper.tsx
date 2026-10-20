@@ -1,4 +1,6 @@
 // 한 일차 안의 아침·점심·저녁을 좌우 Swiper로 탐색하는 컴포넌트입니다.
+import "./MealCard.css";
+import "./MealSwiper.css";
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";

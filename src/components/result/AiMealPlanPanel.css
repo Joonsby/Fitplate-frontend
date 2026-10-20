@@ -1,0 +1,127 @@
+/* AI 식단 결과와 생성 대기 화면 및 애니메이션을 꾸밉니다. */
+
+.aiPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid #d6e8ff;
+  border-radius: 8px;
+  background: #f7fbff;
+}
+
+.aiPanel.error {
+  border-color: #ffd6d9;
+  background: #fff7f8;
+}
+
+.aiPanel h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.aiPanel p {
+  margin: 0;
+  color: #4e5968;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.aiPanelHeader {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.aiPanelHeader span {
+  flex: 0 0 auto;
+  color: #3182f6;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.aiMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.aiMetaGrid div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #ffffff;
+  border : 1px solid #e5e8eb
+}
+
+.aiMetaGrid span {
+  color: #8b95a1;
+  font-size: 11px;
+}
+
+.aiMetaGrid strong {
+  color: #333d4b;
+  font-size: 13px;
+}
+
+.aiDayList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.aiCautionList {
+  margin: 0;
+  padding-left: 18px;
+  color: #6b7684;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.aiLoadingShell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.aiLoadingLogo {
+  display: block;
+  width: 132px;
+  height: auto;
+  margin: 32px auto 0;
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+  animation-delay: 1s;
+}
+
+.aiLoadingCenter {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aiLoadingSteps {
+  display: flex;
+  flex-direction: column;
+}
+
+.aiLoadingCtaWrap {
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+  animation-delay: 1s;
+}

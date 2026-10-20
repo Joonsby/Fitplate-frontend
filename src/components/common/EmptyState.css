@@ -1,0 +1,23 @@
+/* 데이터가 없는 화면의 안내 영역을 꾸밉니다. */
+
+.emptySavedList {
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.emptySavedList {
+  padding: 24px 18px;
+  text-align: center;
+}
+
+.emptySavedList strong {
+  color: #333d4b;
+  font-size: 17px;
+}
+
+.emptySavedList p {
+  margin: 8px 0 0;
+  color: #8b95a1;
+  font-size: 14px;
+}

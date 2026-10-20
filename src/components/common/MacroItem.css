@@ -1,0 +1,21 @@
+/* 탄수화물과 단백질 및 지방 지표를 꾸밉니다. */
+
+.macroItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.macroItem span {
+  color: #6b7684;
+  font-size: 13px;
+}
+
+.macroItem strong {
+  font-size: 19px;
+}

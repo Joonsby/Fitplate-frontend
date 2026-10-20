@@ -1,0 +1,13 @@
+/* 하루 식단의 간단한 요약 카드를 꾸밉니다. */
+
+.aiDayCard {
+  padding: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  border : 1px solid #e5e8eb
+}
+
+.aiDayCard p {
+  margin-top: 8px;
+  font-size: 13px;
+}

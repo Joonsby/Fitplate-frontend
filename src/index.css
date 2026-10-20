@@ -20,3 +20,23 @@ body {
     background-color: #f5f5f5 !important;
   }
 }
+
+/* 문서 전체의 기본 스타일과 앱 표시 영역을 정의합니다. */
+
+button:focus{
+  outline: none !important;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+@media (min-width: 481px) {
+  #root {
+    background-color: #ffffff !important;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}

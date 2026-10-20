@@ -1,3 +1,5 @@
+import "../../styles/layout.css";
+import "./UserProfileForm.css";
 import { Button, TextField } from "@toss/tds-mobile";
 import { useState } from "react";
 import type { ChangeEvent } from "react";

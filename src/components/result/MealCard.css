@@ -1,0 +1,37 @@
+/* 여러 식단 컴포넌트가 공유하는 끼니 카드와 음식 목록 배치를 정의합니다. */
+
+.mealList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mealCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mealCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mealCardHeader strong {
+  font-size: 16px;
+}
+
+.mealCardHeader span {
+  flex: 0 0 auto;
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.foodList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

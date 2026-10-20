@@ -1,0 +1,21 @@
+/* 여러 화면에서 공유하는 세로 배치와 하단 버튼 영역을 정의합니다. */
+
+.screen,
+.savedMealPlansContent,
+.favoriteFoodsContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.savedMealPlansContent,
+.favoriteFoodsContent{
+  gap:12px;
+  padding: 8px 24px;
+}
+
+.buttonRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 16px 24px 24px;
+}

@@ -72,7 +72,7 @@ export function FavoriteFoodsScreen({
                       variant="secondary"
                       onClick={() =>
                         window.open(
-                          getShoppingHref(food.shoppingCategory, food.shoppingKeyword),
+                          getShoppingHref(food.shoppingCategory, food.shoppingKeyword, food.name),
                           "_blank",
                           "noopener,noreferrer",
                         )

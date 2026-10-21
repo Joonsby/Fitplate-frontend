@@ -102,6 +102,20 @@
   font-weight: 700;
 }
 
+.weightListToggle {
+  align-self: center;
+  margin-top: -8px;
+}
+
+.weightListToggle svg {
+  transform: rotate(90deg);
+  transition: transform 0.15s;
+}
+
+.weightListToggle svg.isOpen {
+  transform: rotate(-90deg);
+}
+
 .weightList svg {
   width: 16px;
   height: 16px;

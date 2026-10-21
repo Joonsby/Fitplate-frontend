@@ -1,5 +1,6 @@
 // 기간 안 체중 변화를 선 하나로 그리고, 목표 체중을 이름 붙은 기준선으로 보여줍니다.
 // 계열이 하나라 범례 대신 카드 제목이 이름을 맡고, 누르거나 올리면 가장 가까운 날의 값을 띄웁니다.
+// 눈금 숫자는 격자선 위에 얹어 그래프가 카드의 다른 요소와 같은 좌우 끝선을 쓰게 합니다.
 import "./WeightChart.css";
 import { useRef, useState } from "react";
 import type { PointerEvent } from "react";
@@ -15,7 +16,9 @@ interface WeightChartProps {
 
 const W = 320;
 const H = 176;
-const PAD = { left: 36, right: 16, top: 16, bottom: 26 };
+const PAD = { left: 0, right: 0, top: 18, bottom: 26 };
+// 목표가 기록 범위에서 이만큼(kg) 넘게 떨어져 있으면 범위에 넣지 않고 가장자리 표시만 한다
+const TARGET_REACH = 3;
 
 function dayIndex(from: string, date: string) {
   return Math.round(
@@ -35,9 +38,18 @@ export function WeightChart({
 
   const totalDays = Math.max(1, dayIndex(from, to));
   const values = records.map((record) => record.weight);
-  if (targetWeight != null) values.push(targetWeight);
-  const low = values.length ? Math.floor(Math.min(...values) - 0.5) : 60;
-  const high = values.length ? Math.ceil(Math.max(...values) + 0.5) : 70;
+  const dataMin = values.length ? Math.min(...values) : 60;
+  const dataMax = values.length ? Math.max(...values) : 70;
+  const targetInView =
+    targetWeight != null &&
+    targetWeight >= dataMin - TARGET_REACH &&
+    targetWeight <= dataMax + TARGET_REACH;
+  const low = Math.floor(
+    Math.min(dataMin, targetInView ? targetWeight : dataMin) - 0.5,
+  );
+  const high = Math.ceil(
+    Math.max(dataMax, targetInView ? targetWeight : dataMax) + 0.5,
+  );
   const min = high - low < 2 ? low - 1 : low;
   const max = high - low < 2 ? high + 1 : high;
 
@@ -72,9 +84,17 @@ export function WeightChart({
 
   const active = activeIndex != null ? points[activeIndex] : null;
   const latest = points[points.length - 1];
+  // 선이 위에서 내려와 끝나면 글자가 선을 가리지 않게 점 아래에 둔다
+  const previous = points[points.length - 2];
+  const endLabelBelow =
+    previous != null && latest != null && previous.cy < latest.cy;
 
   if (records.length === 0) {
-    return <p className="weightChartEmpty">이 기간에 체중 기록이 없어요. 기록하면 변화가 그래프로 보여요.</p>;
+    return (
+      <p className="weightChartEmpty">
+        이 기간에 체중 기록이 없어요. 기록하면 변화가 그래프로 보여요.
+      </p>
+    );
   }
 
   return (
@@ -98,12 +118,7 @@ export function WeightChart({
               y1={y(tick)}
               y2={y(tick)}
             />
-            <text
-              className="weightAxis"
-              x={PAD.left - 6}
-              y={y(tick) + 4}
-              textAnchor="end"
-            >
+            <text className="weightAxis" x={PAD.left} y={y(tick) - 4}>
               {Number.isInteger(tick) ? tick : tick.toFixed(1)}
             </text>
           </g>
@@ -120,7 +135,18 @@ export function WeightChart({
           {formatShortDate(to)}
         </text>
 
-        {targetWeight != null ? (
+        {targetWeight != null && !targetInView ? (
+          // 그래프 범위 밖 목표는 날짜 줄 가운데에 방향만 알린다 (선·끝 값과 겹치지 않게)
+          <text
+            className="weightTargetLabel"
+            x={W / 2}
+            y={H - 6}
+            textAnchor="middle"
+          >
+            목표 {targetWeight}kg {targetWeight < min ? "↓" : "↑"}
+          </text>
+        ) : null}
+        {targetWeight != null && targetInView ? (
           <g>
             <line
               className="weightTarget"
@@ -159,7 +185,11 @@ export function WeightChart({
           <text
             className="weightEndLabel"
             x={Math.min(latest.cx, W - PAD.right)}
-            y={latest.cy - 10}
+            y={
+              endLabelBelow
+                ? Math.min(latest.cy + 20, H - PAD.bottom - 4)
+                : latest.cy - 10
+            }
             textAnchor="end"
           >
             {latest.weight}kg
@@ -208,23 +238,26 @@ export function WeightChart({
         </p>
       ) : null}
 
-      <table className="srOnly">
-        <caption>체중 기록 표</caption>
-        <thead>
-          <tr>
-            <th scope="col">날짜</th>
-            <th scope="col">체중(kg)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {records.map((record) => (
-            <tr key={record.date}>
-              <td>{record.date}</td>
-              <td>{record.weight}</td>
+      {/* 표는 너비 제한을 무시하고 늘어나므로 숨김 상자로 감싼다 */}
+      <div className="srOnly">
+        <table>
+          <caption>체중 기록 표</caption>
+          <thead>
+            <tr>
+              <th scope="col">날짜</th>
+              <th scope="col">체중(kg)</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {records.map((record) => (
+              <tr key={record.date}>
+                <td>{record.date}</td>
+                <td>{record.weight}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -10,6 +10,9 @@ import { ChevronRightIcon } from "../common/Icons";
 import { WeightChart } from "./WeightChart";
 import { addDays, formatDateLabel, todayString } from "../../utils/date";
 
+// 접어 둘 때 보여줄 최근 기록 수
+const COLLAPSED_COUNT = 5;
+
 const PERIODS = [
   { key: "week", label: "1주", days: 7 },
   { key: "month", label: "1달", days: 30 },
@@ -34,6 +37,7 @@ export function WeightSection({ onError }: WeightSectionProps) {
   const [targetDraft, setTargetDraft] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState("");
+  const [showAll, setShowAll] = useState(false);
 
   const days = PERIODS.find((item) => item.key === period)!.days;
   const to = todayString();
@@ -123,7 +127,10 @@ export function WeightSection({ onError }: WeightSectionProps) {
   const target = summary?.targetWeight ?? null;
   const toTarget = summary?.toTarget ?? null;
   const change = summary?.changeInRange ?? null;
-  const recentRecords = [...(summary?.records ?? [])].reverse().slice(0, 5);
+  // 최신순. 접어 두면 최근 몇 건만, 펼치면 고른 기간의 기록을 모두 보여준다
+  const periodRecords = [...(summary?.records ?? [])].reverse();
+  const visibleRecords = showAll ? periodRecords : periodRecords.slice(0, COLLAPSED_COUNT);
+  const canExpand = periodRecords.length > COLLAPSED_COUNT;
 
   return (
     <section className="card weightCard" aria-label="체중">
@@ -171,7 +178,10 @@ export function WeightSection({ onError }: WeightSectionProps) {
             role="radio"
             aria-checked={period === item.key}
             className={period === item.key ? "isSelected" : undefined}
-            onClick={() => setPeriod(item.key)}
+            onClick={() => {
+              setPeriod(item.key);
+              setShowAll(false);
+            }}
           >
             {item.label}
           </button>
@@ -188,9 +198,9 @@ export function WeightSection({ onError }: WeightSectionProps) {
         체중 기록하기
       </Button>
 
-      {recentRecords.length > 0 ? (
-        <ul className="weightList" aria-label="최근 체중 기록">
-          {recentRecords.map((record) => (
+      {visibleRecords.length > 0 ? (
+        <ul className="weightList" aria-label={showAll ? "기간 체중 기록" : "최근 체중 기록"}>
+          {visibleRecords.map((record) => (
             <li key={record.date}>
               <button type="button" onClick={() => openEditor(record)}>
                 <span>{formatDateLabel(record.date)}</span>
@@ -200,6 +210,18 @@ export function WeightSection({ onError }: WeightSectionProps) {
             </li>
           ))}
         </ul>
+      ) : null}
+
+      {canExpand ? (
+        <button
+          type="button"
+          className="textLink weightListToggle"
+          aria-expanded={showAll}
+          onClick={() => setShowAll((current) => !current)}
+        >
+          {showAll ? "접기" : `${PERIODS.find((item) => item.key === period)!.label} 기록 전체 보기 (${periodRecords.length}건)`}
+          <ChevronRightIcon className={showAll ? "isOpen" : undefined} />
+        </button>
       ) : null}
 
       {editing ? (

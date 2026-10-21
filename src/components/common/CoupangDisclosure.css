@@ -1,0 +1,12 @@
+/* 쿠팡 파트너스 고지 문구를 꾸밉니다. 눈에 띄되 목록보다 앞서지 않게 작은 회색 상자로 둔다. */
+
+.coupangDisclosure {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: keep-all;
+}

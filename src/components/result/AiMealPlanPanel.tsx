@@ -7,6 +7,7 @@ import { Spinner } from "../common/Spinner";
 import { CheckIcon, RefreshIcon } from "../common/Icons";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { FoodRow } from "./FoodRow";
+import { CoupangDisclosure } from "../common/CoupangDisclosure";
 import type { AIFood, AIMealPlanResponse, MealFood, NutritionTarget } from "../../types/fitplate";
 import type { FoodPosition } from "../../api/mealPlanEditApi";
 
@@ -127,6 +128,7 @@ export function AiMealPlanPanel({
 
   return (
     <section className="aiResult" aria-label="끼니별 식단">
+      <CoupangDisclosure />
       <div className="mealList">
         {aiMealPlan!.meals.map((meal) => {
           const mealCalories = meal.foods.reduce((sum, f) => sum + f.calories, 0);

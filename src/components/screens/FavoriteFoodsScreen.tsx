@@ -4,6 +4,7 @@ import "../common/FoodRow.css";
 import "./FavoriteFoodsScreen.css";
 import { useState } from "react";
 import { getShoppingHref } from "../../utils/shoppingHref";
+import { CoupangDisclosure } from "../common/CoupangDisclosure";
 import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
 import { SkeletonList } from "../common/SkeletonList";
@@ -56,43 +57,50 @@ export function FavoriteFoodsScreen({
             description="식단 결과에서 음식 옆의 별을 누르면 여기에 모여요."
           />
         ) : (
-          <div className="card favoriteFoodCard">
-            <div className="foodList">
-              {favoriteFoods.map((food) => (
-                <div className="foodRow" key={food.favoriteFoodId}>
-                  <div className="foodRowInfo">
-                    <strong>{food.name}</strong>
-                    <span>
-                      {food.amount} · {food.calories} kcal
-                    </span>
+          <>
+            <CoupangDisclosure />
+            <div className="card favoriteFoodCard">
+              <div className="foodList">
+                {favoriteFoods.map((food) => (
+                  <div className="foodRow" key={food.favoriteFoodId}>
+                    <div className="foodRowInfo">
+                      <strong>{food.name}</strong>
+                      <span>
+                        {food.amount} · {food.calories} kcal
+                      </span>
+                    </div>
+                    <div className="foodRowActions">
+                      <Button
+                        size="small"
+                        variant="secondary"
+                        onClick={() =>
+                          window.open(
+                            getShoppingHref(
+                              food.shoppingCategory,
+                              food.shoppingKeyword,
+                              food.name,
+                            ),
+                            "_blank",
+                            "noopener,noreferrer",
+                          )
+                        }
+                      >
+                        <CartIcon />
+                        구매
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="ghost"
+                        onClick={() => setPendingDeleteId(food.favoriteFoodId)}
+                      >
+                        삭제
+                      </Button>
+                    </div>
                   </div>
-                  <div className="foodRowActions">
-                    <Button
-                      size="small"
-                      variant="secondary"
-                      onClick={() =>
-                        window.open(
-                          getShoppingHref(food.shoppingCategory, food.shoppingKeyword, food.name),
-                          "_blank",
-                          "noopener,noreferrer",
-                        )
-                      }
-                    >
-                      <CartIcon />
-                      구매
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="ghost"
-                      onClick={() => setPendingDeleteId(food.favoriteFoodId)}
-                    >
-                      삭제
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </section>
     </>

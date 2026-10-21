@@ -10,7 +10,7 @@ import { EmptyState } from "../common/EmptyState";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { Button } from "../common/Button";
 import { AlertIcon, PencilIcon, PlateIcon } from "../common/Icons";
-import { MealPlanRenameDialog } from "../result/MealPlanRenameDialog";
+import { TextInputSheet } from "../common/TextInputSheet";
 import { formatDateLabel, todayString } from "../../utils/date";
 import { AiMealPlanPanel } from "../result/AiMealPlanPanel";
 import { AiMealPlanFailureScreen } from "../result/AiMealPlanFailureScreen";
@@ -168,8 +168,11 @@ export function ResultScreen({
                 <p>{`${profile.height}cm · ${profile.weight}kg 기준, 하루 ${mealPlan.targetCalories.toLocaleString()} kcal에 맞췄어요.`}</p>
               </header>
               {isRenaming && onRenameTitle ? (
-                <MealPlanRenameDialog
-                  title={displayTitle}
+                <TextInputSheet
+                  title="식단 이름 변경"
+                  label="식단 이름"
+                  initialValue={displayTitle}
+                  maxLength={30}
                   onSave={onRenameTitle}
                   onClose={() => {
                     setIsRenaming(false);

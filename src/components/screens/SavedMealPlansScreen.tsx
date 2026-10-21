@@ -17,6 +17,7 @@ interface SavedMealPlansScreenProps {
   onDelete: (id: string) => void;
   onView: (savedMealPlan: SavedMealPlan) => void;
   onRename: (savedMealPlan: SavedMealPlan) => void;
+  onPickDate: (savedMealPlan: SavedMealPlan) => void;
 }
 
 export function SavedMealPlansScreen({
@@ -26,6 +27,7 @@ export function SavedMealPlansScreen({
   onDelete,
   onView,
   onRename,
+  onPickDate,
 }: SavedMealPlansScreenProps) {
   return (
     <section className="screen">
@@ -55,6 +57,7 @@ export function SavedMealPlansScreen({
               onDelete={onDelete}
               onView={onView}
               onRename={onRename}
+              onPickDate={onPickDate}
             />
           ))}
         </div>
@@ -68,9 +71,10 @@ interface SavedMealPlanCardProps {
   onDelete: (id: string) => void;
   onView: (savedMealPlan: SavedMealPlan) => void;
   onRename: (savedMealPlan: SavedMealPlan) => void;
+  onPickDate: (savedMealPlan: SavedMealPlan) => void;
 }
 
-function SavedMealPlanCard({ savedMealPlan, onDelete, onView, onRename }: SavedMealPlanCardProps) {
+function SavedMealPlanCard({ savedMealPlan, onDelete, onView, onRename, onPickDate }: SavedMealPlanCardProps) {
   const savedDate = new Date(savedMealPlan.savedAt).toLocaleDateString("ko-KR", { dateStyle: "medium" });
   const { planDate } = savedMealPlan;
 
@@ -87,14 +91,23 @@ function SavedMealPlanCard({ savedMealPlan, onDelete, onView, onRename }: SavedM
         <ChevronRightIcon className="savedPlanChevron" />
       </button>
       <div className="savedPlanFooter">
-        <span className={`savedPlanDate${planDate ? " isScheduled" : ""}`}>
-          <CalendarCheckIcon />
-          {planDate == null
-            ? "먹을 날짜 미지정"
-            : planDate === todayString()
-              ? "오늘 먹는 식단"
-              : `${formatDateLabel(planDate)} 식단`}
-        </span>
+        {planDate == null ? (
+          <button
+            type="button"
+            className="savedPlanDate isPickable"
+            aria-label="먹을 날짜 정하기"
+            onClick={() => onPickDate(savedMealPlan)}
+          >
+            <CalendarCheckIcon />
+            먹을 날짜 미지정
+            <ChevronRightIcon />
+          </button>
+        ) : (
+          <span className="savedPlanDate isScheduled">
+            <CalendarCheckIcon />
+            {planDate === todayString() ? "오늘 먹는 식단" : `${formatDateLabel(planDate)} 식단`}
+          </span>
+        )}
         <span className="savedPlanActions">
           <button type="button" className="savedPlanAction" onClick={() => onRename(savedMealPlan)}>
             이름 바꾸기

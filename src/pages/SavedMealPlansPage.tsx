@@ -6,7 +6,8 @@ import { SavedMealPlansScreen } from "../components/screens/SavedMealPlansScreen
 import { deleteSavedMealPlanById } from "../api/mealPlanStorageApi";
 import type { SavedMealPlan } from "../types/fitplate";
 import { formatDateLabel } from "../utils/date";
-import { MealPlanTitleSheet } from "../components/result/MealPlanTitleSheet";
+import { TextInputSheet } from "../components/common/TextInputSheet";
+import { PlanDateSheet } from "../components/result/PlanDateSheet";
 
 interface SavedMealPlansPageProps {
   savedMealPlans: SavedMealPlan[];
@@ -19,6 +20,7 @@ interface SavedMealPlansPageProps {
   pendingScheduleDate: string | null;
   onCancelPendingSchedule: () => void;
   onRename: (mealPlanId: string, title: string | null) => Promise<void>;
+  onSchedule: (mealPlanId: string, planDate: string, replace: boolean) => Promise<unknown>;
 }
 
 export function SavedMealPlansPage({
@@ -30,12 +32,14 @@ export function SavedMealPlansPage({
   pendingScheduleDate,
   onCancelPendingSchedule,
   onRename,
+  onSchedule,
 }: SavedMealPlansPageProps) {
   const navigate = useNavigate();
   const { showToast, toastElement } = useToast();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [renameTarget, setRenameTarget] = useState<SavedMealPlan | null>(null);
+  const [dateTarget, setDateTarget] = useState<SavedMealPlan | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -113,13 +117,24 @@ export function SavedMealPlansPage({
         onDelete={handleDeleteSavedMealPlan}
         onView={handleViewSavedMealPlan}
         onRename={setRenameTarget}
+        onPickDate={setDateTarget}
       />
       {renameTarget ? (
-        <MealPlanTitleSheet
-          title={renameTarget.title}
-          customized={renameTarget.titleCustomized}
+        <TextInputSheet
+          title="식단 이름 변경"
+          label="식단 이름"
+          initialValue={renameTarget.title}
+          maxLength={30}
           onSave={(title) => onRename(renameTarget.id, title)}
           onClose={() => setRenameTarget(null)}
+        />
+      ) : null}
+      {dateTarget ? (
+        <PlanDateSheet
+          planTitle={dateTarget.title}
+          onSchedule={(planDate, replace) => onSchedule(dateTarget.id, planDate, replace)}
+          onDone={(planDate) => showToast(`${formatDateLabel(planDate)} 식단으로 정했어요.`, "success")}
+          onClose={() => setDateTarget(null)}
         />
       ) : null}
     </>

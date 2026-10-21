@@ -67,7 +67,8 @@
   font-size: 13px;
 }
 
-.savedPlanFooter > .savedPlanDate {
+.savedPlanFooter > .savedPlanDate,
+.savedPlanFooter > button.savedPlanDate {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -83,6 +84,29 @@
 .savedPlanFooter > .savedPlanDate.isScheduled {
   color: var(--fp-navy);
   background: var(--fp-blue-soft);
+}
+
+.savedPlanFooter > .savedPlanDate.isPickable {
+  border: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.savedPlanDate.isPickable:active {
+  color: var(--fp-navy);
+  background: var(--fp-blue-soft);
+}
+
+.savedPlanDate.isPickable:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
+}
+
+.savedPlanDate.isPickable svg:last-child {
+  width: 13px;
+  height: 13px;
+  margin-left: -2px;
 }
 
 .savedPlanDate svg {

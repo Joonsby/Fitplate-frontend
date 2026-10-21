@@ -1,0 +1,146 @@
+/* 기록 탭의 영양 통계 카드를 꾸밉니다. 제목 모양은 WeightSection.css 의 statsHead 를 같이 씁니다. */
+
+.statsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.statsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statsSkeleton {
+  display: block;
+  height: 200px;
+  border-radius: 14px;
+}
+
+.statsCoverage {
+  margin: -4px 0 0;
+  color: var(--fp-sub);
+  font-size: 13px;
+}
+
+.statsCoverage strong {
+  color: var(--fp-ink);
+}
+
+.statsEmpty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 14px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.statsCalories {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.statsCalories div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--fp-field);
+}
+
+.statsCalories div.isEaten {
+  background: var(--fp-blue-soft);
+}
+
+.statsCalories dt {
+  color: var(--fp-sub);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.statsCalories dd {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.statsCalories dd small {
+  margin-left: 2px;
+  color: var(--fp-sub);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.statsMacros {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.statsMacroText {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.statsMacroText span {
+  color: var(--fp-sub);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.statsMacroText strong {
+  color: var(--fp-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.statsMacroText small {
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.statsMeter {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--fp-blue-soft);
+}
+
+.statsMeter span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--fp-blue);
+}
+
+/* 목표(100%) 위치 표시 */
+.statsMeter i {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--fp-ink);
+  transform: translateX(-1px);
+}
+
+.statsHead h2 {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 18px;
+  font-weight: 800;
+}

@@ -1,0 +1,109 @@
+/* 식단 날짜 지정 카드를 꾸밉니다. */
+
+.scheduleCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+}
+
+.scheduleCard.isScheduled {
+  box-shadow:
+    inset 0 0 0 1.5px var(--fp-blue-soft),
+    var(--fp-shadow-card);
+}
+
+.scheduleHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.scheduleIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--fp-blue);
+  background: var(--fp-blue-soft);
+}
+
+.scheduleIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.scheduleText {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.scheduleText strong {
+  color: var(--fp-ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.scheduleText span {
+  color: var(--fp-sub);
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.scheduleHead .textLink {
+  flex: 0 0 auto;
+  padding-top: 0;
+}
+
+.textLink:disabled {
+  color: var(--fp-placeholder);
+  cursor: default;
+}
+
+.scheduleNote {
+  margin: -6px 0 0 52px;
+  color: var(--fp-sub);
+  font-size: 12px;
+}
+
+.schedulePicker {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.scheduleDateInput {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  color: var(--fp-ink);
+  background: var(--fp-field);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.scheduleDateInput:focus {
+  border-color: var(--fp-blue);
+  outline: none;
+  background: var(--fp-surface);
+}
+
+.scheduleEditActions {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+}
+
+.scheduleClear {
+  color: var(--fp-error);
+}

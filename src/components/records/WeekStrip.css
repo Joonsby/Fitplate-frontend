@@ -1,0 +1,123 @@
+/* 주간 날짜 선택 줄을 꾸밉니다. */
+
+.weekStrip {
+  padding: 12px 10px 14px;
+}
+
+.weekStripHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 10px;
+}
+
+.weekStripHead strong {
+  color: var(--fp-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.weekStripNav {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  color: var(--fp-sub);
+  background: transparent;
+  cursor: pointer;
+}
+
+.weekStripNav:active {
+  background: var(--fp-field);
+}
+
+.weekStripNav svg {
+  width: 20px;
+  height: 20px;
+}
+
+.weekStripDays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.weekDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 64px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 14px;
+  color: var(--fp-ink);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.weekDay:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
+}
+
+.weekDayName {
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.weekDayNumber {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.weekDay.isToday .weekDayNumber {
+  color: var(--fp-blue);
+}
+
+.weekDay.isSelected {
+  color: #ffffff;
+  background: linear-gradient(160deg, var(--fp-navy), var(--fp-blue));
+}
+
+.weekDay.isSelected .weekDayName,
+.weekDay.isSelected .weekDayNumber {
+  color: #ffffff;
+}
+
+.weekDayDot {
+  width: 7px;
+  height: 7px;
+  box-sizing: border-box;
+  border-radius: 50%;
+}
+
+.weekDayDot--NO_PLAN {
+  visibility: hidden;
+}
+
+.weekDayDot--UPCOMING,
+.weekDayDot--NOT_RECORDED {
+  border: 1.5px solid var(--fp-placeholder);
+}
+
+.weekDayDot--PARTIAL {
+  background: linear-gradient(90deg, var(--fp-success) 50%, var(--fp-line) 50%);
+}
+
+.weekDayDot--COMPLETE {
+  background: var(--fp-success);
+}
+
+.weekDay.isSelected .weekDayDot--UPCOMING,
+.weekDay.isSelected .weekDayDot--NOT_RECORDED {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.weekDay.isSelected .weekDayDot--COMPLETE {
+  background: #ffffff;
+}

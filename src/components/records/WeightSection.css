@@ -1,0 +1,109 @@
+/* 기록 탭의 체중 카드를 꾸밉니다. */
+
+.weightCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.weightHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.weightHead h2 {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.weightStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.weightStats div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weightStats div + div {
+  padding-left: 12px;
+  border-left: 1px solid var(--fp-line);
+}
+
+.weightStats dt {
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.weightStats dd {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.weightStats dd small {
+  margin-left: 2px;
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.weightStats span {
+  color: var(--fp-sub);
+  font-size: 12px;
+}
+
+.weightChartSkeleton {
+  display: block;
+  height: 160px;
+  border-radius: 14px;
+}
+
+.weightList {
+  display: flex;
+  flex-direction: column;
+  margin: -4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weightList li + li {
+  border-top: 1px solid var(--fp-line);
+}
+
+.weightList button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 2px;
+  border: 0;
+  color: var(--fp-sub);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.weightList strong {
+  margin-left: auto;
+  color: var(--fp-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.weightList svg {
+  width: 16px;
+  height: 16px;
+  color: var(--fp-placeholder);
+}

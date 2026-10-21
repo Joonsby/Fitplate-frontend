@@ -14,12 +14,6 @@
   gap: 12px;
 }
 
-.buttonRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
 .card {
   box-sizing: border-box;
   padding: 20px;
@@ -70,4 +64,54 @@
   background: var(--fp-blue-soft);
   font-size: 13px;
   font-weight: 700;
+}
+
+.recordsError {
+  margin: -8px 0 0;
+  color: var(--fp-error);
+  font-size: 13px;
+}
+
+/* 화면에는 보이지 않고 화면 낭독기만 읽는 요소 (그래프의 표 보기 등) */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 2~3개 중 하나를 고르는 작은 전환 버튼 묶음 */
+.segmented {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--fp-field);
+}
+
+.segmented button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--fp-sub);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segmented button.isSelected {
+  color: var(--fp-navy);
+  background: var(--fp-surface);
+  box-shadow: 0 1px 4px rgba(22, 53, 122, 0.12);
+  font-weight: 700;
+}
+
+.segmented button:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
 }

@@ -1,8 +1,7 @@
 import type { GoalType, NutritionTarget, UserProfile } from "../types/fitplate";
 
-// 활동계수는 MVP 2단계에서 고정값으로 사용합니다.
-// 나중에 활동량 선택 화면이 생기면 이 값을 사용자 입력으로 바꾸면 됩니다.
-const ACTIVITY_FACTOR = 1.3;
+// 활동계수는 고정값입니다. 서버 NutritionCalculator 와 같은 값이어야 목표 화면 kcal 이 실제 목표와 맞습니다.
+const ACTIVITY_FACTOR = 1.35;
 
 // 목표별 칼로리 보정값입니다.
 // TDEE에서 감량은 400kcal를 빼고, 증량은 300kcal를 더합니다.
@@ -36,9 +35,14 @@ function sanitizeProfile(profile: UserProfile): UserProfile {
   };
 }
 
-// BMR은 기초대사량입니다.
-// Mifflin-St Jeor 공식은 성별에 따라 마지막 보정값만 달라집니다.
+// BMR은 기초대사량입니다. 서버와 같이 체지방률이 있으면 Katch-McArdle,
+// 없으면 성별별 Mifflin-St Jeor 공식을 씁니다.
 function calculateBmr(profile: UserProfile): number {
+  if (profile.bodyFatRate != null) {
+    const leanBodyMass = profile.weight * (1 - profile.bodyFatRate / 100);
+    return 370 + 21.6 * leanBodyMass;
+  }
+
   const common =
     10 * profile.weight + 6.25 * profile.height - 5 * profile.age;
 
@@ -68,7 +72,7 @@ export function calculateNutritionTarget(
 
   // 남은 칼로리는 탄수화물로 계산하고, 탄수화물 1g은 4kcal로 계산합니다.
   const remainingCalories = calories - proteinGram * 4 - fatGram * 9;
-  const carbsGram = Math.max(0, Math.round(remainingCalories / 4));
+  const carbsGram = Math.max(0, Math.trunc(remainingCalories / 4));
 
   return {
     bmr,

@@ -1,0 +1,116 @@
+/* 체중 선 그래프를 꾸밉니다. 선 2px, 점 지름 8px 이상 + 바탕색 테두리, 격자는 실선 머리카락 굵기. */
+
+.weightChart {
+  position: relative;
+}
+
+.weightChart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.weightGrid {
+  stroke: var(--fp-line);
+  stroke-width: 1;
+}
+
+.weightAxis {
+  fill: var(--fp-sub);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.weightLine {
+  fill: none;
+  stroke: var(--fp-blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.weightDot {
+  fill: var(--fp-blue);
+  stroke: var(--fp-surface);
+  stroke-width: 2;
+}
+
+.weightDot.isActive {
+  fill: var(--fp-navy);
+}
+
+.weightEndLabel {
+  fill: var(--fp-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weightTarget {
+  stroke: var(--fp-sub);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.weightTargetLabel {
+  fill: var(--fp-sub);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.weightCrosshair {
+  stroke: var(--fp-placeholder);
+  stroke-width: 1;
+}
+
+.weightHit {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.weightTooltip {
+  position: absolute;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 6px 10px;
+  border-radius: 10px;
+  color: #ffffff;
+  background: rgba(20, 28, 43, 0.92);
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+}
+
+.weightTooltip strong {
+  font-size: 14px;
+}
+
+.weightChartHint {
+  margin: 4px 0 0;
+  color: var(--fp-sub);
+  font-size: 12px;
+  text-align: center;
+}
+
+.weightEndLabel,
+.weightTargetLabel {
+  paint-order: stroke;
+  stroke: var(--fp-surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.weightChartEmpty {
+  margin: 0;
+  padding: 28px 16px;
+  border-radius: 14px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  word-break: keep-all;
+}

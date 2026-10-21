@@ -1,0 +1,106 @@
+/* 날짜별 섭취 칼로리 막대 그래프를 꾸밉니다. 막대 24px 이하·윗끝 4px 둥글게, 격자는 실선 머리카락 굵기. */
+
+.nutritionChart {
+  position: relative;
+}
+
+.nutritionChart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.nutritionGrid {
+  stroke: var(--fp-line);
+  stroke-width: 1;
+}
+
+.nutritionAxis {
+  fill: var(--fp-sub);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.nutritionBar {
+  fill: var(--fp-blue);
+}
+
+.isActive .nutritionBar {
+  fill: var(--fp-navy);
+}
+
+.nutritionTargetTick {
+  stroke: var(--fp-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.nutritionNoRecord {
+  fill: none;
+  stroke: var(--fp-placeholder);
+  stroke-width: 1.5;
+}
+
+.nutritionHit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.nutritionLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 6px;
+  color: var(--fp-sub);
+  font-size: 12px;
+}
+
+.nutritionLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nutritionLegendBar {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--fp-blue);
+}
+
+.nutritionLegendTick {
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--fp-ink);
+}
+
+.nutritionLegendDot {
+  width: 6px;
+  height: 6px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--fp-placeholder);
+  border-radius: 50%;
+}
+
+.nutritionTooltip {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  color: #ffffff;
+  background: rgba(20, 28, 43, 0.92);
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.nutritionTooltip strong {
+  font-size: 13px;
+}

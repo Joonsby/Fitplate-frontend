@@ -1,0 +1,213 @@
+/* 날짜별 끼니 체크 카드를 꾸밉니다. 체크 상자 모양은 MealCard.css 의 mealIntakeBox 를 같이 씁니다. */
+
+.dayRecord {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dayRecordLoading {
+  gap: 12px;
+}
+
+.dayRecordHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dayRecordHead strong {
+  color: var(--fp-ink);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.dayRecordBadge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dayRecordBadge--PARTIAL,
+.dayRecordBadge--COMPLETE {
+  color: var(--fp-success);
+  background: #e6f6ef;
+}
+
+.dayRecordProgress {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--fp-field);
+}
+
+.dayRecordProgress span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--fp-success);
+  transition: width 0.25s;
+}
+
+.dayRecordMeals {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dayRecordMeal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--fp-field);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dayRecordMeal.isEaten {
+  background: #e6f6ef;
+}
+
+.dayRecordMeal.isEaten .mealIntakeBox {
+  border-color: var(--fp-success);
+  color: #ffffff;
+  background: var(--fp-success);
+}
+
+.dayRecordMeal:disabled {
+  cursor: default;
+}
+
+.dayRecordMeal:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
+}
+
+.dayRecordMealText {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dayRecordMealText strong {
+  color: var(--fp-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.dayRecordMealText span {
+  overflow: hidden;
+  color: var(--fp-sub);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dayRecordMealKcal {
+  flex: 0 0 auto;
+  color: var(--fp-sub);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.dayRecordHint {
+  margin: -4px 0 0;
+  color: var(--fp-sub);
+  font-size: 12px;
+}
+
+.dayRecordTotals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--fp-line);
+}
+
+.dayRecordTotals div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dayRecordTotals dt {
+  color: var(--fp-sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dayRecordTotals dd {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dayRecordTotals .isEaten dd {
+  color: var(--fp-success);
+}
+
+.dayRecordLinks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -6px;
+}
+
+.dayRecordEmpty {
+  align-items: center;
+  text-align: center;
+}
+
+.dayRecordEmpty strong {
+  color: var(--fp-ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dayRecordEmpty p {
+  margin: -6px 0 0;
+  color: var(--fp-sub);
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.dayRecordEmptyIcon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 17px;
+  color: var(--fp-blue);
+  background: var(--fp-blue-soft);
+}
+
+.dayRecordEmptyIcon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.dayRecordEmptyActions {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}

@@ -6,12 +6,10 @@ import type {
   Meal,
   MealFood,
   MealPlan,
-  NutritionTarget,
   SavedMealPlan,
-  UserProfile,
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl, getMealPlanFavoriteUrl } from "./apiConfig";
-import { apiFetch, apiFetchRaw, apiFetchVoid, HttpError } from "./httpClient";
+import { apiFetch, apiFetchRaw, apiFetchVoid } from "./httpClient";
 
 async function readOptionalJson(response: Response): Promise<unknown> {
   const text = await response.text();
@@ -24,8 +22,10 @@ async function readOptionalJson(response: Response): Promise<unknown> {
 }
 
 // GET /api/meal-plans 및 GET /api/meal-plans/{id} 응답 타입입니다.
-interface ApiSavedMealPlan {
+export interface ApiSavedMealPlan {
   id: number;
+  title?: string;
+  titleCustomized?: boolean;
   goal: "MAINTAIN" | "WEIGHT_LOSS" | "WEIGHT_GAIN";
   height: number;
   weight: number;
@@ -38,6 +38,7 @@ interface ApiSavedMealPlan {
   carbsGram: number;
   fatGram: number;
   aiMealPlanResponse: AIMealPlanResponse;
+  planDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -83,6 +84,7 @@ function aiResponseToMealPlan(
       carbs: totalCarbs,
       fat: totalFat,
       foods,
+      eaten: aiMeal.eaten ?? false,
     };
   });
 
@@ -104,12 +106,14 @@ function aiResponseToMealPlan(
   };
 }
 
-function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
+export function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
   const planId = String(item.id);
   const mealPlan = aiResponseToMealPlan(planId, item.aiMealPlanResponse, item.targetCalories);
 
   return {
     id: planId,
+    title: item.title ?? `하루 ${item.targetCalories.toLocaleString()} kcal 식단`,
+    titleCustomized: item.titleCustomized ?? false,
     savedAt: item.createdAt,
     profile: {
       height: item.height,
@@ -127,6 +131,7 @@ function toSavedMealPlanFromApi(item: ApiSavedMealPlan): SavedMealPlan {
       fatGram: item.fatGram,
     },    
     mealPlan,
+    planDate: item.planDate ?? null,
   };
 }
 
@@ -136,6 +141,17 @@ export async function getSavedMealPlans(): Promise<SavedMealPlan[]> {
     networkErrorMessage: "저장된 식단 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
   });  
   return Array.isArray(items) ? items.map(toSavedMealPlanFromApi) : [];
+}
+
+// 식단 이름을 바꾼다. null 이나 빈 문자열이면 자동 이름으로 돌아간다.
+export async function renameSavedMealPlan(mealPlanId: string, title: string | null): Promise<SavedMealPlan> {
+  const data = await apiFetch<ApiSavedMealPlan>(getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/${mealPlanId}/title`), {
+    method: "PATCH",
+    body: { title },
+    networkErrorMessage: "이름을 바꾸지 못했어요. 잠시 후 다시 시도해 주세요.",
+    httpErrorMessage: "이름을 바꾸지 못했어요. 잠시 후 다시 시도해 주세요.",
+  });
+  return toSavedMealPlanFromApi(data);
 }
 
 export async function deleteSavedMealPlanById(mealPlanId: string): Promise<void> {
@@ -194,31 +210,4 @@ export async function deleteMealPlanFavorite(mealPlanId: string): Promise<void> 
     networkErrorMessage: "즐겨찾기 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
     httpErrorMessage: "즐겨찾기 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.",
   });
-}
-
-export async function saveMealPlan({
-  profile,
-  goal,
-  target,
-  aiMealPlanResponse,
-}: {
-  profile: UserProfile;
-  goal: GoalType;
-  target: NutritionTarget;
-  aiMealPlanResponse: AIMealPlanResponse;
-}): Promise<void> {
-  const body = {
-    height: profile.height,
-    weight: profile.weight,
-    age: profile.age,
-    gender: profile.gender === "male" ? "MALE" : "FEMALE",
-    goal: goal === "lose" ? "WEIGHT_LOSS" : goal === "gain" ? "WEIGHT_GAIN" : "MAINTAIN",
-    targetCalories: target.calories,
-    bmr: target.bmr,
-    tdee: target.tdee,
-    proteinGram: target.proteinGram,
-    carbsGram: target.carbsGram,
-    fatGram: target.fatGram,
-    aiMealPlanResponse,
-  };
 }

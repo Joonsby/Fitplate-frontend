@@ -6,7 +6,8 @@ import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
 import { SkeletonList } from "../common/SkeletonList";
 import { Button } from "../common/Button";
-import { BookmarkIcon, ChevronRightIcon } from "../common/Icons";
+import { BookmarkIcon, CalendarCheckIcon, ChevronRightIcon } from "../common/Icons";
+import { formatDateLabel, todayString } from "../../utils/date";
 import type { SavedMealPlan } from "../../types/fitplate";
 
 interface SavedMealPlansScreenProps {
@@ -15,6 +16,7 @@ interface SavedMealPlansScreenProps {
   onCreate: () => void;
   onDelete: (id: string) => void;
   onView: (savedMealPlan: SavedMealPlan) => void;
+  onRename: (savedMealPlan: SavedMealPlan) => void;
 }
 
 export function SavedMealPlansScreen({
@@ -23,6 +25,7 @@ export function SavedMealPlansScreen({
   onCreate,
   onDelete,
   onView,
+  onRename,
 }: SavedMealPlansScreenProps) {
   return (
     <section className="screen">
@@ -51,6 +54,7 @@ export function SavedMealPlansScreen({
               savedMealPlan={savedMealPlan}
               onDelete={onDelete}
               onView={onView}
+              onRename={onRename}
             />
           ))}
         </div>
@@ -63,35 +67,46 @@ interface SavedMealPlanCardProps {
   savedMealPlan: SavedMealPlan;
   onDelete: (id: string) => void;
   onView: (savedMealPlan: SavedMealPlan) => void;
+  onRename: (savedMealPlan: SavedMealPlan) => void;
 }
 
-function SavedMealPlanCard({ savedMealPlan, onDelete, onView }: SavedMealPlanCardProps) {
-  const savedDate = new Date(savedMealPlan.savedAt).toLocaleString("ko-KR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+function SavedMealPlanCard({ savedMealPlan, onDelete, onView, onRename }: SavedMealPlanCardProps) {
+  const savedDate = new Date(savedMealPlan.savedAt).toLocaleDateString("ko-KR", { dateStyle: "medium" });
+  const { planDate } = savedMealPlan;
 
   return (
     <article className="card savedPlanCard">
       <button type="button" className="savedPlanMain" onClick={() => onView(savedMealPlan)}>
         <span className="goalChip">{GOAL_LABELS[savedMealPlan.goal]}</span>
         <span className="savedPlanText">
-          <strong>하루 {savedMealPlan.target.calories.toLocaleString()} kcal 식단</strong>
-          <span>{savedDate}</span>
+          <strong>{savedMealPlan.title}</strong>
+          <span>
+            하루 {savedMealPlan.target.calories.toLocaleString()} kcal · {savedDate} 저장
+          </span>
         </span>
         <ChevronRightIcon className="savedPlanChevron" />
       </button>
       <div className="savedPlanFooter">
-        <span>
-          {savedMealPlan.profile.height}cm · {savedMealPlan.profile.weight}kg 기준
+        <span className={`savedPlanDate${planDate ? " isScheduled" : ""}`}>
+          <CalendarCheckIcon />
+          {planDate == null
+            ? "먹을 날짜 미지정"
+            : planDate === todayString()
+              ? "오늘 먹는 식단"
+              : `${formatDateLabel(planDate)} 식단`}
         </span>
-        <button
-          type="button"
-          className="savedPlanDelete"
-          onClick={() => onDelete(savedMealPlan.id)}
-        >
-          삭제
-        </button>
+        <span className="savedPlanActions">
+          <button type="button" className="savedPlanAction" onClick={() => onRename(savedMealPlan)}>
+            이름 바꾸기
+          </button>
+          <button
+            type="button"
+            className="savedPlanDelete"
+            onClick={() => onDelete(savedMealPlan.id)}
+          >
+            삭제
+          </button>
+        </span>
       </div>
     </article>
   );

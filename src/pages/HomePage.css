@@ -150,6 +150,8 @@
 }
 
 .recentPlanText strong {
+  overflow-wrap: anywhere;
+  word-break: keep-all;
   color: var(--fp-ink);
   font-size: 16px;
   font-weight: 700;
@@ -165,4 +167,26 @@
   height: 20px;
   flex: 0 0 auto;
   color: var(--fp-placeholder);
+}
+
+.profilePrefSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: -8px;
+  padding: 0 4px;
+}
+
+.profilePrefSummary p {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.profilePrefSummary span {
+  margin-right: 8px;
+  color: var(--fp-sub);
+  font-weight: 600;
 }

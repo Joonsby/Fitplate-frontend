@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { SavedMealPlansScreen } from "../components/screens/SavedMealPlansScreen";
 import { deleteSavedMealPlanById } from "../api/mealPlanStorageApi";
 import type { SavedMealPlan } from "../types/fitplate";
+import { formatDateLabel } from "../utils/date";
+import { MealPlanTitleSheet } from "../components/result/MealPlanTitleSheet";
 
 interface SavedMealPlansPageProps {
   savedMealPlans: SavedMealPlan[];
@@ -14,6 +16,9 @@ interface SavedMealPlansPageProps {
   >;
   isLoading: boolean;
   onCreate: () => void;
+  pendingScheduleDate: string | null;
+  onCancelPendingSchedule: () => void;
+  onRename: (mealPlanId: string, title: string | null) => Promise<void>;
 }
 
 export function SavedMealPlansPage({
@@ -22,11 +27,15 @@ export function SavedMealPlansPage({
   setViewingSavedMealPlan,
   isLoading,
   onCreate,
+  pendingScheduleDate,
+  onCancelPendingSchedule,
+  onRename,
 }: SavedMealPlansPageProps) {
   const navigate = useNavigate();
   const { showToast, toastElement } = useToast();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [renameTarget, setRenameTarget] = useState<SavedMealPlan | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -78,18 +87,41 @@ export function SavedMealPlansPage({
       <ConfirmDialog
         open={confirmOpen}
         title="저장된 식단을 삭제할까요?"
-        description="삭제한 식단은 되돌릴 수 없어요."
+        description={
+          savedMealPlans.find((plan) => plan.id === pendingDeleteId)?.planDate
+            ? "이 식단으로 남긴 섭취 기록도 함께 지워지고 되돌릴 수 없어요."
+            : "삭제한 식단은 되돌릴 수 없어요."
+        }
         confirmLabel="삭제"
         onConfirm={() => void handleConfirmDelete()}
         onCancel={handleCancelDelete}
       />
+      {pendingScheduleDate ? (
+        <div className="pendingScheduleBanner" role="status">
+          <span>
+            <strong>{formatDateLabel(pendingScheduleDate)}</strong>에 먹을 식단을 골라 주세요
+          </span>
+          <button type="button" className="textLink" onClick={onCancelPendingSchedule}>
+            그만두기
+          </button>
+        </div>
+      ) : null}
       <SavedMealPlansScreen
         savedMealPlans={savedMealPlans}
         isLoading={isLoading}
         onCreate={onCreate}
         onDelete={handleDeleteSavedMealPlan}
         onView={handleViewSavedMealPlan}
+        onRename={setRenameTarget}
       />
+      {renameTarget ? (
+        <MealPlanTitleSheet
+          title={renameTarget.title}
+          customized={renameTarget.titleCustomized}
+          onSave={(title) => onRename(renameTarget.id, title)}
+          onClose={() => setRenameTarget(null)}
+        />
+      ) : null}
     </>
   );
 }

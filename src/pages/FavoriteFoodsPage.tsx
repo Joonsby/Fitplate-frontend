@@ -21,12 +21,18 @@ export function FavoriteFoodsPage({
     window.scrollTo(0, 0);
   }, []);
 
+  // 목록에서 먼저 빼고, 실패하면 원래 자리로 되돌린다.
   const handleDeleteFavoriteFood = async (favoriteFoodId: number) => {
-    const foodName = favoriteFoods.find((f) => f.favoriteFoodId === favoriteFoodId)?.name;
+    const index = favoriteFoods.findIndex((f) => f.favoriteFoodId === favoriteFoodId);
+    const removed = favoriteFoods[index];
+    setFavoriteFoods((current) => current.filter((f) => f.favoriteFoodId !== favoriteFoodId));
 
     try {
       await deleteFavoriteFood(favoriteFoodId);
     } catch (error) {
+      if (removed) {
+        setFavoriteFoods((current) => [...current.slice(0, index), removed, ...current.slice(index)]);
+      }
       console.error("즐겨찾기 삭제 실패:", error);
       showToast(
         error instanceof Error
@@ -34,13 +40,7 @@ export function FavoriteFoodsPage({
           : "즐겨찾기 삭제 중 알 수 없는 오류가 발생했습니다.",
         "error",
       );
-      return;
     }
-
-    setFavoriteFoods((currentFavoriteFoods) =>
-      currentFavoriteFoods.filter((favoriteFood) => favoriteFood.favoriteFoodId !== favoriteFoodId),
-    );
-    if (foodName) showToast(`${foodName}을 즐겨찾는 음식에서 삭제하였습니다.`, "error");
   };
 
   return (

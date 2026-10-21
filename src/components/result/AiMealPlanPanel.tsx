@@ -2,12 +2,13 @@
 import "../common/FoodRow.css";
 import "./MealCard.css";
 import "./AiMealPlanPanel.css";
-import { useNavigate } from "react-router-dom";
 import { Button } from "../common/Button";
 import { Spinner } from "../common/Spinner";
+import { CheckIcon, RefreshIcon } from "../common/Icons";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { FoodRow } from "./FoodRow";
-import type { AIMealPlanResponse, MealFood, NutritionTarget } from "../../types/fitplate";
+import type { AIFood, AIMealPlanResponse, MealFood, NutritionTarget } from "../../types/fitplate";
+import type { FoodPosition } from "../../api/mealPlanEditApi";
 
 const CAUTIONS = [
   "의학적 진단이나 치료 목적의 식단이 아닙니다.",
@@ -17,15 +18,15 @@ const CAUTIONS = [
 const LOADING_STEPS = [
   {
     title: "내 정보 반영",
-    description: "신체정보와 목표를 바탕으로 맞춤 식단을 구성하고 있어요.",
+    description: "신체정보와 목표에 맞춰 하루 칼로리와 영양소를 나누고 있어요.",
   },
   {
-    title: "자동으로 저장",
-    description: "화면을 닫아도 완성되면 저장 식단에 보관돼요.",
+    title: "세 끼 구성",
+    description: "아침·점심·저녁을 영양 균형에 맞게 짜고 있어요.",
   },
   {
-    title: "1~2분 정도 걸려요",
-    description: "조금만 기다려 주세요.",
+    title: "15~30초 정도 걸려요",
+    description: "완성되면 바로 보여 드리고 저장 식단에도 보관할게요.",
   },
 ];
 
@@ -43,6 +44,12 @@ export interface AiMealPlanPanelProps {
   favoriteFoodNames: Set<string>;
   onFavoriteFoodToggle: (food: MealFood) => void;
   onRetryAiGenerate: () => void;
+  onFoodSwap?: (position: FoodPosition, food: AIFood) => void;
+  onMealRegenerate?: (mealType: FoodPosition["mealType"]) => void;
+  regeneratingMealType?: FoodPosition["mealType"] | null;
+  // 날짜가 정해진 식단이고 그날이 지났거나 오늘이면 끼니마다 먹었는지 체크할 수 있다
+  intakeEnabled?: boolean;
+  onMealIntakeToggle?: (mealType: FoodPosition["mealType"], eaten: boolean) => void;
 }
 
 export function AiMealPlanPanel({
@@ -53,9 +60,12 @@ export function AiMealPlanPanel({
   favoriteFoodNames,
   onFavoriteFoodToggle,
   onRetryAiGenerate,
+  onFoodSwap,
+  onMealRegenerate,
+  regeneratingMealType = null,
+  intakeEnabled = false,
+  onMealIntakeToggle,
 }: AiMealPlanPanelProps) {
-  const navigate = useNavigate();
-
   if (isAiLoading) {
     return (
       <div className="aiLoading">
@@ -66,6 +76,7 @@ export function AiMealPlanPanel({
             <br />
             만들고 있어요
           </h1>
+          <p>잠시만 이 화면에서 기다려 주세요.</p>
         </div>
 
         <ol className="aiLoadingSteps">
@@ -79,10 +90,6 @@ export function AiMealPlanPanel({
             </li>
           ))}
         </ol>
-
-        <Button className="aiLoadingBack" variant="ghost" block onClick={() => navigate(-1)}>
-          뒤로 가기
-        </Button>
       </div>
     );
   }
@@ -123,12 +130,46 @@ export function AiMealPlanPanel({
       <div className="mealList">
         {aiMealPlan!.meals.map((meal) => {
           const mealCalories = meal.foods.reduce((sum, f) => sum + f.calories, 0);
+          const eaten = meal.eaten === true;
           return (
-            <article className="mealCard" key={meal.mealType}>
+            <article
+              className={`mealCard${regeneratingMealType === meal.mealType ? " isRegenerating" : ""}${eaten ? " isEaten" : ""}`}
+              key={meal.mealType}
+              aria-busy={regeneratingMealType === meal.mealType}
+            >
               <div className="mealCardHeader">
                 <strong>{MEAL_TYPE_LABELS[meal.mealType]}</strong>
                 <span>{mealCalories.toLocaleString()} kcal</span>
+                {onMealRegenerate && !eaten ? (
+                  <button
+                    type="button"
+                    className="mealRegenerateButton"
+                    aria-label={`${MEAL_TYPE_LABELS[meal.mealType]} 다시 만들기`}
+                    disabled={regeneratingMealType != null}
+                    onClick={() => onMealRegenerate(meal.mealType)}
+                  >
+                    <RefreshIcon />
+                  </button>
+                ) : null}
               </div>
+              {intakeEnabled && onMealIntakeToggle ? (
+                <button
+                  type="button"
+                  className={`mealIntakeToggle${eaten ? " isEaten" : ""}`}
+                  aria-pressed={eaten}
+                  onClick={() => onMealIntakeToggle(meal.mealType, !eaten)}
+                >
+                  <span className="mealIntakeBox" aria-hidden="true">
+                    {eaten ? <CheckIcon /> : null}
+                  </span>
+                  {eaten ? "먹었어요" : "먹었으면 체크하세요"}
+                </button>
+              ) : null}
+              {regeneratingMealType === meal.mealType ? (
+                <div className="mealRegenerating" role="status">
+                  <Spinner size={40} label={`${MEAL_TYPE_LABELS[meal.mealType]}을 다시 만들고 있어요`} />
+                </div>
+              ) : null}
               <div className="foodList">
                 {meal.foods.map((food, i) => {
                   const mealFood: MealFood = {
@@ -148,6 +189,11 @@ export function AiMealPlanPanel({
                       isFavorite={favoriteFoodNames.has(food.name)}
                       key={mealFood.id}
                       onFavoriteFoodToggle={onFavoriteFoodToggle}
+                      onSwap={
+                        onFoodSwap && !eaten
+                          ? () => onFoodSwap({ mealType: meal.mealType, foodIndex: i }, food)
+                          : undefined
+                      }
                     />
                   );
                 })}

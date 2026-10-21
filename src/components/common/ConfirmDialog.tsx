@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  confirmVariant?: "danger" | "primary";
 }
 
 export function ConfirmDialog({
@@ -21,6 +22,7 @@ export function ConfirmDialog({
   cancelLabel = "취소",
   onConfirm,
   onCancel,
+  confirmVariant = "danger",
 }: ConfirmDialogProps) {
   const titleId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -52,7 +54,7 @@ export function ConfirmDialog({
           <Button ref={cancelRef} variant="ghost" size="medium" onClick={onCancel}>
             {cancelLabel}
           </Button>
-          <Button variant="danger" size="medium" onClick={onConfirm}>
+          <Button variant={confirmVariant} size="medium" onClick={onConfirm}>
             {confirmLabel}
           </Button>
         </div>

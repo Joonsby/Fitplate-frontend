@@ -68,6 +68,7 @@ export function extractAiResponseFromMealPlan(mealPlan: MealPlan): AIMealPlanRes
     ? firstDay.meals.map((meal) => ({
         mealType: meal.mealType,
         title: meal.title,
+        eaten: meal.eaten ?? false,
         foods: meal.foods.map((food) => ({
           name: food.name,
           amount: food.amount,
@@ -80,4 +81,15 @@ export function extractAiResponseFromMealPlan(mealPlan: MealPlan): AIMealPlanRes
       }))
     : [];
   return { meals };
+}
+
+// 끼니 하나의 섭취 여부만 바꾼 새 MealPlan 을 돌려줍니다 (낙관적 업데이트용).
+export function withMealEaten(mealPlan: MealPlan, mealType: Meal["mealType"], eaten: boolean): MealPlan {
+  return {
+    ...mealPlan,
+    days: mealPlan.days.map((day) => ({
+      ...day,
+      meals: day.meals.map((meal) => (meal.mealType === mealType ? { ...meal, eaten } : meal)),
+    })),
+  };
 }

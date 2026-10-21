@@ -132,6 +132,9 @@ export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanP
       }
 
       const snapshot: ResultSnapshot = {
+        mealPlanId: response.mealPlanId != null ? String(response.mealPlanId) : undefined,
+        title: response.title,
+        titleCustomized: false,
         profile: requestProfile,
         goal: requestGoal,
         nutritionTarget,
@@ -177,8 +180,14 @@ export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanP
     setGenerationStatus("idle");
   };
 
+  // 음식 바꾸기·섭취 체크 등으로 바뀐 식단을 현재 결과에 반영한다
+  const updateResultSnapshot = (updater: (current: ResultSnapshot) => ResultSnapshot) => {
+    setResultSnapshot((current) => (current == null ? current : updater(current)));
+  };
+
   return {
     resultSnapshot,
+    updateResultSnapshot,
     isAiLoading,
     generationStatus,
     markGenerating,

@@ -87,6 +87,12 @@
   letter-spacing: -0.6px;
 }
 
+.aiLoadingCenter p {
+  margin: -12px 0 0;
+  color: var(--fp-sub);
+  font-size: 15px;
+}
+
 .aiLoadingSteps {
   display: flex;
   flex-direction: column;
@@ -134,7 +140,3 @@
   word-break: keep-all;
 }
 
-.aiLoadingBack {
-  opacity: 0;
-  animation: aiStepIn 0.4s ease-out 1.2s forwards;
-}

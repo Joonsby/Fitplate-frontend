@@ -1,0 +1,219 @@
+/* 음식 바꾸기 하단 시트와 대안 목록을 꾸밉니다. */
+@keyframes swapFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes swapRise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.swapBackdrop {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(20, 28, 43, 0.45);
+  animation: swapFade 0.18s ease-out;
+}
+
+.swapSheet {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88svh;
+  flex-direction: column;
+  padding: 10px 20px max(20px, env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: var(--fp-surface);
+  box-shadow: 0 -10px 40px rgba(20, 28, 43, 0.18);
+  animation: swapRise 0.26s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.swapHandle {
+  width: 40px;
+  height: 4px;
+  margin: 0 auto 14px;
+  border-radius: 2px;
+  background: var(--fp-line);
+}
+
+.swapSheet h2 {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.swapOriginal {
+  margin: 8px 0 0;
+  color: var(--fp-sub);
+  font-size: 14px;
+}
+
+.swapOriginal strong {
+  color: var(--fp-ink);
+}
+
+.swapHint {
+  margin: 2px 0 0;
+  color: var(--fp-sub);
+  font-size: 13px;
+}
+
+.swapBody {
+  min-height: 220px;
+  margin: 16px -4px 0;
+  padding: 0 4px;
+  overflow-y: auto;
+}
+
+.swapState {
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.swapState p {
+  margin: 0;
+  color: var(--fp-sub);
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.swapErrorIcon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 16px;
+  color: var(--fp-error);
+  background: var(--fp-error-soft);
+}
+
+.swapErrorIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.swapList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.swapOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 14px;
+  border: 1.5px solid var(--fp-line);
+  border-radius: 18px;
+  background: var(--fp-surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.swapOption.isSelected {
+  border-color: var(--fp-blue);
+  background: #f7faff;
+}
+
+.swapOption:focus-visible {
+  outline: 3px solid rgba(47, 127, 224, 0.35) !important;
+  outline-offset: 2px;
+}
+
+.swapRadio {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  border: 2px solid var(--fp-line);
+  border-radius: 50%;
+}
+
+.swapOption.isSelected .swapRadio {
+  border: 6px solid var(--fp-blue);
+}
+
+.swapOptionText {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.swapOptionText strong {
+  color: var(--fp-ink);
+  font-size: 16px;
+  font-weight: 700;
+  word-break: keep-all;
+}
+
+.swapFavoriteTag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: var(--fp-navy);
+  background: var(--fp-blue-soft);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+
+.swapOptionText span {
+  color: var(--fp-sub);
+  font-size: 13px;
+}
+
+.swapOptionText .swapMacros {
+  font-size: 12px;
+}
+
+.swapDiff {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.swapInlineError {
+  margin: 12px 0 0;
+  color: var(--fp-error);
+  font-size: 13px;
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+.swapActions {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 8px;
+  margin-top: 16px;
+}

@@ -100,3 +100,28 @@ export const TrendIcon = ({
     {direction === "up" ? <path d="M4 17l6-6 4 4 6-6m0 0v5m0-5h-5" /> : null}
   </Line>
 );
+
+export const SwapIcon = (p: IconProps) => (
+  <Line strokeWidth="2" {...p}>
+    <path d="M4 8h14m0 0-3.5-3.5M18 8l-3.5 3.5M20 16H6m0 0 3.5-3.5M6 16l3.5 3.5" />
+  </Line>
+);
+
+export const RefreshIcon = (p: IconProps) => (
+  <Line strokeWidth="2" {...p}>
+    <path d="M20 11a8 8 0 0 0-14.3-4.9L4 8m0-4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16m0 4v-4h-4" />
+  </Line>
+);
+
+export const PencilIcon = (p: IconProps) => (
+  <Line strokeWidth="2" {...p}>
+    <path d="M14.5 5.5 18.5 9.5M5 19l1-4L15.8 5.2a1.8 1.8 0 0 1 2.6 0l.4.4a1.8 1.8 0 0 1 0 2.6L9 18l-4 1Z" />
+  </Line>
+);
+
+export const CalendarCheckIcon = (p: IconProps) => (
+  <Line {...p}>
+    <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
+    <path d="M8 3v4m8-4v4M3.5 10h17m-11.5 4.5 2 2 4-4" />
+  </Line>
+);

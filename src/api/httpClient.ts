@@ -5,14 +5,29 @@ export class HttpError extends Error {
   constructor(
     public readonly status: number,
     message: string,
+    // 서버가 상황을 구분하라고 보낸 코드 (예: DATE_TAKEN). 없으면 undefined
+    public readonly code?: string,
   ) {
     super(message);
     this.name = "HttpError";
   }
 }
 
+// 서버가 code 를 보낸 오류는 사용자에게 보여줄 문구도 서버 것을 쓴다.
+function toHttpError(status: number, errorText: string, fallbackMessage: string): HttpError {
+  try {
+    const body = JSON.parse(errorText) as { code?: string; message?: string };
+    if (body.code) {
+      return new HttpError(status, body.message ?? fallbackMessage, body.code);
+    }
+  } catch {
+    // JSON 이 아닌 오류 본문은 기본 문구로 처리한다
+  }
+  return new HttpError(status, fallbackMessage);
+}
+
 export interface RequestOptions {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   headers?: Record<string, string>;
   withAuth?: boolean;
@@ -71,7 +86,7 @@ export async function apiFetch<T>(
       statusText: response.statusText,
       body: errorText,
     });
-    throw new HttpError(response.status, httpErrorMessage);
+    throw toHttpError(response.status, errorText, httpErrorMessage);
   }
 
   return response.json() as Promise<T>;
@@ -96,6 +111,6 @@ export async function apiFetchVoid(
       statusText: response.statusText,
       body: errorText,
     });
-    throw new HttpError(response.status, httpErrorMessage);
+    throw toHttpError(response.status, errorText, httpErrorMessage);
   }
 }

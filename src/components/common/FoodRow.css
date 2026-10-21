@@ -80,3 +80,13 @@
 .favoriteFoodButton:focus-visible {
   outline: 2px solid var(--fp-blue) !important;
 }
+
+.foodSwapButton {
+  color: var(--fp-blue);
+}
+
+@media (max-width: 360px) {
+  .foodRowBuyLabel {
+    display: none;
+  }
+}

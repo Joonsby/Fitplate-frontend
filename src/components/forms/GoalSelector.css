@@ -111,10 +111,21 @@
   margin-top: auto;
 }
 
-.goalAdChip {
-  padding: 2px 7px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.22);
-  font-size: 12px;
-  font-weight: 700;
+.goalQuota {
+  margin: auto 0 -8px;
+  color: var(--fp-sub);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  word-break: keep-all;
 }
+
+.goalQuota.isEmpty {
+  color: var(--fp-ink);
+}
+
+.goalSubmit.hasQuota {
+  margin-top: 0;
+}
+

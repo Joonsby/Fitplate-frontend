@@ -8,6 +8,8 @@ import { getAccessToken } from "./authToken";
 import { apiFetch } from "./httpClient";
 
 interface BackendMealPlanGenerateResponse {
+  mealPlanId?: number;
+  title?: string;
   height: number;
   weight: number;
   age: number;
@@ -112,6 +114,21 @@ function mapGenderToBackend(gender: UserProfile["gender"]): string {
   return gender === "male" ? "MALE" : "FEMALE";
 }
 
+// 오늘 식단을 몇 번 더 만들 수 있는지와 다음 생성에 광고가 필요한지. 하루 첫 생성은 광고 없이 만든다.
+export interface GenerationQuota {
+  usedToday: number;
+  dailyLimit: number;
+  remaining: number;
+  adRequired: boolean;
+}
+
+export async function getGenerationQuota(): Promise<GenerationQuota> {
+  return apiFetch<GenerationQuota>(getApiUrl(`${API_ENDPOINTS.MEAL_PLAN}/generation-quota`), {
+    networkErrorMessage: "생성 가능 횟수를 불러오지 못했어요.",
+    httpErrorMessage: "생성 가능 횟수를 불러오지 못했어요.",
+  });
+}
+
 export async function generateMealPlanFromApi({
   profile,
   goal,
@@ -126,6 +143,10 @@ export async function generateMealPlanFromApi({
     age: profile.age,
     bodyFatRate: profile.bodyFatRate ?? null,
     goal: mapGoalToBackend(goal),
+    // undefined 면 서버에 저장된 취향을 그대로 쓴다
+    preferredFoodCategories: profile.preferredFoodCategories,
+    excludedFoodCategories: profile.excludedFoodCategories,
+    allergyFoodCategories: profile.allergyFoodCategories,
   };
 
   if (USE_TEMPORARY_MEAL_PLAN_DATA) {

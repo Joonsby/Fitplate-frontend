@@ -7,7 +7,7 @@ import { StepProgress } from "../common/StepProgress";
 import { Button } from "../common/Button";
 import { SparkleIcon, TrendIcon } from "../common/Icons";
 import type { GenerationStatus, GoalType } from "../../types/fitplate";
-import { useFullScreenAd } from "../../ads/useFullScreenAd";
+import type { GenerationQuota } from "../../api/mealPlanApi";
 
 interface GoalSelectorProps {
   selectedGoal: GoalType;
@@ -17,6 +17,10 @@ interface GoalSelectorProps {
   onNext: () => void;
   generationStatus: GenerationStatus;
   onStartGenerating: () => void;
+  isAdLoaded: boolean;
+  showAd: (onComplete?: (wasWatched: boolean) => void) => void;
+  // null 이면 아직 모르거나 불러오지 못한 것. 그때는 광고를 보여준다
+  quota: GenerationQuota | null;
 }
 
 const GOALS: GoalType[] = ["lose", "maintain", "gain"];
@@ -35,31 +39,29 @@ export function GoalSelector({
   onNext,
   generationStatus,
   onStartGenerating,
+  isAdLoaded,
+  showAd,
+  quota,
 }: GoalSelectorProps) {
-  const { isAdLoaded, showAd } = useFullScreenAd();
   const isGenerating = generationStatus === "generating";
-  const showsAd =
-    isAdLoaded &&
-    sessionStorage.getItem("adRewardAvailable") !== "true" &&
-    generationStatus !== "failed";
+  const noneLeft = quota != null && quota.remaining === 0;
+  // 하루 첫 생성과 실패한 뒤 다시 만들 때는 광고를 보여주지 않는다
+  const showsAd = isAdLoaded && (quota?.adRequired ?? true) && generationStatus !== "failed";
+  const quotaNote =
+    quota == null
+      ? null
+      : noneLeft
+        ? "오늘은 다 만들었어요. 저장한 식단을 다른 날에 다시 쓰거나 끼니를 바꿔 보세요."
+        : !quota.adRequired
+          ? "오늘 첫 식단은 광고 없이 만들어요."
+          : `오늘 ${quota.remaining}번 더 만들 수 있어요.`;
 
+  // 광고를 기다리지 않고 바로 생성을 시작한다. 광고는 그 위에 띄워 생성 시간과 겹친다
   const handleClickResult = () => {
-    if (isGenerating) return;
-
-    const hasAdReward = sessionStorage.getItem("adRewardAvailable") === "true";
-    if (hasAdReward || generationStatus === "failed") {
-      onStartGenerating();
-      onNext();
-      return;
-    }
-
+    if (isGenerating || noneLeft) return;
     onStartGenerating();
-    showAd((wasWatched) => {
-      if (wasWatched) {
-        sessionStorage.setItem("adRewardAvailable", "true");
-      }
-      onNext();
-    });
+    onNext();
+    if (showsAd) showAd();
   };
 
   return (
@@ -108,14 +110,27 @@ export function GoalSelector({
         TDEE는 현재 활동량을 기준으로 하루에 쓰는 총 칼로리예요.
       </p>
 
-      <Button className="goalSubmit" block onClick={handleClickResult} disabled={isGenerating}>
+      {quotaNote ? (
+        <p className={`goalQuota${noneLeft ? " isEmpty" : ""}`} role="status">
+          {quotaNote}
+        </p>
+      ) : null}
+
+      <Button
+        className={`goalSubmit${quotaNote ? " hasQuota" : ""}`}
+        block
+        onClick={handleClickResult}
+        disabled={isGenerating || noneLeft}
+      >
         {isGenerating ? (
           "식단 만드는 중…"
+        ) : noneLeft ? (
+          "오늘은 다 만들었어요"
         ) : (
           <>
             <SparkleIcon />
             AI 식단 만들기
-            {showsAd ? <span className="goalAdChip">광고</span> : null}
+            {showsAd ? " (AD)" : null}
           </>
         )}
       </Button>

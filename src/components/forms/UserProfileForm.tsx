@@ -6,10 +6,13 @@ import type { Gender, UserProfile } from "../../types/fitplate";
 import { Button } from "../common/Button";
 import { ArrowRightIcon } from "../common/Icons";
 import { StepProgress } from "../common/StepProgress";
+import { FoodPreferencePicker } from "./FoodPreferencePicker";
+import type { FoodPreferenceSelection } from "./FoodPreferencePicker";
 
 interface UserProfileFormProps {
   profile: UserProfile;
-  onProfileSave: (profile: UserProfile) => void;
+  // Promise 를 돌려주면 끝날 때까지 버튼을 잠그고, 실패하면 onNext 를 부르지 않는다
+  onProfileSave: (profile: UserProfile) => void | Promise<void>;
   onNext: () => void;
   mode?: "onboarding" | "edit";
   startEmpty?: boolean;
@@ -80,6 +83,12 @@ export function UserProfileForm({
     bodyFatRate: profile.bodyFatRate == null ? "" : String(profile.bodyFatRate),
   });
   const [fieldErrors, setFieldErrors] = useState<ProfileFieldErrors>({});
+  const [foodPreferences, setFoodPreferences] = useState<FoodPreferenceSelection>({
+    preferred: profile.preferredFoodCategories ?? [],
+    excluded: profile.excludedFoodCategories ?? [],
+    allergies: profile.allergyFoodCategories ?? [],
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const updateNumberField =
     (fieldName: ProfileFieldName) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -97,8 +106,9 @@ export function UserProfileForm({
       validateNumberField(fieldValues[field.name]) === null,
   );
 
-  const handleNext = (event: FormEvent<HTMLFormElement>) => {
+  const handleNext = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSaving) return;
     if (!isProfileValid) {
       setFieldErrors(
         Object.fromEntries(
@@ -112,7 +122,8 @@ export function UserProfileForm({
       );
       return;
     }
-    onProfileSave({
+    const nextProfile: UserProfile = {
+      ...profile,
       height: Number(fieldValues.height),
       weight: Number(fieldValues.weight),
       age: Number(fieldValues.age),
@@ -122,14 +133,25 @@ export function UserProfileForm({
         fieldValues.bodyFatRate.trim() === ""
           ? undefined
           : Number(fieldValues.bodyFatRate),
-    });
+      preferredFoodCategories: foodPreferences.preferred,
+      excludedFoodCategories: foodPreferences.excluded,
+      allergyFoodCategories: foodPreferences.allergies,
+    };
+    setIsSaving(true);
+    try {
+      await onProfileSave(nextProfile);
+    } catch {
+      return;
+    } finally {
+      setIsSaving(false);
+    }
     onNext();
   };
 
   return (
     <form
       className="profileForm"
-      onSubmit={handleNext}
+      onSubmit={(event) => void handleNext(event)}
       noValidate
       aria-labelledby={`${formId}-title`}
     >
@@ -151,7 +173,7 @@ export function UserProfileForm({
         <p>
           {isOnboarding
             ? "하루 칼로리와 영양소 목표를 계산하는 데 사용해요."
-            : "바꾼 정보는 다음 식단을 만들 때 반영돼요."}
+            : "저장하면 다음 식단부터 반영돼요."}
         </p>
       </header>
 
@@ -221,12 +243,18 @@ export function UserProfileForm({
         </div>
       </section>
 
-      <Button className="profileSubmit" type="submit" block>
+      {isOnboarding ? null : (
+        <FoodPreferencePicker value={foodPreferences} onChange={setFoodPreferences} />
+      )}
+
+      <Button className="profileSubmit" type="submit" block disabled={isSaving}>
         {isOnboarding ? (
           <>
             목표 선택하러 가기
             <ArrowRightIcon />
           </>
+        ) : isSaving ? (
+          "저장하는 중…"
         ) : (
           "저장하기"
         )}

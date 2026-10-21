@@ -1,7 +1,7 @@
 import { appLogin } from "@apps-in-toss/web-framework";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
 import { getAccessToken } from "./authToken";
-import type { UserProfile } from "../types/fitplate";
+import type { FoodCategory, UserProfile } from "../types/fitplate";
 import { apiFetch, apiFetchRaw } from "./httpClient";
 
 async function tossLogin(authorizationCode: string, referrer: string) {
@@ -37,15 +37,53 @@ export async function getMyUserProfile(): Promise<UserProfile | null> {
     return null;
   }
 
-  const data = await response.json();
+  return toUserProfile(await response.json());
+}
+
+interface ApiUserProfile {
+  height: number;
+  weight: number;
+  age: number;
+  gender: "MALE" | "FEMALE";
+  bmi?: number;
+  bodyFatRate?: number | null;
+  preferredFoodCategories?: FoodCategory[];
+  excludedFoodCategories?: FoodCategory[];
+  allergyFoodCategories?: FoodCategory[];
+}
+
+function toUserProfile(data: ApiUserProfile): UserProfile {
   return {
     height: data.height,
     weight: data.weight,
     age: data.age,
     gender: data.gender === "FEMALE" ? "female" : "male",
     bmi : data.bmi,
-    bodyFatRate: data.bodyFatRate
+    bodyFatRate: data.bodyFatRate ?? undefined,
+    preferredFoodCategories: data.preferredFoodCategories ?? [],
+    excludedFoodCategories: data.excludedFoodCategories ?? [],
+    allergyFoodCategories: data.allergyFoodCategories ?? [],
   };
+}
+
+// 내 정보(신체 정보·음식 취향)를 서버에 바로 저장합니다.
+export async function updateMyProfile(profile: UserProfile): Promise<UserProfile> {
+  const data = await apiFetch<ApiUserProfile>(getApiUrl(API_ENDPOINTS.USER_PROFILE_ME), {
+    method: "PUT",
+    body: {
+      height: profile.height,
+      weight: profile.weight,
+      age: profile.age,
+      gender: profile.gender === "female" ? "FEMALE" : "MALE",
+      bodyFatRate: profile.bodyFatRate ?? null,
+      preferredFoodCategories: profile.preferredFoodCategories ?? [],
+      excludedFoodCategories: profile.excludedFoodCategories ?? [],
+      allergyFoodCategories: profile.allergyFoodCategories ?? [],
+    },
+    networkErrorMessage: "내 정보를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.",
+    httpErrorMessage: "내 정보를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.",
+  });
+  return toUserProfile(data);
 }
 
 export async function login() {

@@ -1,0 +1,84 @@
+/* 음식 취향 칩 묶음을 꾸밉니다. */
+
+.foodPrefCard {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.foodPrefGroup {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.foodPrefGroup legend {
+  padding: 0;
+  color: var(--fp-ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.foodPrefGroup p {
+  margin: 4px 0 12px;
+  color: var(--fp-sub);
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.foodPrefChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.foodPrefChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.foodPrefChip svg {
+  width: 14px;
+  height: 14px;
+}
+
+.foodPrefChip--preferred.isSelected {
+  border-color: var(--fp-blue);
+  color: var(--fp-navy);
+  background: var(--fp-blue-soft);
+}
+
+.foodPrefChip--excluded.isSelected {
+  border-color: var(--fp-error);
+  color: var(--fp-error);
+  background: var(--fp-error-soft);
+}
+
+/* 흰 글자 대비 4.5:1 을 넘기려고 --fp-error 보다 한 단계 진하게 쓴다 */
+.foodPrefChip--allergies.isSelected {
+  border-color: #b8352b;
+  color: #ffffff;
+  background: #b8352b;
+}
+
+.foodPrefChip:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
+  outline-offset: 2px;
+}

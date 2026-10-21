@@ -1,5 +1,86 @@
 /* 식단 결과 화면 고유의 간격을 정의합니다. 카드 모양은 하위 컴포넌트가 담당합니다. */
 
+/* 결과 화면 제목은 이름이 길어 다른 화면보다 작게 쓴다 */
+.resultHeader h1 {
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+.resultHeader .sectionHeaderStep {
+  margin-bottom: 10px;
+}
+
+.resultTitleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.resultTitleRow h1 {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.resultTitleEdit {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  margin-top: -1px;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  cursor: pointer;
+}
+
+.resultTitleEdit svg {
+  width: 16px;
+  height: 16px;
+}
+
+.resultTitleEdit:active {
+  color: var(--fp-blue);
+  background: var(--fp-blue-soft);
+}
+
+.resultTitleEdit:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
+}
+
+.allergyNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: var(--fp-ink);
+  background: var(--fp-error-soft);
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.allergyNotice svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--fp-error);
+}
+
+.allergyNotice p {
+  margin: 0;
+}
+
+.allergyNotice strong {
+  display: block;
+  color: #b8352b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .screen .aiResult {
   margin-top: 4px;
 }

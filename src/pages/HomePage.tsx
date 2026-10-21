@@ -3,7 +3,7 @@ import "../styles/layout.css";
 import "./HomePage.css";
 import { ScreenSectionHeader } from "../components/common/ScreenSectionHeader";
 import { ArrowRightIcon, ChevronRightIcon, SparkleIcon } from "../components/common/Icons";
-import { GOAL_LABELS } from "../types/fitplate";
+import { FOOD_CATEGORY_LABELS, GOAL_LABELS } from "../types/fitplate";
 import type { SavedMealPlan, UserProfile } from "../types/fitplate";
 
 interface HomePageProps {
@@ -32,6 +32,11 @@ export function HomePage({
   onViewAllSavedMealPlans,
 }: HomePageProps) {
   const latest = findLatest(savedMealPlans);
+  const preferenceLines = [
+    { label: "좋아하는 음식", categories: profile.preferredFoodCategories ?? [] },
+    { label: "빼는 음식", categories: profile.excludedFoodCategories ?? [] },
+    { label: "알레르기", categories: profile.allergyFoodCategories ?? [] },
+  ].filter((line) => line.categories.length > 0);
   const stats = [
     { label: "키", value: profile.height, unit: "cm" },
     { label: "몸무게", value: profile.weight, unit: "kg" },
@@ -62,7 +67,7 @@ export function HomePage({
           <br />
           하루 세 끼가 완성돼요
         </strong>
-        <p>만드는 데 1~2분 정도 걸려요.</p>
+        <p>만드는 데 15~30초 정도 걸려요.</p>
         <button type="button" className="createHeroButton" onClick={onCreate}>
           새 식단 만들기
           <ArrowRightIcon />
@@ -87,6 +92,16 @@ export function HomePage({
           </div>
         ))}
       </dl>
+      {preferenceLines.length > 0 ? (
+        <div className="profilePrefSummary">
+          {preferenceLines.map((line) => (
+            <p key={line.label}>
+              <span>{line.label}</span>
+              {line.categories.map((category) => FOOD_CATEGORY_LABELS[category]).join(", ")}
+            </p>
+          ))}
+        </div>
+      ) : null}
 
       {latest ? (
         <>
@@ -104,9 +119,7 @@ export function HomePage({
           >
             <span className="goalChip">{GOAL_LABELS[latest.goal]}</span>
             <span className="recentPlanText">
-              <strong>
-                하루 {latest.target.calories.toLocaleString()} kcal 식단
-              </strong>
+              <strong>{latest.title}</strong>
               <span>
                 {new Date(latest.savedAt).toLocaleDateString("ko-KR", {
                   dateStyle: "medium",

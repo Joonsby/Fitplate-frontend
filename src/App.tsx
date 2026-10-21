@@ -2,7 +2,7 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { login, getMyUserProfile } from "./api/authApi";
 import { saveAccessToken } from "./api/authToken";
-import { getSavedMealPlans } from "./api/mealPlanStorageApi";
+import { getSavedMealPlans, renameSavedMealPlan } from "./api/mealPlanStorageApi";
 import { getFavoriteFoods } from "./api/favoriteFoodsApi";
 import "./App.css";
 import { AppTopTitle } from "./components/common/AppTopTitle";
@@ -19,23 +19,30 @@ import { ResultPage } from "./pages/ResultPage";
 import { SavedMealPlansPage } from "./pages/SavedMealPlansPage";
 import { FavoriteFoodsPage } from "./pages/FavoriteFoodsPage";
 import { IntroPage } from "./pages/IntroPage";
+import { RecordsPage } from "./pages/RecordsPage";
+import { copyMealPlan, scheduleMealPlan, setMealIntake } from "./api/mealIntakeApi";
+import type { MealType } from "./api/mealIntakeApi";
+import { withMealEaten } from "./utils/mealPlanMerger";
 import { useAiMealPlan, clearAiRequestParams } from "./hooks/useAiMealPlan";
 import { useMealPlanSelection } from "./hooks/useMealPlanSelection";
 import { useSavedMealPlans } from "./hooks/useSavedMealPlans";
 import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
 import { useToast } from "./hooks/useToast";
-import type { SavedMealPlan } from "./types/fitplate";
+import { useBlockBack } from "./hooks/useBlockBack";
+import { useFullScreenAd } from "./ads/useFullScreenAd";
+import type { MealPlan, SavedMealPlan } from "./types/fitplate";
 type LoginStatus = "intro" | "loading" | "success" | "error";
 
 const TAB_PATHS: Record<BottomNavTab, string> = {
   create: "/",
+  records: "/records",
   saved: "/saved-plans",
   favorites: "/favorite-foods",
   profile: "/profile",
 };
 
 // 홈이 아닌 탭끼리는 스택 교체 — 돌아가기가 탭 사이 이력을 밟지 않고 홈으로 오도록
-const SUB_TAB_PATHS = ["/saved-plans", "/favorite-foods", "/profile"];
+const SUB_TAB_PATHS = ["/records", "/saved-plans", "/favorite-foods", "/profile"];
 
 function App() {
   const navigate = useNavigate();
@@ -46,6 +53,10 @@ function App() {
   // 서버 프로필이 있거나 온보딩에서 한 번 입력했으면 true — 처음 쓰는 사람만 빈칸으로 시작
   const [hasEnteredProfile, setHasEnteredProfile] = useState(false);
   const isNavigatingRef = useRef(false);
+  // 같은 끼니 섭취 체크를 응답 전에 또 보내지 않도록 막는다
+  const pendingIntakeRef = useRef(new Set<string>());
+  // 기록 탭에서 「저장 식단에서 고르기」로 넘어왔을 때 지정할 날짜
+  const [pendingScheduleDate, setPendingScheduleDate] = useState<string | null>(null);
   const {
     profile,
     setProfile,
@@ -64,6 +75,8 @@ function App() {
   const { favoriteFoods, setFavoriteFoods } = useFavoriteFoods();
 
   const { showToast, toastElement } = useToast();
+  // showToast 는 상태 setter 만 쓰므로 처음 만든 함수를 계속 써도 안전하다
+  const showRecordError = useCallback((message: string) => showToast(message, "error"), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshSavedMealPlans = useCallback(() => {
     getSavedMealPlans()
@@ -116,6 +129,7 @@ function App() {
 
   const {
     resultSnapshot,
+    updateResultSnapshot,
     isAiLoading,
     generationStatus,
     markGenerating,
@@ -123,6 +137,10 @@ function App() {
     generateAiMealPlan,
     resetAiMealPlan,
   } = useAiMealPlan({ profile, goal, nutritionTarget });
+  // 광고는 생성과 동시에 띄우고 결과 화면으로 넘어가므로, 목표 화면이 사라져도 살아 있도록 여기서 관리한다
+  const { isAdLoaded, showAd } = useFullScreenAd();
+  // 식단을 만드는 동안에는 화면을 벗어나지 못하게 한다
+  useBlockBack(isAiLoading);
 
   const handleGenerationSuccess = () => {
     clearAiRequestParams();
@@ -190,6 +208,7 @@ function App() {
 
   const activeTab: BottomNavTab | null =
     path === "/" ? "create"
+    : path === "/records" ? "records"
     : path === "/saved-plans" ? "saved"
     : path === "/favorite-foods" ? "favorites"
     : path === "/profile" ? "profile"
@@ -248,6 +267,91 @@ function App() {
     navigate(-1);
   };
 
+  // 서버에서 받은 식단을 저장 목록·보고 있는 식단·방금 만든 결과에 모두 반영한다
+  const handleMealPlanReplaced = (saved: SavedMealPlan) => {
+    setSavedMealPlans((current) => current.map((plan) => (plan.id === saved.id ? saved : plan)));
+    setViewingSavedMealPlan((current) => (current?.id === saved.id ? saved : current));
+    updateResultSnapshot((current) =>
+      current.mealPlanId === saved.id
+        ? {
+            ...current,
+            mealPlan: saved.mealPlan,
+            planDate: saved.planDate,
+            title: saved.title,
+            titleCustomized: saved.titleCustomized,
+          }
+        : current,
+    );
+  };
+
+  const updateMealPlanById = (mealPlanId: string, updater: (mealPlan: MealPlan) => MealPlan) => {
+    setSavedMealPlans((current) =>
+      current.map((plan) => (plan.id === mealPlanId ? { ...plan, mealPlan: updater(plan.mealPlan) } : plan)),
+    );
+    setViewingSavedMealPlan((current) =>
+      current?.id === mealPlanId ? { ...current, mealPlan: updater(current.mealPlan) } : current,
+    );
+    updateResultSnapshot((current) =>
+      current.mealPlanId === mealPlanId ? { ...current, mealPlan: updater(current.mealPlan) } : current,
+    );
+  };
+
+  // 섭취 체크: 화면을 먼저 바꾸고, 실패하면 되돌린다. 응답 전 같은 끼니를 다시 누르면 무시한다.
+  const toggleMealIntake = async (mealPlanId: string, mealType: MealType, eaten: boolean): Promise<boolean> => {
+    const key = `${mealPlanId}:${mealType}`;
+    if (pendingIntakeRef.current.has(key)) return false;
+    pendingIntakeRef.current.add(key);
+    updateMealPlanById(mealPlanId, (mealPlan) => withMealEaten(mealPlan, mealType, eaten));
+    try {
+      handleMealPlanReplaced(await setMealIntake(mealPlanId, mealType, eaten));
+      return true;
+    } catch (error) {
+      updateMealPlanById(mealPlanId, (mealPlan) => withMealEaten(mealPlan, mealType, !eaten));
+      showToast(error instanceof Error ? error.message : "섭취 기록을 저장하지 못했어요.", "error");
+      return false;
+    } finally {
+      pendingIntakeRef.current.delete(key);
+    }
+  };
+
+  // 같은 음식의 새 식단을 다른 날짜에 넣는다. 그날 다른 식단이 있으면 HttpError(code=DATE_TAKEN) 가 그대로 올라간다.
+  const copyForDate = async (mealPlanId: string, planDate: string, replace: boolean) => {
+    const copied = await copyMealPlan(mealPlanId, planDate, replace);
+    setPendingScheduleDate(null);
+    refreshSavedMealPlans();
+    return copied;
+  };
+
+  const renameMealPlan = async (mealPlanId: string, title: string | null) => {
+    handleMealPlanReplaced(await renameSavedMealPlan(mealPlanId, title));
+  };
+
+  // 날짜 지정. 같은 날짜에 다른 식단이 있으면 HttpError(code=DATE_TAKEN) 가 그대로 올라간다.
+  const scheduleForDate = async (mealPlanId: string, planDate: string | null, replace: boolean) => {
+    const saved = await scheduleMealPlan(mealPlanId, planDate, replace);
+    handleMealPlanReplaced(saved);
+    setPendingScheduleDate(null);
+    // 다른 식단의 날짜가 풀렸을 수 있어 목록을 다시 읽는다
+    refreshSavedMealPlans();
+    return saved;
+  };
+
+  const openSavedMealPlanById = async (mealPlanId: string) => {
+    const found = savedMealPlans.find((plan) => plan.id === mealPlanId);
+    if (found) {
+      viewSavedMealPlan(found);
+      return;
+    }
+    try {
+      const fetched = await getSavedMealPlans();
+      setSavedMealPlans(fetched);
+      const plan = fetched.find((item) => item.id === mealPlanId);
+      if (plan) viewSavedMealPlan(plan);
+    } catch {
+      showToast("식단을 불러오지 못했어요.", "error");
+    }
+  };
+
   const topBar =
     isResultPage && isAiLoading ? null
     : path === "/onboarding/goal" ? <AppTopTitle onBack={onBack} />
@@ -265,6 +369,8 @@ function App() {
       generateAiMealPlan={generateAiMealPlanWithEvents}
       generationStatus={generationStatus}
       markGenerating={markGenerating}
+      isAdLoaded={isAdLoaded}
+      showAd={showAd}
     />
   );
 
@@ -308,8 +414,12 @@ function App() {
           element={
             <ProfilePage
               profile={profile}
-              onProfileSave={setProfile}
-              onSaved={() => showToast("내 정보를 저장했어요.", "success")}
+              onProfileSaved={(saved) => {
+                setProfile(saved);
+                setHasEnteredProfile(true);
+                showToast("내 정보를 저장했어요.", "success");
+              }}
+              onError={(message) => showToast(message, "error")}
             />
           }
         />
@@ -327,8 +437,27 @@ function App() {
               aiError={aiError}
               isAiLoading={isAiLoading}
               generateAiMealPlan={generateAiMealPlanWithEvents}
-              onSaved={() => {}}
-              onBack={onBack}
+              onMealPlanReplaced={handleMealPlanReplaced}
+              onToggleMealIntake={toggleMealIntake}
+              onSchedule={scheduleForDate}
+              onRename={renameMealPlan}
+              onCopy={copyForDate}
+              defaultScheduleDate={pendingScheduleDate}
+            />
+          }
+        />
+        <Route
+          path="/records"
+          element={
+            <RecordsPage
+              onToggleMealIntake={toggleMealIntake}
+              onOpenMealPlan={(mealPlanId) => void openSavedMealPlanById(mealPlanId)}
+              onPickPlanForDate={(date) => {
+                setPendingScheduleDate(date);
+                void goToSavedPlans();
+              }}
+              onCreate={() => handleTabClick("create")}
+              onError={showRecordError}
             />
           }
         />
@@ -341,6 +470,9 @@ function App() {
               setViewingSavedMealPlan={setViewingSavedMealPlan}
               isLoading={isLoadingSavedMealPlans}
               onCreate={() => handleTabClick("create")}
+              pendingScheduleDate={pendingScheduleDate}
+              onCancelPendingSchedule={() => setPendingScheduleDate(null)}
+              onRename={renameMealPlan}
             />
           }
         />

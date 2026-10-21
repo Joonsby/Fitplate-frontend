@@ -19,7 +19,36 @@ export interface UserProfile {
   gender: Gender;
   bmi?: number;
   bodyFatRate?: number;
+  preferredFoodCategories?: FoodCategory[];
+  excludedFoodCategories?: FoodCategory[];
+  allergyFoodCategories?: FoodCategory[];
 }
+
+// 식단 생성 시 선호·제외로 고를 수 있는 음식 분류입니다. 백엔드 FoodCategory 와 같은 값입니다.
+export type FoodCategory =
+  | "PORK"
+  | "BEEF"
+  | "CHICKEN"
+  | "SEAFOOD"
+  | "EGG"
+  | "DAIRY"
+  | "SOY"
+  | "NUTS"
+  | "WHEAT";
+
+export const FOOD_CATEGORY_LABELS: Record<FoodCategory, string> = {
+  PORK: "돼지고기",
+  BEEF: "소고기",
+  CHICKEN: "닭고기",
+  SEAFOOD: "생선·해산물",
+  EGG: "달걀",
+  DAIRY: "우유·유제품",
+  SOY: "콩·두부",
+  NUTS: "견과류",
+  WHEAT: "밀가루·빵",
+};
+
+export const FOOD_CATEGORIES = Object.keys(FOOD_CATEGORY_LABELS) as FoodCategory[];
 
 // 결과 화면에 보여줄 하루 영양 목표 타입입니다.
 // bmr/tdee는 계산 과정을 사용자에게 설명하기 위해 함께 보관합니다.
@@ -87,6 +116,7 @@ export interface Meal {
   carbs?: number;
   fat?: number;
   foods: MealFood[];
+  eaten?: boolean;
 }
 
 // 기간 식단 안의 하루 식단을 표현하는 타입입니다.
@@ -108,17 +138,6 @@ export interface MealPlan {
   days: DayMeal[];
 }
 
-// 장보기 리스트에서 중복 재료를 합친 뒤 보여줄 항목 타입입니다.
-export interface ShoppingListItem {
-  id: string;
-  name: string;
-  amountText: string;
-  totalCalories: number;
-  servingCount: number;
-  shoppingCategory: ShoppingCategory;
-  shoppingKeyword?: string;
-}
-
 // AI 응답 안의 음식 한 개 타입입니다.
 export interface AIFood {
   name: string;
@@ -135,6 +154,8 @@ export interface AIMeal {
   mealType: "breakfast" | "lunch" | "dinner";
   title: string;
   foods: AIFood[];
+  // 먹었다고 체크했는지 (저장된 식단 응답에만 있다)
+  eaten?: boolean;
 }
 
 // AI 식단 응답 전체 타입입니다. 백엔드는 하루치 meals 배열만 반환합니다.
@@ -145,16 +166,26 @@ export interface AIMealPlanResponse {
 // 다시 보기 화면에 필요한 저장 식단 타입입니다.
 export interface SavedMealPlan {
   id: string;
+  // 보여줄 이름. 사용자가 정하지 않았으면 음식으로 만든 자동 이름
+  title: string;
+  titleCustomized: boolean;
   savedAt: string;
   profile: UserProfile;
   goal: GoalType;
   target: NutritionTarget;  
   mealPlan: MealPlan;
+  // 이 식단을 따르는 날짜 (YYYY-MM-DD). null 이면 날짜 미지정
+  planDate: string | null;
 }
 
 // ResultPage 복원에 필요한 전체 데이터를 메모리에 보관하는 스냅샷 타입입니다.
 // aiError가 있으면 생성 실패 상태로 복원됩니다.
 export interface ResultSnapshot {
+  // 서버에 저장된 식단 ID. 음식 바꾸기에 쓴다.
+  mealPlanId?: string;
+  planDate?: string | null;
+  title?: string;
+  titleCustomized?: boolean;
   profile: UserProfile;
   goal: GoalType;
   nutritionTarget: NutritionTarget;

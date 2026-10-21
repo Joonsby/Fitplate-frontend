@@ -42,6 +42,10 @@ export function HomePage({
     { label: "몸무게", value: profile.weight, unit: "kg" },
     { label: "나이", value: profile.age, unit: "세" },
     { label: "성별", value: profile.gender === "male" ? "남성" : "여성", unit: "" },
+    // 체지방률은 선택 입력이라 비어 있으면 「-」로 보여준다
+    profile.bodyFatRate == null
+      ? { label: "체지방률", value: "-", unit: "" }
+      : { label: "체지방률", value: Number(profile.bodyFatRate.toFixed(1)), unit: "%" },
   ];
 
   return (

@@ -30,6 +30,29 @@
   opacity: 1;
   transform: translate(-50%, 0);
 }
+.fpToast.isOpen.hasAction {
+  pointer-events: auto;
+}
+.fpToastAction {
+  flex: 0 0 auto;
+  margin: -4px -8px -4px 2px;
+  padding: 7px 11px;
+  border: 0;
+  border-radius: 10px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.fpToastAction:active {
+  background: rgba(255, 255, 255, 0.26);
+}
+.fpToastAction:focus-visible {
+  outline: 2px solid #ffffff !important;
+}
 .fpToastIcon {
   display: grid;
   width: 22px;

@@ -30,7 +30,7 @@ import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
 import { useToast } from "./hooks/useToast";
 import { useBlockBack } from "./hooks/useBlockBack";
 import { useFullScreenAd } from "./ads/useFullScreenAd";
-import type { MealPlan, SavedMealPlan } from "./types/fitplate";
+import type { FoodCategory, MealPlan, PlanSchedule, SavedMealPlan, UserProfile } from "./types/fitplate";
 type LoginStatus = "intro" | "loading" | "success" | "error";
 
 const TAB_PATHS: Record<BottomNavTab, string> = {
@@ -154,9 +154,9 @@ function App() {
     navigate("/result");
   };
 
-  const generateAiMealPlanWithEvents = async () => {
+  const generateAiMealPlanWithEvents = async (schedule?: PlanSchedule | null) => {
     try {
-      const result = await generateAiMealPlan();
+      const result = await generateAiMealPlan(schedule);
       if (result !== null) {
         handleGenerationSuccess();
       } else {
@@ -367,6 +367,7 @@ function App() {
       onGoalChange={setGoal}
       onGeneratedStart={clearViewingSavedMealPlan}
       generateAiMealPlan={generateAiMealPlanWithEvents}
+      requestedPlanDate={(location.state as { planDate?: string } | null)?.planDate ?? null}
       generationStatus={generationStatus}
       markGenerating={markGenerating}
       isAdLoaded={isAdLoaded}
@@ -387,7 +388,7 @@ function App() {
               profile={profile}
               savedMealPlans={savedMealPlans}
               onCreate={() => navigate("/goal")}
-              onEditProfile={() => navigate("/profile")}
+              onEditProfile={() => navigate("/profile", { state: { from: "home" } })}
               onViewSavedMealPlan={viewSavedMealPlan}
               onViewAllSavedMealPlans={() => void goToSavedPlans()}
             />
@@ -415,9 +416,17 @@ function App() {
             <ProfilePage
               profile={profile}
               onProfileSaved={(saved) => {
+                const tasteChanged = !sameFoodTaste(profile, saved);
                 setProfile(saved);
                 setHasEnteredProfile(true);
-                showToast("내 정보를 저장했어요.", "success");
+                // 홈의 「수정」으로 들어왔으면 홈으로 돌아가고, 하단 탭으로 들어왔으면 그대로 둔다
+                if ((location.state as { from?: string } | null)?.from === "home") navigate(-1);
+                showToast(
+                  "내 정보를 저장했어요.",
+                  "success",
+                  // 취향·알레르기가 바뀌면 이미 만든 식단에는 반영되지 않으니 새로 만들 수 있게 한다
+                  tasteChanged ? { label: "새 식단 만들기", onClick: () => navigate("/goal") } : undefined,
+                );
               }}
               onError={(message) => showToast(message, "error")}
             />
@@ -456,7 +465,7 @@ function App() {
                 setPendingScheduleDate(date);
                 void goToSavedPlans();
               }}
-              onCreate={() => handleTabClick("create")}
+              onCreate={(date) => navigate("/goal", { state: { planDate: date } })}
               onError={showRecordError}
             />
           }
@@ -473,6 +482,7 @@ function App() {
               pendingScheduleDate={pendingScheduleDate}
               onCancelPendingSchedule={() => setPendingScheduleDate(null)}
               onRename={renameMealPlan}
+              onSchedule={scheduleForDate}
             />
           }
         />
@@ -495,3 +505,13 @@ function App() {
 }
 
 export default App;
+
+// 선호·제외·알레르기 분류가 모두 같은지 (순서는 보지 않는다)
+function sameFoodTaste(before: UserProfile, after: UserProfile): boolean {
+  const key = (categories?: FoodCategory[]) => [...(categories ?? [])].sort().join(",");
+  return (
+    key(before.preferredFoodCategories) === key(after.preferredFoodCategories) &&
+    key(before.excludedFoodCategories) === key(after.excludedFoodCategories) &&
+    key(before.allergyFoodCategories) === key(after.allergyFoodCategories)
+  );
+}

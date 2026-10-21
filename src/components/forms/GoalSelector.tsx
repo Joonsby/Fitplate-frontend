@@ -8,13 +8,21 @@ import { Button } from "../common/Button";
 import { SparkleIcon, TrendIcon } from "../common/Icons";
 import type { GenerationStatus, GoalType } from "../../types/fitplate";
 import type { GenerationQuota } from "../../api/mealPlanApi";
+import { useState } from "react";
+import { ConfirmDialog } from "../common/ConfirmDialog";
+import { PlanDatePicker } from "./PlanDatePicker";
+import { formatDateLabel } from "../../utils/date";
 
 interface GoalSelectorProps {
   selectedGoal: GoalType;
   goalCalories: Record<GoalType, number>;
   isOnboarding: boolean;
   onGoalChange: (goal: GoalType) => void;
-  onNext: () => void;
+  // replaceDate 가 true 면 그날 있던 식단 대신 새 식단을 넣는다
+  onNext: (replaceDate: boolean) => void;
+  planDate: string | null;
+  takenDates: ReadonlySet<string>;
+  onPlanDateChange: (planDate: string | null) => void;
   generationStatus: GenerationStatus;
   onStartGenerating: () => void;
   isAdLoaded: boolean;
@@ -42,7 +50,12 @@ export function GoalSelector({
   isAdLoaded,
   showAd,
   quota,
+  planDate,
+  takenDates,
+  onPlanDateChange,
 }: GoalSelectorProps) {
+  const [confirmReplace, setConfirmReplace] = useState(false);
+  const dateTaken = planDate != null && takenDates.has(planDate);
   const isGenerating = generationStatus === "generating";
   const noneLeft = quota != null && quota.remaining === 0;
   // 하루 첫 생성과 실패한 뒤 다시 만들 때는 광고를 보여주지 않는다
@@ -57,11 +70,21 @@ export function GoalSelector({
           : `오늘 ${quota.remaining}번 더 만들 수 있어요.`;
 
   // 광고를 기다리지 않고 바로 생성을 시작한다. 광고는 그 위에 띄워 생성 시간과 겹친다
+  const startGenerating = (replaceDate: boolean) => {
+    setConfirmReplace(false);
+    onStartGenerating();
+    onNext(replaceDate);
+    if (showsAd) showAd();
+  };
+
+  // 그날 식단이 이미 있으면 AI 를 부르기 전에 바꿀지 묻는다
   const handleClickResult = () => {
     if (isGenerating || noneLeft) return;
-    onStartGenerating();
-    onNext();
-    if (showsAd) showAd();
+    if (dateTaken) {
+      setConfirmReplace(true);
+      return;
+    }
+    startGenerating(false);
   };
 
   return (
@@ -110,6 +133,8 @@ export function GoalSelector({
         TDEE는 현재 활동량을 기준으로 하루에 쓰는 총 칼로리예요.
       </p>
 
+      <PlanDatePicker planDate={planDate} takenDates={takenDates} onChange={onPlanDateChange} />
+
       {quotaNote ? (
         <p className={`goalQuota${noneLeft ? " isEmpty" : ""}`} role="status">
           {quotaNote}
@@ -134,6 +159,15 @@ export function GoalSelector({
           </>
         )}
       </Button>
+      <ConfirmDialog
+        open={confirmReplace}
+        title={`${planDate ? formatDateLabel(planDate) : ""}에는 다른 식단이 있어요`}
+        description="새 식단으로 바꿀까요? 기존 식단은 날짜 지정만 풀리고 저장 식단에는 남아요."
+        confirmLabel="새 식단으로 바꾸기"
+        confirmVariant="primary"
+        onConfirm={() => startGenerating(true)}
+        onCancel={() => setConfirmReplace(false)}
+      />
     </section>
   );
 }

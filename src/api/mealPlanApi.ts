@@ -1,6 +1,7 @@
 ﻿import type {
   AIMealPlanResponse,
   GoalType,
+  PlanSchedule,
   UserProfile,
 } from "../types/fitplate";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
@@ -10,6 +11,7 @@ import { apiFetch } from "./httpClient";
 interface BackendMealPlanGenerateResponse {
   mealPlanId?: number;
   title?: string;
+  planDate?: string | null;
   height: number;
   weight: number;
   age: number;
@@ -132,9 +134,11 @@ export async function getGenerationQuota(): Promise<GenerationQuota> {
 export async function generateMealPlanFromApi({
   profile,
   goal,
+  schedule,
 }: {
   profile: UserProfile;
   goal: GoalType;
+  schedule?: PlanSchedule | null;
 }): Promise<BackendMealPlanGenerateResponse> {
   const requestBody = {
     height: profile.height,
@@ -147,6 +151,8 @@ export async function generateMealPlanFromApi({
     preferredFoodCategories: profile.preferredFoodCategories,
     excludedFoodCategories: profile.excludedFoodCategories,
     allergyFoodCategories: profile.allergyFoodCategories,
+    planDate: schedule?.planDate ?? null,
+    replaceDate: schedule?.replaceDate ?? false,
   };
 
   if (USE_TEMPORARY_MEAL_PLAN_DATA) {

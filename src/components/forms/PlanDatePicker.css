@@ -1,0 +1,83 @@
+/* 새 식단을 먹을 날짜 칩을 꾸밉니다. 날짜 입력칸은 MealScheduleCard.css 의 scheduleDateInput 을 같이 쓴다. */
+
+.planDatePick {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--fp-surface);
+  box-shadow: var(--fp-shadow-card);
+}
+
+.planDatePickHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.planDatePickHead strong {
+  color: var(--fp-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.planDatePickHead span {
+  color: var(--fp-sub);
+  font-size: 13px;
+  word-break: keep-all;
+}
+
+.planDateChips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.planDateChip {
+  position: relative;
+  min-height: 40px;
+  padding: 0 4px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  color: var(--fp-sub);
+  background: var(--fp-field);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.planDateChip.isSelected {
+  border-color: var(--fp-blue);
+  color: var(--fp-navy);
+  background: var(--fp-blue-soft);
+}
+
+.planDateChip:focus-visible {
+  outline: 2px solid var(--fp-blue) !important;
+  outline-offset: 2px;
+}
+
+/* 그날 식단이 이미 있다는 표시 */
+.planDateDot {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fp-sub);
+}
+
+.planDateTaken {
+  margin: 0;
+  color: var(--fp-ink);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: keep-all;
+}

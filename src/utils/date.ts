@@ -45,3 +45,13 @@ export function formatShortDate(value: string): string {
   const date = parseDateString(value);
   return `${date.getMonth() + 1}.${date.getDate()}`;
 }
+
+// 오늘부터 식단이 비어 있는 가장 가까운 날. 60일 안에 없으면 오늘
+export function firstFreeDate(takenDates: ReadonlySet<string>): string {
+  const today = todayString();
+  for (let offset = 0; offset < 60; offset++) {
+    const date = addDays(today, offset);
+    if (!takenDates.has(date)) return date;
+  }
+  return today;
+}

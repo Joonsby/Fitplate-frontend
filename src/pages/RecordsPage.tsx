@@ -14,7 +14,8 @@ interface RecordsPageProps {
   onToggleMealIntake: (mealPlanId: string, mealType: MealType, eaten: boolean) => Promise<boolean>;
   onOpenMealPlan: (mealPlanId: string) => void;
   onPickPlanForDate: (date: string) => void;
-  onCreate: () => void;
+  // date 는 기록 탭에서 고른 날짜. 그 날짜로 먹을 새 식단을 만든다
+  onCreate: (date: string) => void;
   onError: (message: string) => void;
 }
 
@@ -123,7 +124,7 @@ export function RecordsPage({
         onToggle={(mealType, eaten) => void handleToggle(mealType, eaten)}
         onOpenMealPlan={onOpenMealPlan}
         onPickPlan={() => onPickPlanForDate(selectedDate)}
-        onCreate={onCreate}
+        onCreate={() => onCreate(selectedDate)}
       />
 
       <NutritionStatsSection refreshKey={statsRefreshKey} onError={onError} />

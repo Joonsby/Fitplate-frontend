@@ -8,6 +8,7 @@ import type {
   MealPlan,
   NutritionTarget,
   ResultSnapshot,
+  PlanSchedule,
   UserProfile,
 } from "../types/fitplate";
 
@@ -15,18 +16,20 @@ const SESSION_KEY = "fitplate_result_snapshot";
 const GENERATION_STATUS_KEY = "mealPlanGenerationStatus";
 const SESSION_AI_REQUEST_KEY = "fitplate_ai_request_params";
 
-function saveAiRequestParams(profile: UserProfile, goal: GoalType): void {
+function saveAiRequestParams(profile: UserProfile, goal: GoalType, schedule: PlanSchedule | null): void {
   try {
-    sessionStorage.setItem(SESSION_AI_REQUEST_KEY, JSON.stringify({ profile, goal }));
+    sessionStorage.setItem(SESSION_AI_REQUEST_KEY, JSON.stringify({ profile, goal, schedule }));
   } catch {
     // ignore
   }
 }
 
-function loadAiRequestParams(): { profile: UserProfile; goal: GoalType } | null {
+function loadAiRequestParams(): { profile: UserProfile; goal: GoalType; schedule?: PlanSchedule | null } | null {
   try {
     const raw = sessionStorage.getItem(SESSION_AI_REQUEST_KEY);
-    return raw != null ? (JSON.parse(raw) as { profile: UserProfile; goal: GoalType }) : null;
+    return raw != null
+      ? (JSON.parse(raw) as { profile: UserProfile; goal: GoalType; schedule?: PlanSchedule | null })
+      : null;
   } catch {
     return null;
   }
@@ -99,7 +102,8 @@ export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanP
     saveSnapshot(resultSnapshot);
   }, [resultSnapshot]);
 
-  const generateAiMealPlan = async () => {
+  // schedule 은 새 식단을 바로 지정할 날짜. 다시 시도할 때는 처음 요청의 값을 그대로 쓴다
+  const generateAiMealPlan = async (schedule?: PlanSchedule | null) => {
     if (isInFlightRef.current) return null;
     isInFlightRef.current = true;
     saveGenerationStatus("generating");
@@ -111,14 +115,16 @@ export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanP
     const savedParams = loadAiRequestParams();
     const requestProfile = savedParams?.profile ?? profile;
     const requestGoal = savedParams?.goal ?? goal;
+    const requestSchedule = savedParams != null ? (savedParams.schedule ?? null) : (schedule ?? null);
     if (savedParams == null) {
-      saveAiRequestParams(profile, goal);
+      saveAiRequestParams(profile, goal, requestSchedule);
     }
 
     try {
       const response = await generateMealPlanFromApi({
         profile: requestProfile,
         goal: requestGoal,
+        schedule: requestSchedule,
       });
 
       let mealPlan: MealPlan;
@@ -135,6 +141,7 @@ export function useAiMealPlan({ profile, goal, nutritionTarget }: UseAiMealPlanP
         mealPlanId: response.mealPlanId != null ? String(response.mealPlanId) : undefined,
         title: response.title,
         titleCustomized: false,
+        planDate: response.planDate ?? null,
         profile: requestProfile,
         goal: requestGoal,
         nutritionTarget,

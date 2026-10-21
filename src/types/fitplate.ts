@@ -178,6 +178,13 @@ export interface SavedMealPlan {
   planDate: string | null;
 }
 
+// 새 식단을 만들면서 지정할 날짜. planDate 가 null 이면 날짜 없이 저장한다
+export interface PlanSchedule {
+  planDate: string | null;
+  // 그날 다른 식단이 있으면 새 식단으로 바꾼다
+  replaceDate: boolean;
+}
+
 // ResultPage 복원에 필요한 전체 데이터를 메모리에 보관하는 스냅샷 타입입니다.
 // aiError가 있으면 생성 실패 상태로 복원됩니다.
 export interface ResultSnapshot {

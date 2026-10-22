@@ -5,6 +5,8 @@ import { ScreenSectionHeader } from "../components/common/ScreenSectionHeader";
 import { ArrowRightIcon, ChevronRightIcon, SparkleIcon } from "../components/common/Icons";
 import { FOOD_CATEGORY_LABELS, GOAL_LABELS } from "../types/fitplate";
 import type { SavedMealPlan, UserProfile } from "../types/fitplate";
+import { BannerAd } from "../ads/BannerAd";
+import { BANNER_AD_GROUP_ID } from "../ads/tossAdConfig";
 
 interface HomePageProps {
   profile: UserProfile;
@@ -134,6 +136,8 @@ export function HomePage({
           </button>
         </>
       ) : null}
+
+      <BannerAd adGroupId={BANNER_AD_GROUP_ID} />
     </section>
   );
 }

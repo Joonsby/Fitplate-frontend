@@ -1,0 +1,9 @@
+/* 배너 광고 칸. 앱인토스 가이드의 고정형 크기(가로 100%, 높이 96px)를 따르고, 위 버튼과 떨어뜨려 잘못 누르지 않게 한다. */
+
+.bannerAdSlot {
+  width: 100%;
+  height: 96px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 16px;
+}

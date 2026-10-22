@@ -1,4 +1,4 @@
-/* 앱 상단의 브랜드 표시와 뒤로 가기 막대를 꾸밉니다. */
+/* 탭 화면 상단의 브랜드 막대를 꾸밉니다. */
 
 .homeTopBar {
   box-sizing: border-box;
@@ -7,38 +7,6 @@
   gap: 4px;
   min-height: 56px;
   padding: 8px 20px;
-}
-
-.topBackButton {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  margin-left: -10px;
-  place-items: center;
-  border: 0;
-  border-radius: 12px;
-  color: var(--fp-ink);
-  background: transparent;
-  cursor: pointer;
-}
-
-.topBackButton:active {
-  background: var(--fp-field);
-}
-
-.topBackButton:focus-visible {
-  outline: 2px solid var(--fp-blue) !important;
-}
-
-.topBackButton svg {
-  width: 24px;
-  height: 24px;
-}
-
-.topBarTitle {
-  color: var(--fp-ink);
-  font-size: 17px;
-  font-weight: 700;
 }
 
 @media (max-width: 350px) {

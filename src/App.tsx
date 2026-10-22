@@ -263,10 +263,6 @@ function App() {
     navigate("/result", { state: { source: "savedMealPlan" } });
   };
 
-  const onBack = () => {
-    navigate(-1);
-  };
-
   // 서버에서 받은 식단을 저장 목록·보고 있는 식단·방금 만든 결과에 모두 반영한다
   const handleMealPlanReplaced = (saved: SavedMealPlan) => {
     setSavedMealPlans((current) => current.map((plan) => (plan.id === saved.id ? saved : plan)));
@@ -352,12 +348,10 @@ function App() {
     }
   };
 
-  const topBar =
-    isResultPage && isAiLoading ? null
-    : path === "/onboarding/goal" ? <AppTopTitle onBack={onBack} />
-    : path === "/goal" ? <AppTopTitle onBack={onBack} title="새 식단 만들기" />
-    : isSavedResult ? <AppTopTitle onBack={onBack} title="저장한 식단" />
-    : <AppTopTitle />;
+  // 흐름 화면은 토스 내비게이션 바의 뒤로 가기를 쓰므로 자체 상단 막대를 두지 않는다
+  const hideTopBar =
+    (isResultPage && isAiLoading) || path === "/onboarding/goal" || path === "/goal" || isSavedResult;
+  const topBar = hideTopBar ? null : <AppTopTitle />;
 
   const goalPage = (
     <GoalPage

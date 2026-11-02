@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { loadFullScreenAd, showFullScreenAd } from "@apps-in-toss/web-framework";
 import { FULL_SCREEN_AD_GROUP_ID } from "./tossAdConfig";
+import { logEvent } from "../analytics/logEvent";
 
 export function useFullScreenAd() {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
@@ -47,6 +48,9 @@ export function useFullScreenAd() {
       showFullScreenAd({
         options: { adGroupId: FULL_SCREEN_AD_GROUP_ID },
         onEvent: (event) => {
+          if (event.type === "show") {
+            logEvent("fullscreen_ad_show");
+          }
           if (event.type === "dismissed") {
             setIsAdLoaded(false);
             loadAd();

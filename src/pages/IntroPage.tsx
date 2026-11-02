@@ -1,5 +1,7 @@
 // 로그인 전에 Fitplate의 주요 가치를 소개하는 인트로 화면
 import "./IntroPage.css";
+import { useEffect } from "react";
+import { logEvent } from "../analytics/logEvent";
 import { Button } from "../components/common/Button";
 import { BrandLogo } from "../components/common/BrandLogo";
 import mealPlanPreviewImage from "../assets/images/intro-meal-plan-preview.png";
@@ -9,6 +11,10 @@ interface IntroPageProps {
 }
 
 export function IntroPage({ onStart }: IntroPageProps) {
+  useEffect(() => {
+    logEvent("intro_view");
+  }, []);
+
   return (
     <main className="introPage">
       <header className="introHeader">

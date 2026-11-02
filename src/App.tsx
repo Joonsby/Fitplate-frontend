@@ -30,6 +30,7 @@ import { useFavoriteFoods } from "./hooks/useFavoriteFoods";
 import { useToast } from "./hooks/useToast";
 import { useBlockBack } from "./hooks/useBlockBack";
 import { useFullScreenAd } from "./ads/useFullScreenAd";
+import { logEvent } from "./analytics/logEvent";
 import type { FoodCategory, MealPlan, PlanSchedule, SavedMealPlan, UserProfile } from "./types/fitplate";
 type LoginStatus = "intro" | "loading" | "success" | "error";
 
@@ -86,12 +87,14 @@ function App() {
 
   const checkLogin = useCallback(async () => {
     setLoginStatus("loading");
+    logEvent("login_start");
 
     try{
       const data = await login();
       saveAccessToken(data.accessToken);
 
       const userProfile = await getMyUserProfile();
+      logEvent("login_complete", { has_profile: userProfile !== null });
       if (userProfile !== null) {
         setProfile(userProfile);
         setHasEnteredProfile(true);
@@ -115,6 +118,7 @@ function App() {
       refreshSavedMealPlans();
     } catch (error) {
       console.error("[Login] 실패", error);
+      logEvent("login_fail");
       setLoginStatus("error");
     }
   }, [setProfile, setFavoriteFoods, refreshSavedMealPlans, navigate]);
@@ -155,15 +159,21 @@ function App() {
   };
 
   const generateAiMealPlanWithEvents = async (schedule?: PlanSchedule | null) => {
+    // 첫 식단인지는 생성을 시작한 시점의 저장 목록으로 본다
+    const logParams = { goal, first_plan: savedMealPlans.length === 0 };
+    logEvent("meal_generation_start", logParams);
     try {
       const result = await generateAiMealPlan(schedule);
       if (result !== null) {
+        logEvent("meal_generation_complete", logParams);
         handleGenerationSuccess();
       } else {
+        logEvent("meal_generation_fail", logParams);
         handleGenerationError();
       }
       return result;
     } catch {
+      logEvent("meal_generation_fail", logParams);
       handleGenerationError();
       return null;
     }
@@ -300,6 +310,7 @@ function App() {
     updateMealPlanById(mealPlanId, (mealPlan) => withMealEaten(mealPlan, mealType, eaten));
     try {
       handleMealPlanReplaced(await setMealIntake(mealPlanId, mealType, eaten));
+      logEvent("meal_intake_check", { meal_type: mealType, eaten });
       return true;
     } catch (error) {
       updateMealPlanById(mealPlanId, (mealPlan) => withMealEaten(mealPlan, mealType, !eaten));
@@ -397,6 +408,7 @@ function App() {
               onProfileSave={(nextProfile) => {
                 setProfile(nextProfile);
                 setHasEnteredProfile(true);
+                logEvent("onboarding_profile_complete");
               }}
               onNext={() => navigate("/onboarding/goal")}
             />

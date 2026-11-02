@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   MEAL_PLAN: "/api/meal-plan",
   AUTH_DEV_LOGIN: "/api/auth/dev-login",
   AUTH_TOSS_LOGIN: "/api/auth/toss-login",
+  AUTH_ANONYMOUS_LOGIN: "/api/auth/anonymous-login",
   USER_PROFILE_ME: "/api/user-profile/me",
   FAVORITE_FOODS: "/api/favorite-foods",
 } as const;

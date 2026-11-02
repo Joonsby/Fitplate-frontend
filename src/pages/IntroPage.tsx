@@ -1,4 +1,4 @@
-// 로그인 전에 Fitplate의 주요 가치를 소개하는 인트로 화면
+// 처음 온 사용자에게 Fitplate의 주요 가치를 소개하는 인트로 화면
 import "./IntroPage.css";
 import { useEffect } from "react";
 import { logEvent } from "../analytics/logEvent";
@@ -42,9 +42,8 @@ export function IntroPage({ onStart }: IntroPageProps) {
       </ul>
 
       <footer className="introFooter">
-        <p>식단 기록을 안전하게 저장하기 위해 로그인이 필요해요.</p>
         <Button block onClick={onStart}>
-          토스로 시작하기
+          시작하기
         </Button>
       </footer>
     </main>

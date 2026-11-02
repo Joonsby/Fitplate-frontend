@@ -106,10 +106,3 @@
   margin-top: auto;
   padding-top: 8px;
 }
-
-.introFooter p {
-  margin: 0;
-  color: var(--fp-sub);
-  font-size: 12px;
-  text-align: center;
-}

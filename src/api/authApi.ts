@@ -1,8 +1,22 @@
-import { appLogin } from "@apps-in-toss/web-framework";
+import { appLogin, TossAuth, User } from "@apps-in-toss/web-framework";
 import { API_ENDPOINTS, getApiUrl } from "./apiConfig";
 import { getAccessToken } from "./authToken";
 import type { FoodCategory, UserProfile } from "../types/fitplate";
 import { apiFetch, apiFetchRaw } from "./httpClient";
+import { logEvent } from "../analytics/logEvent";
+
+// 로그인 화면 없이 사용자 식별키로 들어옵니다. 예전에 토스 로그인을 쓴 사용자는 기존 계정을 찾도록 토스 인가 코드도 함께 보냅니다.
+async function anonymousLogin() {
+  // 이미 동의한 사용자라 동의 화면 없이 인가 코드만 돌아온다
+  const linkLogin = (await TossAuth.isIntegrated()) ? await appLogin() : null;
+  const { code } = await User.createAnonymousKeyAuthCode();
+  return apiFetch<{ accessToken: string }>(getApiUrl(API_ENDPOINTS.AUTH_ANONYMOUS_LOGIN), {
+    method: "POST",
+    body: { code, authorizationCode: linkLogin?.authorizationCode, referrer: linkLogin?.referrer },
+    withAuth: false,
+    httpErrorMessage: "로그인에 실패했습니다.",
+  });
+}
 
 async function tossLogin(authorizationCode: string, referrer: string) {
   return apiFetch<{ accessToken: string }>(getApiUrl(API_ENDPOINTS.AUTH_TOSS_LOGIN), {
@@ -87,6 +101,16 @@ export async function updateMyProfile(profile: UserProfile): Promise<UserProfile
 }
 
 export async function login() {
+  try {
+    const result = await anonymousLogin();
+    console.log("[Auth] 사용자 식별키 로그인");
+    return result;
+  } catch (error) {
+    // 오래된 토스 앱처럼 식별키로 들어오지 못하면 예전처럼 토스 로그인으로 들어온다
+    console.warn("[Auth] 사용자 식별키 로그인 실패", error);
+    logEvent("login_fallback");
+  }
+
   try {
     const { authorizationCode, referrer } = await appLogin();
     console.log("[Auth] 앱인토스 로그인");

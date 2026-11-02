@@ -6,6 +6,7 @@ export type AppEventName =
   | "login_start"
   | "login_complete"
   | "login_fail"
+  | "login_fallback"
   | "onboarding_profile_complete"
   | "meal_generation_start"
   | "meal_generation_complete"

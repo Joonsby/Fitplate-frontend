@@ -48,7 +48,8 @@ const SUB_TAB_PATHS = ["/records", "/saved-plans", "/favorite-foods", "/profile"
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loginStatus, setLoginStatus] = useState<LoginStatus>("intro");
+  const [loginStatus, setLoginStatus] = useState<LoginStatus>("loading");
+  const loginStartedRef = useRef(false);
   const [isLoadingSavedMealPlans, setIsLoadingSavedMealPlans] = useState(false);
   const [isLoadingFavoriteFoods, setIsLoadingFavoriteFoods] = useState(true);
   // 서버 프로필이 있거나 온보딩에서 한 번 입력했으면 true — 처음 쓰는 사람만 빈칸으로 시작
@@ -98,12 +99,12 @@ function App() {
       if (userProfile !== null) {
         setProfile(userProfile);
         setHasEnteredProfile(true);
+        setLoginStatus("success");
       } else {
-        // 프로필이 없으면 처음 쓰는 사용자 — 탭 없이 온보딩부터 시작
+        // 프로필이 없으면 처음 쓰는 사용자 — 소개를 보여 준 뒤 탭 없이 온보딩부터 시작
         navigate("/onboarding", { replace: true });
+        setLoginStatus("intro");
       }
-
-      setLoginStatus("success");
 
       getFavoriteFoods()
         .then((foods) => {
@@ -122,6 +123,13 @@ function App() {
       setLoginStatus("error");
     }
   }, [setProfile, setFavoriteFoods, refreshSavedMealPlans, navigate]);
+
+  // 앱을 열면 한 번만 로그인한다. navigate 가 경로마다 바뀌어 checkLogin 도 다시 만들어지므로 ref 로 막는다
+  useEffect(() => {
+    if (loginStartedRef.current) return;
+    loginStartedRef.current = true;
+    void checkLogin();
+  }, [checkLogin]);
 
   useEffect(() => {
     window.history.scrollRestoration = 'manual';
@@ -181,13 +189,13 @@ function App() {
 
 
   if (loginStatus === "intro") {
-    return <IntroPage onStart={checkLogin} />;
+    return <IntroPage onStart={() => setLoginStatus("success")} />;
   }
 
   if (loginStatus === "loading") {
     return (
       <main className="appCenter">
-        <Spinner size={64} label="로그인하고 있어요" />
+        <Spinner size={64} label="불러오고 있어요" />
       </main>
     );
   }
@@ -198,7 +206,7 @@ function App() {
         <span className="appCenterIcon" aria-hidden="true">
           <AlertIcon />
         </span>
-        <h1>로그인하지 못했어요</h1>
+        <h1>정보를 불러오지 못했어요</h1>
         <p>잠시 후 다시 시도해 주세요.</p>
         <Button size="medium" onClick={checkLogin}>
           다시 시도

@@ -12,7 +12,8 @@ export type AppEventName =
   | "meal_generation_complete"
   | "meal_generation_fail"
   | "fullscreen_ad_show"
-  | "meal_intake_check";
+  | "meal_intake_check"
+  | "review_request";
 
 // 결과를 기다리지 않는다. 로그가 실패해도 화면 흐름은 그대로 간다
 export function logEvent(name: AppEventName, params: Record<string, string | number | boolean> = {}) {

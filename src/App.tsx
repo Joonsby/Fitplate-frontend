@@ -1,5 +1,6 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback, useRef } from "react";
+import { Review } from "@apps-in-toss/web-framework";
 import { login, getMyUserProfile } from "./api/authApi";
 import { saveAccessToken } from "./api/authToken";
 import { getSavedMealPlans, renameSavedMealPlan } from "./api/mealPlanStorageApi";
@@ -44,6 +45,21 @@ const TAB_PATHS: Record<BottomNavTab, string> = {
 
 // 홈이 아닌 탭끼리는 스택 교체 — 돌아가기가 탭 사이 이력을 밟지 않고 홈으로 오도록
 const SUB_TAB_PATHS = ["/records", "/saved-plans", "/favorite-foods", "/profile"];
+
+let reviewRequested = false;
+
+// 리뷰 창은 한 세션에 한 번만 부른다. 뜨지 않을 수도 있어 결과를 기다리지 않는다
+function requestReviewOnce() {
+  if (reviewRequested) return;
+  reviewRequested = true;
+  try {
+    if (!Review.request.isSupported()) return;
+    logEvent("review_request");
+    Review.request().catch(() => undefined);
+  } catch {
+    // 앱인토스 밖(일반 브라우저)에서는 호출 자체가 실패할 수 있다
+  }
+}
 
 function App() {
   const navigate = useNavigate();
@@ -319,6 +335,8 @@ function App() {
     try {
       handleMealPlanReplaced(await setMealIntake(mealPlanId, mealType, eaten));
       logEvent("meal_intake_check", { meal_type: mealType, eaten });
+      // 식단대로 먹었다고 체크한 순간을 만족한 시점으로 보고 리뷰를 요청한다
+      if (eaten) requestReviewOnce();
       return true;
     } catch (error) {
       updateMealPlanById(mealPlanId, (mealPlan) => withMealEaten(mealPlan, mealType, !eaten));

@@ -13,6 +13,7 @@ export type AppEventName =
   | "meal_generation_fail"
   | "fullscreen_ad_show"
   | "meal_intake_check"
+  | "meal_plan_share"
   | "review_request";
 
 // 결과를 기다리지 않는다. 로그가 실패해도 화면 흐름은 그대로 간다

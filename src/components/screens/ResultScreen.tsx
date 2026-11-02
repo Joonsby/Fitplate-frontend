@@ -9,7 +9,7 @@ import { ScreenSectionHeader } from "../common/ScreenSectionHeader";
 import { EmptyState } from "../common/EmptyState";
 import { NutritionPanel } from "../common/NutritionPanel";
 import { Button } from "../common/Button";
-import { AlertIcon, PencilIcon, PlateIcon } from "../common/Icons";
+import { AlertIcon, PencilIcon, PlateIcon, ShareIcon } from "../common/Icons";
 import { TextInputSheet } from "../common/TextInputSheet";
 import { formatDateLabel, todayString } from "../../utils/date";
 import { AiMealPlanPanel } from "../result/AiMealPlanPanel";
@@ -53,6 +53,8 @@ export interface ResultScreenProps {
   planTitle?: string | null;
   // 있으면 제목 옆 연필 버튼으로 이름 변경 모달을 연다. 실패하면 예외를 던진다
   onRenameTitle?: (title: string) => Promise<void>;
+  // 있으면 제목 옆 공유 버튼으로 식단 요약을 공유한다
+  onShare?: (title: string) => void;
   // 이 식단을 먹는 날짜 (YYYY-MM-DD)
   planDate?: string | null;
 }
@@ -79,6 +81,7 @@ export function ResultScreen({
   allergies = [],
   planTitle,
   onRenameTitle,
+  onShare,
   planDate = null,
 }: ResultScreenProps) {
   const navigate = useNavigate();
@@ -162,6 +165,16 @@ export function ResultScreen({
                       onClick={() => setIsRenaming(true)}
                     >
                       <PencilIcon />
+                    </button>
+                  ) : null}
+                  {onShare ? (
+                    <button
+                      type="button"
+                      className="resultTitleShare"
+                      aria-label="식단 공유"
+                      onClick={() => onShare(displayTitle)}
+                    >
+                      <ShareIcon />
                     </button>
                   ) : null}
                 </div>

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Share } from "@apps-in-toss/web-framework";
+import { logEvent } from "../analytics/logEvent";
 import { useToast } from "../hooks/useToast";
 import { useLocation } from "react-router-dom";
 import { ResultScreen } from "../components/screens/ResultScreen";
@@ -144,6 +146,33 @@ export function ResultPage({
     }
   };
 
+  // 화면에 보이는 끼니별 음식과 앱 첫 화면 링크를 공유 시트로 보낸다
+  const handleShare = async (title: string) => {
+    let link: string;
+    try {
+      link = await Share.createLink({ path: "intoss://fitplate" });
+    } catch (error) {
+      console.warn("[Share] 공유 링크 생성 실패", error);
+      showToast("공유 링크를 만들지 못했어요. 잠시 후 다시 시도해 주세요.", "error");
+      return;
+    }
+    const meals = (resultMealPlan.days[0]?.meals ?? []).map(
+      (meal) => `${MEAL_LABELS[meal.mealType]} · ${meal.foods.map((food) => food.name).join(", ")}`,
+    );
+    const message = [
+      `[핏플레이트] ${title}`,
+      `하루 ${resultMealPlan.targetCalories.toLocaleString()} kcal에 맞춘 AI 식단이에요.`,
+      "",
+      ...meals,
+      "",
+      "나도 식단 받아 보기",
+      link,
+    ].join("\n");
+    logEvent("meal_plan_share");
+    // 공유 시트를 닫았을 때 어떻게 끝나는지 문서에 없어, 이 단계 오류는 사용자에게 알리지 않는다
+    Share.sendMessage({ message }).catch((error) => console.warn("[Share] 공유 시트 오류", error));
+  };
+
   const handleConfirmSwap = async (food: AIFood) => {
     if (mealPlanId == null || swapTarget == null) return;
     const saved = await replaceMealPlanFood(mealPlanId, swapTarget.position, food);
@@ -209,6 +238,7 @@ export function ResultPage({
         onRenameTitle={
           mealPlanId != null && planTitle != null ? (title) => onRename(mealPlanId, title) : undefined
         }
+        onShare={(title) => void handleShare(title)}
         savedAt={dbData?.savedAt}
         target={resultTarget}
         showEmptyState={showEmptyState}

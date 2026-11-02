@@ -119,6 +119,12 @@ export const PencilIcon = (p: IconProps) => (
   </Line>
 );
 
+export const ShareIcon = (p: IconProps) => (
+  <Line strokeWidth="2" {...p}>
+    <path d="M12 15V4m0 0L8 8m4-4 4 4M7 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1" />
+  </Line>
+);
+
 export const CalendarCheckIcon = (p: IconProps) => (
   <Line {...p}>
     <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
